@@ -1,0 +1,20 @@
+{
+    "name": "dobee/router",
+    "description": "dobee router component",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "janhuang",
+            "email": "384099566@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Router\\": "src/Router"
+        }
+    }
+}
