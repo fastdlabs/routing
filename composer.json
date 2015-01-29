@@ -8,13 +8,27 @@
             "email": "384099566@qq.com"
         }
     ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://coding.net/janhuang/http.git"
+        },
+        {
+            "type": "git",
+            "url": "https://coding.net/janhuang/annotation.git"
+        }
+    ],
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.7"
     },
+    "require-dev": {
+        "dobee/http": "*",
+        "dobee/annotation": "*"
+    },
     "autoload": {
         "psr-4": {
-            "Router\\": "src/Router"
+            "Dobee\\Routing\\": "src/Routing"
         }
     }
 }

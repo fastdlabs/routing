@@ -6,11 +6,11 @@
  * Time: 下午10:08
  */
 
-namespace Dobee\Component\Routing\Generator;
+namespace Dobee\Routing\Generator;
 
 class RouteGenerator 
 {
-    public function generateUrl($route)
+    public static function generateUrl($route)
     {
 
     }
