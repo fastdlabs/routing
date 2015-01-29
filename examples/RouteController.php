@@ -33,10 +33,8 @@ class RouteController
      *      method="GET"
      * )
      */
-    public function demoAction(Test $test, $arg, $age)
+    public function demoAction($arg, $age)
     {
-        print_r($arg);
+        print_r(func_get_args());
     }
-
-
 }

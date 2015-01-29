@@ -48,5 +48,9 @@ $collections->addRoute(new Route(
 $request = \Http\Request::createGlobalRequest();
 
 $route = $collections->match($request->getPathInfo());
-print_r($route);
-print_r($route->getController());
+
+list($controller, $action) = explode('@', $route->getController());
+
+$result = call_user_func_array(array(new $controller(), $action), $route->getParameters());
+
+print_r($result);
