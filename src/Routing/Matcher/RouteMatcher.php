@@ -19,7 +19,10 @@ class RouteMatcher implements RouteMatcherInterface
     public function match($uri, RouteInterface $routeInterface = null)
     {
         if (!preg_match($routeInterface->getPattern(), $uri, $match)) {
-            $args = array_slice($routeInterface->getArguments(), substr_count(rtrim($uri, '/'), '/'));
+            $args = array_slice(
+                $routeInterface->getArguments(),
+                substr_count(rtrim($uri, '/'), '/') - count($routeInterface->getArguments())
+            );
             $defaults = $this->filter($routeInterface->getDefaults(), $args);
             $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
             if (!preg_match($routeInterface->getPattern(), $uri, $match)) {
@@ -27,8 +30,8 @@ class RouteMatcher implements RouteMatcherInterface
             }
         }
         array_shift($match);
-        
-        $parameters = array_combine(array_values($routeInterface->getParameters()), $match);
+
+        $parameters = array_combine(array_values($routeInterface->getArguments()), $match);
 
         $routeInterface->setParameters($parameters);
 

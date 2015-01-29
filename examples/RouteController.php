@@ -17,10 +17,17 @@ class Test{}
 class RouteController 
 {
     /**
+     * @Route("/test/{name}", name="test")
+     * @Route(defaults={"name":"jan"})
+     */
+    public function testAction()
+    {}
+
+    /**
      * @Route(
      *      "/{arg}/{age}",
      *      name="demo",
-     *      defaults={"arg":1, "age": 123},
+     *      defaults={"arg":1, "age": 222},
      *      requirements={"arg": "\d+", "age": "\d+"},
      *      format="json",
      *      method="GET"
@@ -31,10 +38,5 @@ class RouteController
         print_r($arg);
     }
 
-    /**
-     * @Route("/test", name="test")
-     * @Route(defaults={"name":"janhuang"})
-     */
-    public function testAction()
-    {}
+
 }

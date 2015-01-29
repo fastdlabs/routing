@@ -108,7 +108,6 @@ class Route extends RouteAbstract
         if (preg_match_all('/\{(\w+)\}/ui', $route, $match)) {
             foreach ($match[1] as $val) {
                 $pattern = isset($requirements[$val]) ? $requirements[$val] : '\w+';
-//                $pattern = (isset($defaults[$val]) ? '?(' : '{1}(') . $pattern . ')';
                 $route = str_replace('{' . $val . '}', '{1}(' . $pattern . ')', $route);
             }
 
