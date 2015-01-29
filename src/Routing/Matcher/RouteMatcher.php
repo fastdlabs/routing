@@ -25,9 +25,9 @@ class RouteMatcher implements RouteMatcherInterface
             if (!preg_match($routeInterface->getPattern(), $uri, $match)) {
                 return false;
             }
-            array_shift($match);
         }
-
+        array_shift($match);
+        
         $parameters = array_combine(array_values($routeInterface->getParameters()), $match);
 
         $routeInterface->setParameters($parameters);
