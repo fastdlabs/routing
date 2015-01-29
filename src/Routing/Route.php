@@ -28,7 +28,7 @@ class Route extends RouteAbstract
 
     private $pattern;
 
-    private $arguments;
+    private $arguments = array();
 
     private $_controller;
 
@@ -108,7 +108,8 @@ class Route extends RouteAbstract
         if (preg_match_all('/\{(\w+)\}/ui', $route, $match)) {
             foreach ($match[1] as $val) {
                 $pattern = isset($requirements[$val]) ? $requirements[$val] : '\w+';
-                $route = str_replace('{' . $val . '}', '?(' . $pattern . ')', $route);
+//                $pattern = (isset($defaults[$val]) ? '?(' : '{1}(') . $pattern . ')';
+                $route = str_replace('{' . $val . '}', '{1}(' . $pattern . ')', $route);
             }
 
             $this->arguments = $match[1];
@@ -132,6 +133,13 @@ class Route extends RouteAbstract
     public function getController()
     {
         return $this->_controller;
+    }
+
+    public function setParameters($parameters)
+    {
+        $this->_parameters = $parameters;
+
+        return $this;
     }
 
     public function getParameters()

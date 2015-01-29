@@ -18,13 +18,34 @@ class RouteMatcher implements RouteMatcherInterface
 {
     public function match($uri, RouteInterface $routeInterface = null)
     {
-        if (!preg_match_all($routeInterface->getPattern(), $uri, $match)) {
-            $uri = str_replace('//', '/', $uri . '/' . implode(array_values($routeInterface->getDefaults())));
-            if (!preg_match_all($routeInterface->getPattern(), $uri, $match)) {
+        if (!preg_match($routeInterface->getPattern(), $uri, $match)) {
+            $args = array_slice($routeInterface->getArguments(), substr_count(rtrim($uri, '/'), '/'));
+            $defaults = $this->filter($routeInterface->getDefaults(), $args);
+            $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
+            if (!preg_match($routeInterface->getPattern(), $uri, $match)) {
                 return false;
             }
+            array_shift($match);
         }
 
+        $parameters = array_combine(array_values($routeInterface->getParameters()), $match);
+
+        $routeInterface->setParameters($parameters);
+
         return $routeInterface;
+    }
+
+    public function filter($defaults, $args)
+    {
+        $parameters = array();
+
+        foreach ($args as $val) {
+            if (isset($defaults[$val])) {
+                $parameters[$val] = $defaults[$val];
+            }
+        }
+        unset($defaults, $args);
+
+        return $parameters;
     }
 }

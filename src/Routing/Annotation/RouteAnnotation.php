@@ -85,7 +85,9 @@ class RouteAnnotation extends RulesAbstract
         $parameters = array();
 
         foreach ($reflectionMethod->getParameters() as $val) {
-            $parameters[] = $val->getName();
+            if (!is_object($val->getClass())) {
+                $parameters[] = $val->getName();
+            }
         }
 
         unset($reflectionMethod);

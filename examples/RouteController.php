@@ -9,7 +9,7 @@
  * SegmentFault: http://segmentfault.com/u/janhuang
  * Blog: http://segmentfault.com/blog/janhuang
  */
-
+class Test{}
 /**
  * @Route("/")
  * @Method("test")
@@ -18,15 +18,15 @@ class RouteController
 {
     /**
      * @Route(
-     *      "/{arg}",
+     *      "/{arg}/{age}",
      *      name="demo",
-     *      defaults={"arg":1},
-     *      requirements={"arg": "\d+", "name": "\d+"},
+     *      defaults={"arg":1, "age": 123},
+     *      requirements={"arg": "\d+", "age": "\d+"},
      *      format="json",
-     *      method={"GET"}
+     *      method="GET"
      * )
      */
-    public function demoAction($arg, $demo)
+    public function demoAction(Test $test, $arg, $age)
     {
         print_r($arg);
     }
