@@ -25,6 +25,9 @@ class RouteAnnotation extends RulesAbstract
         $this->getAnnotationPrefix($reflectionClass->getDocComment());
 
         foreach ($reflectionClass->getMethods() as $val) {
+            if (!$this->hasAnnotation($val->getDocComment())) {
+                continue;
+            }
             $routeParameters = $this->getAnnotationMethod($val->getDocComment());
             $routeParameters['_controller'] = $val->getNamespaceName() . $val->class . '@' . $val->getName();
             $routeParameters['_parameters'] = $this->getMethodParameters($val);
@@ -50,7 +53,7 @@ class RouteAnnotation extends RulesAbstract
 
         $parameters = array(
             'prefix' => $this->prefix,
-            'route' => $this->prefix . trim(array_shift($annotation), '"'),
+            'route' => str_replace('//', '/', $this->prefix . trim(array_shift($annotation), '"')),
             'name' => '',
             'method' => '',
             'defaults' => '',
@@ -93,5 +96,10 @@ class RouteAnnotation extends RulesAbstract
         unset($reflectionMethod);
 
         return $parameters;
+    }
+
+    public function hasAnnotation($annotation)
+    {
+        return false !== strpos($annotation, '@Route');
     }
 }
