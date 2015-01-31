@@ -34,4 +34,9 @@ class Router
     {
         return RouteGenerator::generateUrl($name);
     }
+
+    public function match($uri, RouteInterface $routeInterface = null)
+    {
+        return $this->route_collection->match($uri, $routeInterface);
+    }
 }

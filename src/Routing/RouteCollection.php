@@ -16,7 +16,7 @@ use Dobee\Routing\Matcher\RouteMatcherInterface;
 
 class RouteCollection implements RouteCollectionInterface
 {
-    private $route_collections;
+    private $route_collections = array();
 
     private $matcher;
 
