@@ -20,8 +20,10 @@ class RouteController
      * @Route("/test/{name}", name="test")
      * @Route(defaults={"name":"jan"})
      */
-    public function testAction()
-    {}
+    public function testAction($name)
+    {
+        echo 'hello test ' . $name;
+    }
 
     /**
      * @Route(
@@ -35,6 +37,6 @@ class RouteController
      */
     public function demoAction($arg, $age)
     {
-        print_r(func_get_args());
+        echo 'hello test ' . $arg . ' and ' . $age;
     }
 }

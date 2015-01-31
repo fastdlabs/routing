@@ -21,7 +21,7 @@ class RouteMatcher implements RouteMatcherInterface
         if (!preg_match($routeInterface->getPattern(), $uri, $match)) {
             $args = array_slice(
                 $routeInterface->getArguments(),
-                substr_count(rtrim($uri, '/'), '/') - count($routeInterface->getArguments())
+                substr_count(rtrim($uri, '/'), '/') - substr_count(rtrim($routeInterface->getPrefix(), '/'), '/') - count($routeInterface->getArguments())
             );
             $defaults = $this->filter($routeInterface->getDefaults(), $args);
             $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));

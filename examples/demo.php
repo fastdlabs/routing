@@ -26,6 +26,7 @@ $collections = new RouteCollection(new RouteMatcher());
 $collections->addRoute(new Route(
     $annotation->getParameters('demo')['route'],
     $annotation->getParameters('demo')['name'],
+    $annotation->getParameters('test')['prefix'],
     $annotation->getParameters('demo')['_controller'],
     $annotation->getParameters('demo')['_parameters'],
     $annotation->getParameters('demo')['method'],
@@ -37,6 +38,7 @@ $collections->addRoute(new Route(
 $collections->addRoute(new Route(
     $annotation->getParameters('test')['route'],
     $annotation->getParameters('test')['name'],
+    $annotation->getParameters('test')['prefix'],
     $annotation->getParameters('test')['_controller'],
     $annotation->getParameters('test')['_parameters'],
     ($annotation->getParameters('test')['method']),

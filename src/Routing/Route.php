@@ -18,6 +18,8 @@ class Route extends RouteAbstract
 
     private $name;
 
+    private $prefix = '';
+
     private $method = array();
 
     private $defaults = array();
@@ -34,11 +36,13 @@ class Route extends RouteAbstract
 
     private $_parameters = array();
 
-    public function __construct($route, $name = "", $controller = '', $parameters = array(), $method = array(), $defaults = array(), $requirements = array(), $format = "php")
+    public function __construct($route, $name = "", $prefix = '', $controller = '', $parameters = array(), $method = array(), $defaults = array(), $requirements = array(), $format = "php")
     {
         $this->route = str_replace('//', '/', $route);
 
         $this->name = $name;
+
+        $this->prefix = $prefix;
 
         $this->_controller = $controller;
 
@@ -69,6 +73,11 @@ class Route extends RouteAbstract
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getPrefix()
+    {
+        return $this->prefix;
     }
 
     /**
