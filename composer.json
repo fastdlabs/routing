@@ -23,12 +23,12 @@
         "php": ">=5.3.7"
     },
     "require-dev": {
-        "dobee/http": "*",
-        "dobee/annotation": "*"
+        "dobee/http": "1.0.2",
+        "dobee/annotation": "1.0.1"
     },
     "autoload": {
         "psr-4": {
-            "Dobee\\Routing\\": "src/Routing"
+            "Dobee\\": "src/Dobee"
         }
     }
 }
