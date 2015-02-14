@@ -12,15 +12,45 @@
 
 namespace Dobee\Routing;
 
+/**
+ * Interface RouteCollectionInterface
+ *
+ * @package Dobee\Routing
+ */
 interface RouteCollectionInterface
 {
+    /**
+     * @return mixed
+     */
     public function getRoutes();
 
+    /**
+     * @return RouteInterface
+     */
     public function getRoute($route_name);
 
+    /**
+     * @param RouteInterface $routeInterface
+     * @return mixed
+     */
     public function addRoute(RouteInterface $routeInterface);
 
+    /**
+     * @param $name
+     * @return mixed
+     */
     public function removeRoute($name);
 
+    /**
+     * @param $name
+     * @return mixed
+     */
     public function hasRoute($name);
+
+    /**
+     * @param       $name
+     * @param array $parameters
+     * @return mixed
+     */
+    public function generateUrl($name, array $parameters = array());
 }

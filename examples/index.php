@@ -47,9 +47,11 @@ $collections->addRoute(new Route(
     $annotation->getParameters('test')['format']
 ));
 
-$request = \Http\Request::createGlobalRequest();
+$request = \Dobee\Http\Request::createGlobalRequest();
 
 $route = $collections->match($request->getPathInfo());
+
+echo $collections->generateUrl('test', array('name' => 'helloworld'));
 
 list($controller, $action) = explode('@', $route->getController());
 

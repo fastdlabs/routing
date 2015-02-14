@@ -12,24 +12,53 @@
 
 namespace Dobee\Routing;
 
+use Dobee\Routing\Generator\RouteGenerator;
 use Dobee\Routing\Matcher\RouteMatcherInterface;
 
+/**
+ * Class RouteCollection
+ *
+ * @package Dobee\Routing
+ */
 class RouteCollection implements RouteCollectionInterface
 {
+    /**
+     * @var array
+     */
     private $route_collections = array();
 
+    /**
+     * @var RouteMatcherInterface
+     */
     private $matcher;
 
+    /**
+     * @var RouteGenerator
+     */
+    private $generator;
+
+    /**
+     * @param RouteMatcherInterface $routeMatcherInterface
+     */
     public function __construct(RouteMatcherInterface $routeMatcherInterface)
     {
         $this->matcher = $routeMatcherInterface;
+
+        $this->generator = new RouteGenerator($this);
     }
 
+    /**
+     * @return array
+     */
     public function getRoutes()
     {
         return $this->route_collections;
     }
 
+    /**
+     * @param $route_name
+     * @return mixed
+     */
     public function getRoute($route_name)
     {
         if (!$this->hasRoute($route_name)) {
@@ -39,6 +68,10 @@ class RouteCollection implements RouteCollectionInterface
         return $this->route_collections[$route_name];
     }
 
+    /**
+     * @param RouteInterface $routeInterface
+     * @return $this
+     */
     public function addRoute(RouteInterface $routeInterface)
     {
         $this->route_collections[$routeInterface->getName()] = $routeInterface;
@@ -46,6 +79,10 @@ class RouteCollection implements RouteCollectionInterface
         return $this;
     }
 
+    /**
+     * @param RouteCollectionInterface $collectionInterface
+     * @return $this
+     */
     public function addRouteCollection(RouteCollectionInterface $collectionInterface)
     {
         foreach ($collectionInterface->getRoutes() as $val) {
@@ -57,6 +94,10 @@ class RouteCollection implements RouteCollectionInterface
         return $this;
     }
 
+    /**
+     * @param $name
+     * @return $this
+     */
     public function removeRoute($name)
     {
         if ($this->hasRoute($name)) {
@@ -66,11 +107,21 @@ class RouteCollection implements RouteCollectionInterface
         return $this;
     }
 
+    /**
+     * @param $name
+     * @return bool
+     */
     public function hasRoute($name)
     {
         return isset($this->route_collections[$name]);
     }
 
+    /**
+     * @param                $uri
+     * @param RouteInterface $routeInterface
+     * @return mixed
+     * @throws RouteException
+     */
     public function match($uri, RouteInterface $routeInterface = null)
     {
         if (null !== $routeInterface) {
@@ -84,5 +135,16 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         throw new RouteException(sprintf('%s\' is not match.', $uri));
+    }
+
+    /**
+     * @param       $name
+     * @param array $parameters
+     * @return mixed
+     * @throws RouteException
+     */
+    public function generateUrl($name, array $parameters = array())
+    {
+        return $this->generator->generateUrl($name, $parameters);
     }
 }

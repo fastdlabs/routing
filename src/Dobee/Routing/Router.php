@@ -12,12 +12,22 @@
 
 namespace Dobee\Routing;
 
-use Dobee\Routing\Generator\RouteGenerator;
-
+/**
+ * Class Router
+ *
+ * @package Dobee\Routing
+ */
 class Router
 {
+    /**
+     * @var RouteCollectionInterface
+     */
     private $route_collection;
 
+    /**
+     * @param RouteCollectionInterface $routeCollectionInterface
+     * @return $this
+     */
     public function setRouteCollection(RouteCollectionInterface $routeCollectionInterface)
     {
         $this->route_collection = $routeCollectionInterface;
@@ -25,16 +35,29 @@ class Router
         return $this;
     }
 
+    /**
+     * @return RouteCollectionInterface
+     */
     public function getRouteCollection()
     {
         return $this->route_collection;
     }
 
-    public function generateUrl($name)
+    /**
+     * @param       $name
+     * @param array $parameters
+     * @return mixed
+     */
+    public function generateUrl($name, array $parameters = array())
     {
-        return RouteGenerator::generateUrl($name);
+        return $this->route_collection->generateUrl($name, $parameters);
     }
 
+    /**
+     * @param                $uri
+     * @param RouteInterface $routeInterface
+     * @return mixed
+     */
     public function match($uri, RouteInterface $routeInterface = null)
     {
         return $this->route_collection->match($uri, $routeInterface);
