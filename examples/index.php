@@ -26,7 +26,7 @@ $collections = new RouteCollection(new RouteMatcher());
 $collections->addRoute(new Route(
     $annotation->getParameters('demo')['route'],
     $annotation->getParameters('demo')['name'],
-    $annotation->getParameters('test')['prefix'],
+    $annotation->getParameters('demo')['prefix'],
     $annotation->getParameters('demo')['_controller'],
     $annotation->getParameters('demo')['_parameters'],
     $annotation->getParameters('demo')['method'],
@@ -51,7 +51,10 @@ $request = \Dobee\Http\Request::createGlobalRequest();
 
 $route = $collections->match($request->getPathInfo());
 
-echo $collections->generateUrl('test', array('name' => 'helloworld'));
+$route = $collections->matchRequestMethod($request->getMethod(), $route);
+$route = $collections->matchRequestFormat($request->getFormat(), $route);
+
+echo $collections->generateUrl('test', array('name' => 'janhuang'));
 
 list($controller, $action) = explode('@', $route->getController());
 

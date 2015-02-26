@@ -18,7 +18,6 @@ class RouteController
 {
     /**
      * @Route("/test/{name}", name="test")
-     * @Route(defaults={"name":"jan"})
      */
     public function testAction($name)
     {
@@ -29,10 +28,10 @@ class RouteController
      * @Route(
      *      "/{arg}/{age}",
      *      name="demo",
-     *      defaults={"arg":1, "age": 222},
+     *      defaults={"arg":1},
      *      requirements={"arg": "\d+", "age": "\d+"},
-     *      format="json",
-     *      method="GET"
+     *      format=["json", "xml", "php"],
+     *      method="ANY"
      * )
      */
     public function demoAction($arg, $age)

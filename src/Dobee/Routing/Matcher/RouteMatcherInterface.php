@@ -14,7 +14,31 @@ namespace Dobee\Routing\Matcher;
 
 use Dobee\Routing\RouteInterface;
 
+/**
+ * Interface RouteMatcherInterface
+ *
+ * @package Dobee\Routing\Matcher
+ */
 interface RouteMatcherInterface
 {
+    /**
+     * @param                $uri
+     * @param RouteInterface $routeInterface
+     * @return mixed
+     */
     public function match($uri, RouteInterface $routeInterface = null);
+
+    /**
+     * @param                $method
+     * @param RouteInterface $route
+     * @return mixed
+     */
+    public function matchRequestMethod($method, RouteInterface $route);
+
+    /**
+     * @param                $format
+     * @param RouteInterface $route
+     * @return mixed
+     */
+    public function matchRequestFormat($format, RouteInterface $route);
 }

@@ -41,11 +41,12 @@ class RouteGenerator
     {
         $route = $this->collections->getRoute($route);
 
-        $arguments = $route->getArguments();
-        $defaults = empty($parameters) ? $route->getDefaults() : $parameters;
+        $requirement = $route->getArguments();
 
-        if (!empty($arguments) && empty($defaults)) {
-            throw new RouteException(sprintf('Route parameter is null or empty.'));
+        $defaults = (null == ($defaults = $route->getDefaults())) ? $parameters : array_merge($defaults, $parameters);
+
+        if (!empty($requirement) && empty($defaults)) {
+            throw new RouteException(sprintf('Route "%s" parameter ["%s"] is null or empty.', $route->getName(), implode('", "', $route->getArguments())));
         }
 
         $replacer = array_map(function ($value) {
@@ -55,9 +56,9 @@ class RouteGenerator
         $routeUrl = str_replace($replacer, $defaults, $route->getRoute());
 
         if (!preg_match_all($route->getPattern(), $routeUrl, $match)) {
-            throw new RouteException(sprintf('route generator fail.'));
+            throw new RouteException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())));
         }
 
-        return $routeUrl;
+        return $routeUrl . $route->getFormat();
     }
 } 

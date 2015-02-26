@@ -13,9 +13,20 @@
 namespace Dobee\Routing\Matcher;
 
 use Dobee\Routing\RouteInterface;
+use Dobee\Routing\RouteException;
 
+/**
+ * Class RouteMatcher
+ *
+ * @package Dobee\Routing\Matcher
+ */
 class RouteMatcher implements RouteMatcherInterface
 {
+    /**
+     * @param                $uri
+     * @param RouteInterface $routeInterface
+     * @return bool|RouteInterface
+     */
     public function match($uri, RouteInterface $routeInterface = null)
     {
         if (!preg_match($routeInterface->getPattern(), $uri, $match)) {
@@ -38,6 +49,57 @@ class RouteMatcher implements RouteMatcherInterface
         return $routeInterface;
     }
 
+    /**
+     * @param                $method
+     * @param RouteInterface $route
+     * @return RouteInterface
+     * @throws RouteException
+     */
+    public function matchRequestMethod($method, RouteInterface $route)
+    {
+        if ("ANY" === ($methods = $route->getMethod())) {
+            return $route;
+        }
+
+        if (is_string($methods)) {
+            $methods = array($methods);
+        }
+
+        if (!in_array($method, $methods)) {
+            throw new RouteException(sprintf('Route "%s" request method must to be ["%s"]', $route->getName(), implode('", "', $methods)));
+        }
+
+        return $route;
+    }
+
+    /**
+     * @param                $format
+     * @param RouteInterface $route
+     * @return RouteInterface
+     * @throws RouteException
+     */
+    public function matchRequestFormat($format, RouteInterface $route)
+    {
+        if ("" == ($formats = $route->getFormat())) {
+            return $route;
+        }
+
+        if (is_string($formats)) {
+            $formats = array($formats);
+        }
+
+        if (!in_array($format, $formats)) {
+            throw new RouteException(sprintf('Route "%s" request format must to be ["%s"]', $route->getName(), implode('", "', $formats)));
+        }
+
+        return $route;
+    }
+
+    /**
+     * @param $defaults
+     * @param $args
+     * @return array
+     */
     public function filter($defaults, $args)
     {
         $parameters = array();

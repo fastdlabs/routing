@@ -57,7 +57,7 @@ class RouteCollection implements RouteCollectionInterface
 
     /**
      * @param $route_name
-     * @return mixed
+     * @return RouteInterface
      */
     public function getRoute($route_name)
     {
@@ -129,12 +129,34 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         foreach ($this->getRoutes() as $val) {
-            if (false !== ($match = $this->matcher->match($uri, $val))) {
-                return $match;
+            if (false !== ($route = $this->matcher->match($uri, $val))) {
+                return $route;
             }
         }
 
-        throw new RouteException(sprintf('%s\' is not match.', $uri));
+        throw new RouteException(sprintf('Route {\'%s\'} is not match.', $uri));
+    }
+
+    /**
+     * @param                $method
+     * @param RouteInterface $route
+     * @return RouteInterface
+     * @throws RouteException
+     */
+    public function matchRequestMethod($method, RouteInterface $route)
+    {
+        return $this->matcher->matchRequestMethod($method, $route);
+    }
+
+    /**
+     * @param                $format
+     * @param RouteInterface $route
+     * @return RouteInterface
+     * @throws RouteException
+     */
+    public function matchRequestFormat($format, RouteInterface $route)
+    {
+        return $this->matcher->matchRequestFormat($format, $route);
     }
 
     /**

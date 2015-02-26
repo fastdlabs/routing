@@ -23,7 +23,7 @@
         "php": ">=5.3.7"
     },
     "require-dev": {
-        "dobee/http": "~1.0.3",
+        "dobee/http": "~1.0.9",
         "dobee/annotation": "~1.0.2"
     },
     "autoload": {

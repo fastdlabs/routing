@@ -12,7 +12,55 @@
 
 namespace Dobee\Routing;
 
+/**
+ * Interface RouteInterface
+ *
+ * @package Dobee\Routing
+ */
 interface RouteInterface
 {
+    /**
+     * @return string
+     */
     public function getName();
+
+    /**
+     * @return string|array
+     */
+    public function getArguments();
+
+    /**
+     * @return array
+     */
+    public function getDefaults();
+
+    /**
+     * @return string
+     */
+    public function getRoute();
+
+    /**
+     * @return string
+     */
+    public function getPattern();
+
+    /**
+     * @return string
+     */
+    public function getFormat();
+
+    /**
+     * @return string|array
+     */
+    public function getRequirements();
+
+    /**
+     * @return string
+     */
+    public function getPrefix();
+
+    /**
+     * @return string|array
+     */
+    public function getMethod();
 }
