@@ -14,15 +14,27 @@ namespace Dobee\Routing\Annotation;
 
 use Dobee\Annotation\RulesAbstract;
 
+/**
+ * Class RouteAnnotation
+ *
+ * @package Dobee\Routing\Annotation
+ */
 class RouteAnnotation extends RulesAbstract
 {
-    private $prefix = '';
+    /**
+     * @var string
+     */
+    private $prefix;
 
+    /**
+     * @param \ReflectionClass $reflectionClass
+     * @return array
+     */
     public function parserAnnotation(\ReflectionClass $reflectionClass)
     {
         $parameters = array();
 
-        $this->getAnnotationPrefix($reflectionClass->getDocComment());
+        $this->getAnnotationClassPrefix($reflectionClass->getDocComment());
 
         foreach ($reflectionClass->getMethods() as $val) {
             if (!$this->hasAnnotation($val->getDocComment())) {
@@ -37,16 +49,25 @@ class RouteAnnotation extends RulesAbstract
         return $parameters;
     }
 
-    public function getAnnotationPrefix($annotation)
+    /**
+     * @param string $annotation
+     * @return string
+     */
+    public function getAnnotationClassPrefix($annotation)
     {
-        if (empty($this->prefix)) {
+        if (null === $this->prefix) {
             preg_match('/\@Route\(\"?(.*?)\"?\)/', $annotation, $prefix);
             $this->prefix = (!empty($prefix) && isset($prefix[1])) ? $prefix[1] : '';
+            unset($prefix);
         }
 
         return $this->prefix;
     }
 
+    /**
+     * @param $annotation
+     * @return array
+     */
     public function getAnnotationParameters($annotation)
     {
         $annotation = explode(PHP_EOL, preg_replace('/\,(\w+)/', PHP_EOL . '$1', $annotation));
@@ -71,6 +92,10 @@ class RouteAnnotation extends RulesAbstract
         return $parameters;
     }
 
+    /**
+     * @param $annotation
+     * @return array|null
+     */
     public function getAnnotationMethod($annotation)
     {
         if (false !== strstr($annotation, '@Route')) {
@@ -83,6 +108,10 @@ class RouteAnnotation extends RulesAbstract
         return null;
     }
 
+    /**
+     * @param \ReflectionMethod $reflectionMethod
+     * @return array
+     */
     public function getMethodParameters(\ReflectionMethod $reflectionMethod)
     {
         $parameters = array();
@@ -98,6 +127,10 @@ class RouteAnnotation extends RulesAbstract
         return $parameters;
     }
 
+    /**
+     * @param $annotation
+     * @return bool
+     */
     public function hasAnnotation($annotation)
     {
         return false !== strpos($annotation, '@Route');

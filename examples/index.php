@@ -19,7 +19,7 @@ use Dobee\Routing\Annotation\RouteAnnotation;
 use Dobee\Routing\RouteCollection;
 use Dobee\Routing\Route;
 
-$annotation = new AnnotationContext(new RouteAnnotation('\\RouteController'));
+$annotation = new AnnotationContext(new RouteAnnotation('Examples\\RouteController'));
 
 $collections = new RouteCollection(new RouteMatcher());
 

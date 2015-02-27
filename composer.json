@@ -5,7 +5,7 @@
     "authors": [
         {
             "name": "janhuang",
-            "email": "384099566@qq.com"
+            "email": "bboyjanhuang@gmail.com"
         }
     ],
     "repositories": [
@@ -16,18 +16,25 @@
         {
             "type": "git",
             "url": "https://coding.net/janhuang/annotation.git"
+        },
+        {
+            "type": "git",
+            "url": "https://coding.net/janhuang/configuration.git"
         }
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.3.7"
+        "php": ">=5.3.7",
+        "phpunit/phpunit": "4.5.*"
     },
     "require-dev": {
         "dobee/http": "~1.0.9",
-        "dobee/annotation": "~1.0.2"
+        "dobee/annotation": "~1.0.2",
+        "dobee/configuration": "~1.0.1"
     },
     "autoload": {
         "psr-4": {
+            "Examples\\": "examples",
             "Dobee\\": "src/Dobee"
         }
     }
