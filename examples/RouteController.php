@@ -9,9 +9,11 @@
  * SegmentFault: http://segmentfault.com/u/janhuang
  * Blog: http://segmentfault.com/blog/janhuang
  */
-class Test{}
+
+namespace Examples;
+
 /**
- * @Route("/")
+ * @Route("/route")
  * @Method("test")
  */
 class RouteController 
