@@ -6,9 +6,11 @@
  * Time: 下午11:37
  */
 
-namespace Dobee\Component\Routing\Collections;
+namespace Dobee\Routing\Collections;
 
-use Dobee\Component\Routing\Route\RouteInterface;
+use Dobee\Routing\RouteInterface;
+use Dobee\Routing\RouteInvalidException;
+use Dobee\Routing\RouteNotFoundException;
 
 /**
  * Interface RouteCollectionInterface
@@ -20,12 +22,35 @@ interface RouteCollectionInterface
     /**
      * @param                $name
      * @param RouteInterface $routeInterface
-     * @return mixed
+     * @return $this
+     * @throws RouteInvalidException
+     * @throws \Exception
      */
-    public function add($name, RouteInterface $routeInterface);
+    public function setRoute($name, RouteInterface $routeInterface = null);
+
+    /**
+     * @param $name
+     * @return RouteInterface
+     * @throws RouteNotFoundException
+     */
+    public function getRoute($name);
+
+    /**
+     * @param $name
+     * @return bool
+     * @throw RouteNotFoundException
+     */
+    public function hasRoute($name);
+
+    /**
+     * @param $name
+     * @return bool
+     * @throw RouteNotFoundException
+     */
+    public function removeRoute($name);
 
     /**
      * @return mixed
      */
-    public function getRoutes();
+    public function getRouteCollections();
 }

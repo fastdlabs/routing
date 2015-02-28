@@ -12,14 +12,10 @@
 
 namespace Examples;
 
-/**
- * @Route("/route")
- * @Method("test")
- */
 class RouteController 
 {
     /**
-     * @Route("/test/{name}", name="test")
+     * @Route("/test/{name}", name="test", defaults={"name": "123"}, requirements={"name": "\d+"}, format=json)
      */
     public function testAction($name)
     {

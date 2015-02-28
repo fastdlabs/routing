@@ -8,8 +8,7 @@
 
 namespace Dobee\Routing\Generator;
 
-use Dobee\Routing\RouteCollectionInterface;
-use Dobee\Routing\RouteException;
+use Dobee\Routing\RouteInterface;
 
 /**
  * Class RouteGenerator
@@ -19,46 +18,36 @@ use Dobee\Routing\RouteException;
 class RouteGenerator
 {
     /**
-     * @var RouteCollectionInterface
+     * @param RouteInterface $route
+     * @param array          $parameters
+     * @return string
+     * @throws RouteGenerateException
      */
-    private $collections;
-
-    /**
-     * @param RouteCollectionInterface $collectionInterface
-     */
-    public function __construct(RouteCollectionInterface $collectionInterface)
+    public function generateUrl(RouteInterface $route, array $parameters = array())
     {
-        $this->collections = $collectionInterface;
-    }
-
-    /**
-     * @param       $route
-     * @param array $parameters
-     * @return mixed
-     * @throws RouteException
-     */
-    public function generateUrl($route, array $parameters = array())
-    {
-        $route = $this->collections->getRoute($route);
-
         $requirement = $route->getArguments();
 
         $defaults = (null == ($defaults = $route->getDefaults())) ? $parameters : array_merge($defaults, $parameters);
 
         if (!empty($requirement) && empty($defaults)) {
-            throw new RouteException(sprintf('Route "%s" parameter ["%s"] is null or empty.', $route->getName(), implode('", "', $route->getArguments())));
+            throw new RouteGenerateException(sprintf('Route "%s" parameter ["%s"] is null or empty.', $route->getName(), implode('", "', $route->getArguments())));
         }
 
         $replacer = array_map(function ($value) {
             return '{' . $value . '}';
-        }, $route->getArguments());
+        }, $requirement);
 
         $routeUrl = str_replace($replacer, $defaults, $route->getRoute());
 
         if (!preg_match_all($route->getPattern(), $routeUrl, $match)) {
-            throw new RouteException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())));
+            throw new RouteGenerateException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())));
         }
 
-        return $routeUrl . $route->getFormat();
+        if (is_array(($format = $route->getFormat()))) {
+            $index = mt_rand(0, (count($format) - 1));
+            $format = $format[$index];
+        }
+
+        return $routeUrl . '.' . $format;
     }
 } 

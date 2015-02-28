@@ -17,95 +17,21 @@ namespace Dobee\Routing;
  *
  * @package Dobee\Routing
  */
-class Route extends RouteAbstract
+class Route implements RouteInterface
 {
     /**
-     * @var string
+     * @var RouteParameterBagInterface
      */
-    protected $route;
+    protected $routeParametersBag;
 
     /**
-     * @var string
+     * @param RouteParameterBagInterface $routeParametersBag
      */
-    protected $name;
-
-    /**
-     * @var string
-     */
-    protected $prefix = '';
-
-    /**
-     * @var array|string
-     */
-    protected $method = array();
-
-    /**
-     * @var array
-     */
-    protected $defaults = array();
-
-    /**
-     * @var array|string
-     */
-    protected $requirements = array();
-
-    /**
-     * @var string
-     */
-    protected $format = '';
-
-    /**
-     * @var string
-     */
-    protected $pattern;
-
-    /**
-     * @var array
-     */
-    protected $arguments = array();
-
-    /**
-     * @var string
-     */
-    protected $_controller;
-
-    /**
-     * @var array
-     */
-    protected $_parameters = array();
-
-    /**
-     * @param string $route
-     * @param string $name
-     * @param string $prefix
-     * @param string $controller
-     * @param array  $parameters
-     * @param array  $method
-     * @param array  $defaults
-     * @param array  $requirements
-     * @param string $format
-     */
-    public function __construct($route = '', $name = '', $prefix = '', $controller = '', $parameters = array(), $method = array(), $defaults = array(), $requirements = array(), $format = '')
+    public function __construct(RouteParameterBagInterface $routeParametersBag)
     {
-        $this->setRoute(str_replace('//', '/', $route));
+        $this->routeParametersBag = $routeParametersBag;
 
-        $this->setName($name);
-
-        $this->setPrefix($prefix);
-
-        $this->setParameters($parameters);
-
-        $this->setController($controller);
-
-        $this->setMethod($method);
-
-        $this->setDefaults($defaults);
-
-        $this->setRequirements($requirements);
-
-        $this->setFormat($requirements);
-
-        $this->parsePattern($this->getRoute(), $this->getRequirements(), $this->getDefaults());
+        $this->parsePattern($routeParametersBag->getRoute(), $routeParametersBag->getRequirements());
     }
 
     /**
@@ -114,7 +40,7 @@ class Route extends RouteAbstract
      */
     public function setRoute($route)
     {
-        $this->route = $route;
+        $this->routeParametersBag->setRoute($route);
 
         return $this;
     }
@@ -124,7 +50,7 @@ class Route extends RouteAbstract
      */
     public function getRoute()
     {
-        return $this->route;
+        return $this->routeParametersBag->getRoute();
     }
 
     /**
@@ -133,7 +59,7 @@ class Route extends RouteAbstract
      */
     public function setName($name)
     {
-        $this->name = $name;
+        $this->routeParametersBag->setName($name);
 
         return $this;
     }
@@ -142,7 +68,7 @@ class Route extends RouteAbstract
      */
     public function getName()
     {
-        return $this->name;
+        return $this->routeParametersBag->getName();
     }
 
     /**
@@ -151,7 +77,7 @@ class Route extends RouteAbstract
      */
     public function setPrefix($prefix)
     {
-        $this->prefix = $prefix;
+        $this->routeParametersBag->setPrefix($prefix);
 
         return $this;
     }
@@ -161,7 +87,7 @@ class Route extends RouteAbstract
      */
     public function getPrefix()
     {
-        return $this->prefix;
+        return $this->routeParametersBag->getPrefix();
     }
 
     /**
@@ -170,7 +96,7 @@ class Route extends RouteAbstract
      */
     public function setMethod($method)
     {
-        $this->method = $method;
+        $this->routeParametersBag->setMethod($method);
 
         return $this;
     }
@@ -180,16 +106,16 @@ class Route extends RouteAbstract
      */
     public function getMethod()
     {
-        return $this->method;
+        return $this->routeParametersBag->getMethod();
     }
 
     /**
      * @param array $defaults
      * @return $this
      */
-    public function setDefaults($defaults)
+    public function setDefaults(array $defaults)
     {
-        $this->defaults = $defaults;
+        $this->routeParametersBag->setDefaults($defaults);
 
         return $this;
     }
@@ -199,16 +125,16 @@ class Route extends RouteAbstract
      */
     public function getDefaults()
     {
-        return $this->defaults;
+        return $this->routeParametersBag->getDefaults();
     }
 
     /**
      * @param array|string $requirements
      * @return $this
      */
-    public function setRequirements($requirements)
+    public function setRequirements(array $requirements)
     {
-        $this->requirements = $requirements;
+        $this->routeParametersBag->setRequirements($requirements);
 
         return $this;
     }
@@ -218,7 +144,7 @@ class Route extends RouteAbstract
      */
     public function getRequirements()
     {
-        return $this->requirements;
+        return $this->routeParametersBag->getRequirements();
     }
 
     /**
@@ -227,7 +153,7 @@ class Route extends RouteAbstract
      */
     public function setFormat($format)
     {
-        $this->format = $format;
+        $this->routeParametersBag->setFormat($format);
 
         return $this;
     }
@@ -237,16 +163,15 @@ class Route extends RouteAbstract
      */
     public function getFormat()
     {
-        return $this->format;
+        return $this->routeParametersBag->getFormat();
     }
 
     /**
      * @param      $route
      * @param null $requirements
-     * @param null $defaults
      * @return $this
      */
-    protected function parsePattern($route, $requirements = null, $defaults = null)
+    protected function parsePattern($route, $requirements = array())
     {
         if (preg_match_all('/\{(\w+)\}/ui', $route, $match)) {
             foreach ($match[1] as $val) {
@@ -254,10 +179,10 @@ class Route extends RouteAbstract
                 $route = str_replace('{' . $val . '}', '{1}(' . $pattern . ')', $route);
             }
 
-            $this->arguments = $match[1];
+            $this->setArguments($match[1]);
         }
 
-        $this->pattern = '/^' . str_replace('/', '\/', $route) . '$/';
+        $this->setPattern('/^' . str_replace('/', '\/', $route) . '$/');
 
         return $this;
     }
@@ -268,7 +193,7 @@ class Route extends RouteAbstract
      */
     public function setPattern($pattern)
     {
-        $this->pattern = $pattern;
+        $this->routeParametersBag->setPattern($pattern);
 
         return $this;
     }
@@ -278,7 +203,7 @@ class Route extends RouteAbstract
      */
     public function getPattern()
     {
-        return $this->pattern;
+        return $this->routeParametersBag->getPattern();
     }
 
     /**
@@ -287,7 +212,7 @@ class Route extends RouteAbstract
      */
     public function setArguments($arguments)
     {
-        $this->arguments = $arguments;
+        $this->routeParametersBag->setArguments($arguments);
 
         return $this;
     }
@@ -297,16 +222,16 @@ class Route extends RouteAbstract
      */
     public function getArguments()
     {
-        return $this->arguments;
+        return $this->routeParametersBag->getArguments();
     }
 
     /**
-     * @param string $controller
+     * @param string $callable
      * @return $this
      */
-    public function setController($controller)
+    public function setCallable($callable)
     {
-        $this->_controller = $controller;
+        $this->routeParametersBag->setCallable($callable);
 
         return $this;
     }
@@ -314,18 +239,18 @@ class Route extends RouteAbstract
     /**
      * @return string
      */
-    public function getController()
+    public function getCallable()
     {
-        return $this->_controller;
+        return $this->routeParametersBag->getCallable();
     }
 
     /**
      * @param $parameters
      * @return $this
      */
-    public function setParameters($parameters)
+    public function setParameters(array $parameters)
     {
-        $this->_parameters = $parameters;
+        $this->routeParametersBag->setParameters($parameters);
 
         return $this;
     }
@@ -335,6 +260,44 @@ class Route extends RouteAbstract
      */
     public function getParameters()
     {
-        return $this->_parameters;
+        return $this->routeParametersBag->getParameters();
+    }
+
+    /**
+     * @return string
+     */
+    public function getClass()
+    {
+        return $this->routeParametersBag->getClass();
+    }
+
+    /**
+     * @param string $class
+     * @return $this
+     */
+    public function setClass($class)
+    {
+        $this->routeParametersBag->setClass($class);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->routeParametersBag->getAction();
+    }
+
+    /**
+     * @param string $action
+     * @return $this
+     */
+    public function setAction($action)
+    {
+        $this->routeParametersBag->setAction($action);
+
+        return $this;
     }
 }

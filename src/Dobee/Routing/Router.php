@@ -12,6 +12,11 @@
 
 namespace Dobee\Routing;
 
+use Dobee\Routing\Collections\RouteCollections;
+use Dobee\Routing\Generator\RouteGenerator;
+use Dobee\Routing\Matcher\RouteMatcher;
+use Dobee\Routing\Collections\RouteCollectionInterface;
+
 /**
  * Class Router
  *
@@ -20,27 +25,40 @@ namespace Dobee\Routing;
 class Router
 {
     /**
-     * @var RouteCollectionInterface
+     * @var RouteCollections
      */
-    private $route_collection;
+    private $collections;
 
     /**
-     * @param RouteCollectionInterface $routeCollectionInterface
-     * @return $this
+     * @var RouteGenerator
      */
-    public function setRouteCollection(RouteCollectionInterface $routeCollectionInterface)
-    {
-        $this->route_collection = $routeCollectionInterface;
+    private $generator;
 
-        return $this;
+    /**
+     * @var RouteMatcher
+     */
+    private $matcher;
+
+    /**
+     * Router constructor.
+     *
+     * Initialize route collections and route Generator.
+     */
+    public function __construct()
+    {
+        $this->collections = new RouteCollections();
+
+        $this->generator = new RouteGenerator();
+
+        $this->matcher = new RouteMatcher();
     }
 
     /**
      * @return RouteCollectionInterface
      */
-    public function getRouteCollection()
+    public function getCollections()
     {
-        return $this->route_collection;
+        return $this->collections;
     }
 
     /**
@@ -50,16 +68,84 @@ class Router
      */
     public function generateUrl($name, array $parameters = array())
     {
-        return $this->route_collection->generateUrl($name, $parameters);
+        return $this->generator->generateUrl($this->collections->getRoute($name), $parameters);
+    }
+
+    /**
+     * @param                $name
+     * @param RouteInterface $routeInterface
+     * @return $this
+     * @throws RouteInvalidException
+     * @throws \Exception
+     */
+    public function setRoute($name, RouteInterface $routeInterface = null)
+    {
+        return $this->collections->setRoute($name, $routeInterface);
+    }
+
+    /**
+     * @param $name
+     * @return RouteInterface
+     * @throws RouteNotFoundException
+     */
+    public function getRoute($name)
+    {
+        return $this->collections->getRoute($name);
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     * @throw RouteNotFoundException
+     */
+    public function hasRoute($name)
+    {
+        return $this->collections->hasRoute($name);
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     * @throw RouteNotFoundException
+     */
+    public function removeRoute($name)
+    {
+        return $this->collections->removeRoute($name);
     }
 
     /**
      * @param                $uri
-     * @param RouteInterface $routeInterface
+     * @param RouteInterface $route
      * @return mixed
      */
-    public function match($uri, RouteInterface $routeInterface = null)
+    public function match($uri, RouteInterface $route = null)
     {
-        return $this->route_collection->match($uri, $routeInterface);
+        if (null === $route) {
+            return $this->matcher->match($uri, $this->collections);
+        }
+
+        return $this->matcher->matchRequestRoute($uri, $route);
+    }
+
+    /**
+     * @param                $method
+     * @param RouteInterface $route
+     * @return RouteInterface
+     * @throws RouteException
+     */
+    public function matchMethod($method, RouteInterface $route)
+    {
+        return $this->matcher->matchRequestMethod($method, $route);
+    }
+
+    /**
+     * @param                $format
+     * @param RouteInterface $route
+     * @return RouteInterface
+     * @throws RouteException
+     */
+    public function matchFormat($format, RouteInterface $route)
+    {
+        return $this->matcher->matchRequestFormat($format, $route);
     }
 }

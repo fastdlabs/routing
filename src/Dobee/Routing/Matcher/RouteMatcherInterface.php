@@ -13,6 +13,7 @@
 namespace Dobee\Routing\Matcher;
 
 use Dobee\Routing\RouteInterface;
+use Dobee\Routing\Collections\RouteCollectionInterface;
 
 /**
  * Interface RouteMatcherInterface
@@ -23,10 +24,17 @@ interface RouteMatcherInterface
 {
     /**
      * @param                $uri
-     * @param RouteInterface $routeInterface
+     * @param RouteCollectionInterface $collections
      * @return mixed
      */
-    public function match($uri, RouteInterface $routeInterface = null);
+    public function match($uri, RouteCollectionInterface $collections = null);
+
+    /**
+     * @param                $uri
+     * @param RouteInterface $route
+     * @return mixed
+     */
+    public function matchRequestRoute($uri, RouteInterface $route);
 
     /**
      * @param                $method
