@@ -13,34 +13,31 @@ echo '<pre>';
 $composer = include __DIR__ . '/../vendor/autoload.php';
 include __DIR__ . '/RouteController.php';
 
-use Dobee\Routing\Matcher\RouteMatcher;
 use Dobee\Annotation\AnnotationContext;
 use Dobee\Routing\Annotation\RouteAnnotation;
-use Dobee\Routing\RouteCollection;
 use Dobee\Routing\Route;
+use Dobee\Routing\Router;
+
+$router = new Router();
 
 $annotation = new AnnotationContext(new RouteAnnotation('Examples\\RouteController'));
 
-$collections = new RouteCollection(new RouteMatcher());
-
-$collections->addRoute(new Route(
+$router->setRoute(new Route(
     $annotation->getParameters('demo')['route'],
     $annotation->getParameters('demo')['name'],
     $annotation->getParameters('demo')['prefix'],
-    $annotation->getParameters('demo')['_controller'],
-    $annotation->getParameters('demo')['_parameters'],
+    $annotation->getParameters('demo')['parameters'],
     $annotation->getParameters('demo')['method'],
     ($annotation->getParameters('demo')['defaults']),
     ($annotation->getParameters('demo')['requirements']),
     $annotation->getParameters('demo')['format']
 ));
 
-$collections->addRoute(new Route(
+$router->setRoute(new Route(
     $annotation->getParameters('test')['route'],
     $annotation->getParameters('test')['name'],
     $annotation->getParameters('test')['prefix'],
-    $annotation->getParameters('test')['_controller'],
-    $annotation->getParameters('test')['_parameters'],
+    $annotation->getParameters('test')['parameters'],
     ($annotation->getParameters('test')['method']),
     ($annotation->getParameters('test')['defaults']),
     ($annotation->getParameters('test')['requirements']),
@@ -49,15 +46,11 @@ $collections->addRoute(new Route(
 
 $request = \Dobee\Http\Request::createGlobalRequest();
 
-$route = $collections->match($request->getPathInfo());
+echo $router->generateUrl('test');
 
-$route = $collections->matchRequestMethod($request->getMethod(), $route);
-$route = $collections->matchRequestFormat($request->getFormat(), $route);
+$route = $router->match($request->getPathInfo());
 
-echo $collections->generateUrl('test', array('name' => 'janhuang'));
+$response = $route->getCallable();
 
-list($controller, $action) = explode('@', $route->getController());
+print_r($response);
 
-$result = call_user_func_array(array(new $controller(), $action), $route->getParameters());
-
-print_r($result);

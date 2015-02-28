@@ -34,7 +34,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Examples": "examples",
+            "Examples\\": "examples",
             "Dobee\\": "src/Dobee"
         }
     }

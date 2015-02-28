@@ -19,7 +19,7 @@ use Dobee\Annotation\RulesAbstract;
  *
  * @package Dobee\Routing\Annotation
  */
-class RouteAnnotation extends RulesAbstract
+class RouteAnnotation extends RulesAbstract implements RouteAnnotationInterface
 {
     /**
      * @var string
@@ -34,15 +34,14 @@ class RouteAnnotation extends RulesAbstract
     {
         $parameters = array();
 
-        $this->getAnnotationPrefix($reflectionClass->getDocComment());
+        $this->getAnnotationClassPrefix($reflectionClass->getDocComment());
 
         foreach ($reflectionClass->getMethods() as $val) {
             if (!$this->hasAnnotation($val->getDocComment())) {
                 continue;
             }
             $routeParameters = $this->getAnnotationMethod($val->getDocComment());
-            $routeParameters['_controller'] = $val->getNamespaceName() . $val->class . '@' . $val->getName();
-            $routeParameters['_parameters'] = $this->getMethodParameters($val);
+            $routeParameters['parameters'] = $this->getMethodParameters($val);
             $parameters[isset($routeParameters['name']) ? $routeParameters['name'] : ""] = $routeParameters;
         }
 
@@ -51,9 +50,9 @@ class RouteAnnotation extends RulesAbstract
 
     /**
      * @param $annotation
-     * @return string
+     * @return string|null
      */
-    public function getAnnotationPrefix($annotation)
+    public function getAnnotationClassPrefix($annotation)
     {
         if (empty($this->prefix)) {
             preg_match('/\@Route\(\"?(.*?)\"?\)/', $annotation, $prefix);
@@ -67,19 +66,19 @@ class RouteAnnotation extends RulesAbstract
      * @param $annotation
      * @return array
      */
-    public function getAnnotationParameters($annotation)
+    public function getAnnotationMethodParameters($annotation)
     {
         $annotation = explode(PHP_EOL, preg_replace('/\,(\w+)/', PHP_EOL . '$1', $annotation));
 
-        $parameters = array(
-            'prefix' => $this->prefix,
-            'route' => str_replace('//', '/', $this->prefix . trim(array_shift($annotation), '"')),
-            'name' => '',
-            'method' => '',
-            'defaults' => '',
-            'requirements' => '',
-            'format' => '',
-        );
+        $parameters = new \ArrayObject(array(
+                'prefix'    => $this->prefix,
+                'route'     => str_replace('//', '/', $this->prefix . trim(array_shift($annotation), '"')),
+                'name'      => '',
+                'method'    => '',
+                'defaults'  => '',
+                'requirements' => '',
+                'format'    => '',
+        ));
 
         foreach ($annotation as $val) {
             list($key, $value) = explode("=", $val);
@@ -101,7 +100,7 @@ class RouteAnnotation extends RulesAbstract
             preg_match_all('/\@Route\((.*?)\)/', str_replace(array("\r\n", "\n", '*'), '', $annotation), $match);
             $match = implode(',', $match[1]);
             $match = preg_replace(['/\*{1,}/', '/\s{1,}/'], ['', ''], $match);
-            return $this->getAnnotationParameters($match);
+            return $this->getAnnotationMethodParameters($match);
         }
 
         return null;

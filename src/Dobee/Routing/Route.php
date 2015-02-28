@@ -17,7 +17,7 @@ namespace Dobee\Routing;
  *
  * @package Dobee\Routing
  */
-class Route extends RouteAbstract
+class Route implements RouteInterface
 {
     /**
      * @var string
@@ -65,27 +65,26 @@ class Route extends RouteAbstract
     protected $arguments = array();
 
     /**
-     * @var string
+     * @var \Closures
      */
-    protected $_controller;
+    protected $_callable = null;
 
     /**
      * @var array
      */
-    protected $_parameters = array();
+    protected $parameters = array();
 
     /**
      * @param        $route
      * @param string $name
      * @param string $prefix
-     * @param string $controller
      * @param array  $parameters
      * @param array  $method
      * @param array  $defaults
      * @param array  $requirements
      * @param string $format
      */
-    public function __construct($route, $name = "", $prefix = '', $controller = '', $parameters = array(), $method = array(), $defaults = array(), $requirements = array(), $format = "")
+    public function __construct($route = '', $name = "", $prefix = '', $parameters = array(), $method = array(), $defaults = array(), $requirements = array(), $format = "")
     {
         $this->setRoute(str_replace('//', '/', $route));
 
@@ -95,17 +94,13 @@ class Route extends RouteAbstract
 
         $this->setParameters($parameters);
 
-        $this->setController($controller);
-
         $this->setMethod($method);
 
         $this->setDefaults($defaults);
 
         $this->setRequirements($requirements);
 
-        $this->setFormat($requirements);
-
-        $this->parsePattern($this->getRoute(), $this->getRequirements(), $this->getDefaults());
+        $this->setFormat($format);
     }
 
     /**
@@ -115,6 +110,10 @@ class Route extends RouteAbstract
     public function setRoute($route)
     {
         $this->route = $route;
+
+        if (null !== $this->requirements) {
+            $this->parsePattern($this->getRoute(), $this->getRequirements(), $this->getDefaults());
+        }
 
         return $this;
     }
@@ -210,6 +209,10 @@ class Route extends RouteAbstract
     {
         $this->requirements = $requirements;
 
+        if (null !== $this->route) {
+            $this->parsePattern($this->getRoute(), $this->getRequirements(), $this->getDefaults());
+        }
+
         return $this;
     }
 
@@ -243,10 +246,9 @@ class Route extends RouteAbstract
     /**
      * @param      $route
      * @param null $requirements
-     * @param null $defaults
      * @return $this
      */
-    protected function parsePattern($route, $requirements = null, $defaults = null)
+    protected function parsePattern($route, $requirements = null)
     {
         if (preg_match_all('/\{(\w+)\}/ui', $route, $match)) {
             foreach ($match[1] as $val) {
@@ -301,12 +303,12 @@ class Route extends RouteAbstract
     }
 
     /**
-     * @param string $controller
+     * @param string $callable
      * @return $this
      */
-    public function setController($controller)
+    public function setCallable($callable)
     {
-        $this->_controller = $controller;
+        $this->_callable = $callable;
 
         return $this;
     }
@@ -314,9 +316,9 @@ class Route extends RouteAbstract
     /**
      * @return string
      */
-    public function getController()
+    public function getCallable()
     {
-        return $this->_controller;
+        return $this->_callable;
     }
 
     /**
@@ -325,7 +327,7 @@ class Route extends RouteAbstract
      */
     public function setParameters($parameters)
     {
-        $this->_parameters = $parameters;
+        $this->parameters = $parameters;
 
         return $this;
     }
@@ -335,6 +337,14 @@ class Route extends RouteAbstract
      */
     public function getParameters()
     {
-        return $this->_parameters;
+        return $this->parameters;
     }
+
+    /**
+     * @return Route
+     */
+    /*public static function createRoute()
+    {
+        return new Route();
+    }*/
 }

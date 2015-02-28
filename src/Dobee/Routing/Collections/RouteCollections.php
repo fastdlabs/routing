@@ -6,39 +6,97 @@
  * Time: 下午1:51
  */
 
-namespace Dobee\Component\Routing\Collections;
+namespace Dobee\Routing\Collections;
 
-use Dobee\Component\Routing\Route\Route;
-use Dobee\Component\Routing\Route\RouteInterface;
+use Dobee\Routing\RouteInterface;
+use Dobee\Routing\RouteInvalidException;
+use Dobee\Routing\RouteNotFoundException;
 
 /**
  * Class RouteCollections
  *
  * @package Dobee\Component\Routing\Collections
  */
-class RouteCollections implements RouteCollectionInterface
+class RouteCollections implements RouteCollectionInterface, \Iterator
 {
     /**
      * @var array
      */
-    private $routes = array();
+    private $routeCollections = array();
 
     /**
-     * @var null
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Return the current element
+     *
+     * @link http://php.net/manual/en/iterator.current.php
+     * @return mixed Can return any type.
      */
-    protected static $instance = null;
+    public function current()
+    {
+        // TODO: Implement current() method.
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Move forward to next element
+     *
+     * @link http://php.net/manual/en/iterator.next.php
+     * @return void Any returned value is ignored.
+     */
+    public function next()
+    {
+        // TODO: Implement next() method.
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Return the key of the current element
+     *
+     * @link http://php.net/manual/en/iterator.key.php
+     * @return mixed scalar on success, or null on failure.
+     */
+    public function key()
+    {
+        // TODO: Implement key() method.
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Checks if current position is valid
+     *
+     * @link http://php.net/manual/en/iterator.valid.php
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     *       Returns true on success or false on failure.
+     */
+    public function valid()
+    {
+        // TODO: Implement valid() method.
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.0.0)<br/>
+     * Rewind the Iterator to the first element
+     *
+     * @link http://php.net/manual/en/iterator.rewind.php
+     * @return void Any returned value is ignored.
+     */
+    public function rewind()
+    {
+        // TODO: Implement rewind() method.
+    }
 
     /**
      * @param                $name
      * @param RouteInterface $routeInterface
      * @return $this
+     * @throws RouteInvalidException
      * @throws \Exception
      */
-    public function add($name, RouteInterface $routeInterface = null)
+    public function setRoute($name, RouteInterface $routeInterface = null)
     {
-        if ($name instanceof RouteInterface) {
+        if ($name instanceof RouteInterface && null === $routeInterface) {
             if (null === $name->getName()) {
-                throw new \LengthException(sprintf("'%s' route name is empty.", get_class($name)));
+                throw new RouteInvalidException(sprintf("Route '%s' route name is empty or null.", get_class($name)));
             }
 
             $routeInterface = $name;
@@ -46,61 +104,58 @@ class RouteCollections implements RouteCollectionInterface
             $name = $name->getName();
         }
 
-        if (array_key_exists($name, $this->routes)) {
+        if (array_key_exists($name, $this->routeCollections)) {
             throw new \Exception(sprintf("Route name '%s' is exists.", $name));
         }
 
-        $this->routes[$name] = $routeInterface;
+        $this->routeCollections[$name] = $routeInterface;
 
         return $this;
     }
 
     /**
-     * @return array
+     * @param $name
+     * @return mixed
+     * @throws RouteNotFoundException
      */
-    public function getRoutes()
+    public function getRoute($name)
     {
-        return $this->routes;
-    }
-
-    /**
-     * @return null
-     */
-    public static function getInstance()
-    {
-        if (null === static::$instance) {
-            static::$instance = new static();
+        if (!$this->hasRoute($name)) {
+            throw new RouteNotFoundException(sprintf('Route "%s" is not found.', $name));
         }
 
-        return static::$instance;
+        return $this->routeCollections[$name];
     }
 
     /**
-     * @param $method
-     * @param $arguments
-     * @return RouteCollections
-     * @throws \Exception
+     * @param $name
+     * @return bool
+     * @throw RouteNotFoundException
      */
-    public function __call($method, $arguments)
+    public function hasRoute($name)
     {
-        if (count($arguments) < 2) {
-            throw new \LengthException(sprintf("Arguments error."));
+        return isset($this->routeCollections[$name]);
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     * @throw RouteNotFoundException
+     */
+    public function removeRoute($name)
+    {
+        if ($this->hasRoute($name)) {
+            unset($this->routeCollections[$name]);
         }
 
-        $route = new Route($arguments[0], $arguments[1], isset($arguments[2]) ? $arguments[2] : array());
-
-        $route->setMethod($method);
-
-        return $this->add($route);
+        return true;
     }
 
     /**
-     * @param $method
-     * @param $args
      * @return mixed
      */
-    public static function __callStatic($method, $args)
+    public function getRouteCollections()
     {
-        return call_user_func_array(array(static::getInstance(), '__call'), array($method, $args));
+        return $this->routeCollections;
     }
 }
