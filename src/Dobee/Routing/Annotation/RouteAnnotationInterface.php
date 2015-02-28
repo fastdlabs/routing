@@ -19,23 +19,23 @@ interface RouteAnnotationInterface
      * @param $annotation
      * @return string|null
      */
-    public function getAnnotationClassPrefix($annotation);
+//    public function getAnnotationClassPrefix($annotation);
 
     /**
      * @param $annotation
      * @return array
      */
-    public function getAnnotationMethodParameters($annotation);
+//    public function getAnnotationMethodParameters($annotation);
 
     /**
      * @param $annotation
      * @return bool
      */
-    public function hasAnnotation($annotation);
+//    public function hasAnnotation($annotation);
 
     /**
      * @param $annotation
      * @return string
      */
-    public function getAnnotationMethod($annotation);
+//    public function getAnnotationMethod($annotation);
 }

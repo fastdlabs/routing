@@ -36,19 +36,19 @@ class RouteAnnotation extends RulesAbstract implements RouteAnnotationInterface
      */
     public function parserAnnotation(\ReflectionClass $reflectionClass)
     {
-        $parameters = array();
-
-        $parameters['namespace'] = $reflectionClass->getNamespaceName();
-        $parameters['class'] = $reflectionClass->getName();
-        $parameters['path'] = dirname($reflectionClass->getFileName());
-        $parameters['route_prefix'] = $this->getAnnotationClassPrefix($reflectionClass->getDocComment());
+        $parameters = array(
+            'namespace'     => $reflectionClass->getNamespaceName(),
+            'class'         => $reflectionClass->getName(),
+            'path'          => dirname($reflectionClass->getFileName()),
+            'route_prefix'  => $this->getAnnotationClassPrefix($reflectionClass->getDocComment()),
+        );
 
         foreach ($reflectionClass->getMethods() as $method) {
-            if (!$this->hasAnnotation($method->getDocComment())) {
+            if (!$this->hasRouteAnnotation($method)) {
                 continue;
             }
-            
-            $routeParameters = $this->getAnnotationMethod($method->getDocComment());
+
+            $routeParameters = $this->getRouteParameters($method);
             print_r($routeParameters);
             die;
             $routeParameters['class'] = $parameters['class'];
@@ -140,12 +140,31 @@ class RouteAnnotation extends RulesAbstract implements RouteAnnotationInterface
         return $parameters;
     }
 
+    public function getRouteParameters(\ReflectionMethod $method)
+    {
+
+    }
+
+    public function getRouteName(\ReflectionMethod $method)
+    {
+
+    }
+
+    /**
+     * @param \ReflectionMethod $method
+     * @return bool
+     */
+    public function hasRouteAnnotation(\ReflectionMethod $method)
+    {
+        return false !== strpos($method->getDocComment(), '@Route');
+    }
+
     /**
      * @param $annotation
      * @return bool
      */
     public function hasAnnotation($annotation)
     {
-        return false !== strpos($annotation, '@Route');
+        // TODO: Implement hasAnnotation() method.
     }
 }
