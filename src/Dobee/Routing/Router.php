@@ -15,6 +15,7 @@ namespace Dobee\Routing;
 use Dobee\Routing\Collections\RouteCollections;
 use Dobee\Routing\Generator\RouteGenerator;
 use Dobee\Routing\Matcher\RouteMatcher;
+use Dobee\Routing\Collections\RouteCollectionInterface;
 
 /**
  * Class Router

@@ -12,6 +12,8 @@
 
 namespace Dobee\Routing;
 
+use Dobee\Routing\RouteParameterBagInterface;
+
 /**
  * Class Route
  *
@@ -75,32 +77,26 @@ class Route implements RouteInterface
     protected $parameters = array();
 
     /**
-     * @param        $route
-     * @param string $name
-     * @param string $prefix
-     * @param array  $parameters
-     * @param array  $method
-     * @param array  $defaults
-     * @param array  $requirements
-     * @param string $format
+     * @var string
      */
-    public function __construct($route = '', $name = "", $prefix = '', $parameters = array(), $method = array(), $defaults = array(), $requirements = array(), $format = "")
+    protected $class = "";
+
+    /**
+     * @var string
+     */
+    protected $action = "";
+
+    /**
+     * @var RouteParameterBagInterface
+     */
+    protected $routeParameters;
+
+    /**
+     * @param RouteParameterBagInterface $routeBag
+     */
+    public function __construct(RouteParameterBagInterface $routeBag)
     {
-        $this->setRoute(str_replace('//', '/', $route));
-
-        $this->setName($name);
-
-        $this->setPrefix($prefix);
-
-        $this->setParameters($parameters);
-
-        $this->setMethod($method);
-
-        $this->setDefaults($defaults);
-
-        $this->setRequirements($requirements);
-
-        $this->setFormat($format);
+        $this->routeParameters = $routeBag;
     }
 
     /**
@@ -341,10 +337,40 @@ class Route implements RouteInterface
     }
 
     /**
-     * @return Route
+     * @return string
      */
-    /*public static function createRoute()
+    public function getClass()
     {
-        return new Route();
-    }*/
+        return $this->class;
+    }
+
+    /**
+     * @param string $class
+     * @return $this
+     */
+    public function setClass($class)
+    {
+        $this->class = $class;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+
+    /**
+     * @param string $action
+     * @return $this
+     */
+    public function setAction($action)
+    {
+        $this->action = $action;
+
+        return $this;
+    }
 }
