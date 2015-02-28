@@ -16,13 +16,14 @@ use Dobee\Routing\Collections\RouteCollections;
 use Dobee\Routing\Generator\RouteGenerator;
 use Dobee\Routing\Matcher\RouteMatcher;
 use Dobee\Routing\Collections\RouteCollectionInterface;
+use Dobee\Routing\Rest\RESTRouteSetting;
 
 /**
  * Class Router
  *
  * @package Dobee\Routing
  */
-class Router
+class Router implements RESTRouteSetting
 {
     /**
      * @var RouteCollections
@@ -147,5 +148,83 @@ class Router
     public function matchFormat($format, RouteInterface $route)
     {
         return $this->matcher->matchRequestFormat($format, $route);
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function get($setting, $callback)
+    {
+        $this->setRoute();
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function post($setting, $callback)
+    {
+        // TODO: Implement post() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function put($setting, $callback)
+    {
+        // TODO: Implement put() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function delete($setting, $callback)
+    {
+        // TODO: Implement delete() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function options($setting, $callback)
+    {
+        // TODO: Implement options() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function head($setting, $callback)
+    {
+        // TODO: Implement head() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function any($setting, $callback)
+    {
+        // TODO: Implement any() method.
+    }
+
+    /**
+     * @return void
+     */
+    public function run()
+    {
+        // TODO: Implement run() method.
     }
 }

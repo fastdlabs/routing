@@ -29,7 +29,7 @@ class Route implements RouteInterface
      */
     public function __construct(RouteParameterBagInterface $routeParametersBag)
     {
-        $this->routeParametersBag = $routeParametersBag;
+        $this->routeParametersBsag = $routeParametersBag;
 
         $this->parsePattern($routeParametersBag->getRoute(), $routeParametersBag->getRequirements());
     }
