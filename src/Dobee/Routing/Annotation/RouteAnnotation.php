@@ -13,52 +13,99 @@
 namespace Dobee\Routing\Annotation;
 
 use Dobee\Annotation\RulesAbstract;
+use Dobee\Routing\RouteBag;
 
-class RouteAnnotation extends RulesAbstract
+/**
+ * Class RouteAnnotation
+ *
+ * @package Dobee\Routing\Annotation
+ */
+class RouteAnnotation extends RulesAbstract implements RouteAnnotationInterface
 {
-    private $prefix = '';
+    /**
+     * @var string
+     */
+    private $prefix = null;
 
-    public function parserAnnotation(\ReflectionClass $reflectionClass)
+    private $class = null;
+
+    /**
+     * Parse PHP class annotation.
+     *
+     * @param \ReflectionClass $class
+     * @return array
+     */
+    public function parserAnnotation(\ReflectionClass $class)
     {
-        $parameters = array();
+        $routes = array();
 
-        $this->getAnnotationPrefix($reflectionClass->getDocComment());
-
-        foreach ($reflectionClass->getMethods() as $val) {
-            if (!$this->hasAnnotation($val->getDocComment())) {
+        foreach ($class->getMethods() as $method) {
+            if (!$this->hasRouteAnnotation($method)) {
                 continue;
             }
-            $routeParameters = $this->getAnnotationMethod($val->getDocComment());
-            $routeParameters['_controller'] = $val->getNamespaceName() . $val->class . '@' . $val->getName();
-            $routeParameters['_parameters'] = $this->getMethodParameters($val);
-            $parameters[isset($routeParameters['name']) ? $routeParameters['name'] : ""] = $routeParameters;
+
+            $routeParametersBag = $this->getRouteParameters($method);
+            $routes[$routeParametersBag->getName()] = $routeParametersBag;
         }
 
-        return $parameters;
+        return $routes;
     }
 
-    public function getAnnotationPrefix($annotation)
+    /**
+     * @param \ReflectionClass $class
+     * @return string|null
+     */
+    public function getRoutePrefix(\ReflectionClass $class)
     {
-        if (empty($this->prefix)) {
-            preg_match('/\@Route\(\"?(.*?)\"?\)/', $annotation, $prefix);
+        if (null === $this->prefix || $class->getName() !== $this->class) {
+            preg_match('/\@Route\(\"?(.*?)\"?\)/', $class->getDocComment(), $prefix);
             $this->prefix = (!empty($prefix) && isset($prefix[1])) ? $prefix[1] : '';
+            $this->class = $class->getName();
         }
 
         return $this->prefix;
     }
 
-    public function getAnnotationParameters($annotation)
+    /**
+     * @param \ReflectionMethod $method
+     * @return RouteBag|null
+     */
+    public function getRouteParameters(\ReflectionMethod $method)
     {
+        if ($this->hasRouteAnnotation($method)) {
+            return $this->parseRouteParameters($method);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \ReflectionMethod $method
+     * @return RouteBag
+     */
+    public function parseRouteParameters(\ReflectionMethod $method)
+    {
+        preg_match_all('/\@Route\((.*?)\)/', str_replace(array("\r\n", "\n", '*'), '', $method->getDocComment()), $match);
+
+        $match = implode(',', $match[1]);
+
+        $annotation = preg_replace(array('/\*{1,}/', '/\s{1,}/'), array('', ''), $match);
+
         $annotation = explode(PHP_EOL, preg_replace('/\,(\w+)/', PHP_EOL . '$1', $annotation));
 
         $parameters = array(
-            'prefix' => $this->prefix,
-            'route' => str_replace('//', '/', $this->prefix . trim(array_shift($annotation), '"')),
-            'name' => '',
-            'method' => '',
-            'defaults' => '',
-            'requirements' => '',
-            'format' => '',
+            'prefix'        => $this->getRoutePrefix($method->getDeclaringClass()),
+            'route'         => trim(array_shift($annotation), '"'),
+            'name'          => '',
+            'method'        => 'ANY',
+            'defaults'      => '',
+            'requirements'  => array(),
+            'arguments'     => array(),
+            'parameters'    => array(),
+            'format'        => '',
+            'class'         => $method->getDeclaringClass()->getName(),
+            'action'        => $method->getName(),
+            'path'          => $method->getDeclaringClass()->getFileName()
         );
 
         foreach ($annotation as $val) {
@@ -68,38 +115,15 @@ class RouteAnnotation extends RulesAbstract
             $parameters[$key] = $value;
         }
 
-        return $parameters;
+        return new RouteBag($parameters);
     }
 
-    public function getAnnotationMethod($annotation)
+    /**
+     * @param \ReflectionMethod $method
+     * @return bool
+     */
+    public function hasRouteAnnotation(\ReflectionMethod $method)
     {
-        if (false !== strstr($annotation, '@Route')) {
-            preg_match_all('/\@Route\((.*?)\)/', str_replace(array("\r\n", "\n", '*'), '', $annotation), $match);
-            $match = implode(',', $match[1]);
-            $match = preg_replace(['/\*{1,}/', '/\s{1,}/'], ['', ''], $match);
-            return $this->getAnnotationParameters($match);
-        }
-
-        return null;
-    }
-
-    public function getMethodParameters(\ReflectionMethod $reflectionMethod)
-    {
-        $parameters = array();
-
-        foreach ($reflectionMethod->getParameters() as $val) {
-            if (!is_object($val->getClass())) {
-                $parameters[] = $val->getName();
-            }
-        }
-
-        unset($reflectionMethod);
-
-        return $parameters;
-    }
-
-    public function hasAnnotation($annotation)
-    {
-        return false !== strpos($annotation, '@Route');
+        return false !== strpos($method->getDocComment(), '@Route');
     }
 }

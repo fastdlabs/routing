@@ -9,15 +9,13 @@
  * SegmentFault: http://segmentfault.com/u/janhuang
  * Blog: http://segmentfault.com/blog/janhuang
  */
-class Test{}
-/**
- * @Route("/")
- * @Method("test")
- */
+
+namespace Examples;
+
 class RouteController 
 {
     /**
-     * @Route("/test/{name}", name="test")
+     * @Route("/test/{name}", name="test", defaults={"name": "123"}, requirements={"name": "\d+"}, format=json)
      */
     public function testAction($name)
     {

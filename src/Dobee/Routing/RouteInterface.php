@@ -63,4 +63,9 @@ interface RouteInterface
      * @return string|array
      */
     public function getMethod();
+
+    /**
+     * @return mixed
+     */
+    public function getCallable();
 }

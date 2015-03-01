@@ -12,8 +12,10 @@
 
 namespace Dobee\Routing\Matcher;
 
+use Dobee\Routing\Collections\RouteCollectionInterface;
 use Dobee\Routing\RouteInterface;
 use Dobee\Routing\RouteException;
+use Dobee\Routing\RouteNotFoundException;
 
 /**
  * Class RouteMatcher
@@ -23,30 +25,52 @@ use Dobee\Routing\RouteException;
 class RouteMatcher implements RouteMatcherInterface
 {
     /**
-     * @param                $uri
-     * @param RouteInterface $routeInterface
-     * @return bool|RouteInterface
+     * @param                          $uri
+     * @param RouteCollectionInterface $collection
+     * @return mixed
+     * @throws RouteNotFoundException
      */
-    public function match($uri, RouteInterface $routeInterface = null)
+    public function match($uri, RouteCollectionInterface $collection = null)
     {
-        if (!preg_match($routeInterface->getPattern(), $uri, $match)) {
-            $args = array_slice(
-                $routeInterface->getArguments(),
-                substr_count(rtrim($uri, '/'), '/') - substr_count(rtrim($routeInterface->getPrefix(), '/'), '/') - count($routeInterface->getArguments())
-            );
-            $defaults = $this->filter($routeInterface->getDefaults(), $args);
-            $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
-            if (!preg_match($routeInterface->getPattern(), $uri, $match)) {
-                return false;
+        foreach ($collection->getRouteCollections() as $route) {
+            try {
+                $route = $this->matchRequestRoute($uri, $route);
+                return $route;
+            } catch (RouteNotFoundException $e) {
+                continue;
             }
         }
+
+        throw new RouteNotFoundException(sprintf('Route "%s" is not found.', $uri));
+    }
+
+    /**
+     * @param                $uri
+     * @param RouteInterface $route
+     * @return RouteInterface
+     * @throws RouteNotFoundException
+     */
+    public function matchRequestRoute($uri, RouteInterface $route = null)
+    {
+        if (!preg_match($route->getPattern(), $uri, $match)) {
+            $args = array_slice(
+                $route->getArguments(),
+                substr_count(rtrim($uri, '/'), '/') - substr_count(rtrim($route->getPrefix(), '/'), '/') - count($route->getArguments())
+            );
+            $defaults = $this->filter($route->getDefaults(), $args);
+            $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
+            if (!preg_match($route->getPattern(), $uri, $match)) {
+                throw new RouteNotFoundException(sprintf('Route "%s" is not found.', $uri));
+            }
+        }
+
         array_shift($match);
 
-        $parameters = array_combine(array_values($routeInterface->getArguments()), $match);
+        $parameters = array_combine(array_values($route->getArguments()), $match);
 
-        $routeInterface->setParameters($parameters);
+        $route->setParameters($parameters);
 
-        return $routeInterface;
+        return $route;
     }
 
     /**
