@@ -23,7 +23,7 @@ use Dobee\Routing\Rest\RESTRouteSetting;
  *
  * @package Dobee\Routing
  */
-class Router implements RESTRouteSetting
+class Router
 {
     /**
      * @var RouteCollections
@@ -151,80 +151,13 @@ class Router implements RESTRouteSetting
     }
 
     /**
-     * @param $setting
-     * @param $callback
-     * @return $this
+     * @param $route
+     * @param $callable
+     * @return \ReflectionParameter[]
      */
-    public function get($setting, $callback)
+    public function createRoute($route, $callable)
     {
-        $this->setRoute();
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function post($setting, $callback)
-    {
-        // TODO: Implement post() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function put($setting, $callback)
-    {
-        // TODO: Implement put() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function delete($setting, $callback)
-    {
-        // TODO: Implement delete() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function options($setting, $callback)
-    {
-        // TODO: Implement options() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function head($setting, $callback)
-    {
-        // TODO: Implement head() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function any($setting, $callback)
-    {
-        // TODO: Implement any() method.
-    }
-
-    /**
-     * @return void
-     */
-    public function run()
-    {
-        // TODO: Implement run() method.
+        $function = new \ReflectionFunction($callable);
+        return $function->getParameters();
     }
 }

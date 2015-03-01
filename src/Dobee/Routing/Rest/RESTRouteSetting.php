@@ -70,9 +70,4 @@ interface RESTRouteSetting
      * @return $this
      */
     public function any($setting, $callback);
-
-    /**
-     * @return void
-     */
-    public function run();
 }

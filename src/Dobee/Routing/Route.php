@@ -12,12 +12,14 @@
 
 namespace Dobee\Routing;
 
+use Dobee\Routing\Rest\RESTRouteSetting;
+
 /**
  * Class Route
  *
  * @package Dobee\Routing
  */
-class Route implements RouteInterface
+class Route implements RouteInterface, RESTRouteSetting
 {
     /**
      * @var RouteParameterBagInterface
@@ -27,9 +29,9 @@ class Route implements RouteInterface
     /**
      * @param RouteParameterBagInterface $routeParametersBag
      */
-    public function __construct(RouteParameterBagInterface $routeParametersBag)
+    public function __construct(RouteParameterBagInterface $routeParametersBag = null)
     {
-        $this->routeParametersBsag = $routeParametersBag;
+        $this->routeParametersBag = $routeParametersBag;
 
         $this->parsePattern($routeParametersBag->getRoute(), $routeParametersBag->getRequirements());
     }
@@ -167,8 +169,8 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param      $route
-     * @param null $requirements
+     * @param string $route
+     * @param array  $requirements
      * @return $this
      */
     protected function parsePattern($route, $requirements = array())
@@ -299,5 +301,89 @@ class Route implements RouteInterface
         $this->routeParametersBag->setAction($action);
 
         return $this;
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function get($setting, $callback)
+    {
+        // TODO: Implement get() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function post($setting, $callback)
+    {
+        // TODO: Implement post() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function put($setting, $callback)
+    {
+        // TODO: Implement put() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function delete($setting, $callback)
+    {
+        // TODO: Implement delete() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function options($setting, $callback)
+    {
+        // TODO: Implement options() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function head($setting, $callback)
+    {
+        // TODO: Implement head() method.
+    }
+
+    /**
+     * @param $setting
+     * @param $callback
+     * @return $this
+     */
+    public function any($setting, $callback)
+    {
+        // TODO: Implement any() method.
+    }
+
+    public static function createRoute($method, $setting, $callable)
+    {
+        if (!method_exists(self, $method)) {
+            throw new \BadMethodCallException(sprintf('Route method "%s" is not exists.', $method));
+        }
+
+        return (new self)->$method($setting, $callable);
+    }
+
+    public static function __callStatic($method, $arguments = array())
+    {
+        return call_user_func_array(array((new self), $method), $arguments);
     }
 }

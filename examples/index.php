@@ -26,9 +26,11 @@ $router->setRoute(new Route($annotation->getRouteBag('demo')));
 
 $router->setRoute(new Route($annotation->getRouteBag('test')));
 
+//$router->setRoute();
+
 $request = \Dobee\Http\Request::createGlobalRequest();
 
-echo $router->generateUrl('test');
+//echo $router->generateUrl('test');
 
 $route = $router->match($request->getPathInfo());
 

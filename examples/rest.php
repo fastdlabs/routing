@@ -22,12 +22,13 @@ use Dobee\Routing\Router;
 
 $router = new Router();
 
-$router->get();
+$response = $router->createRoute(array(
+    '/hello/{name}',
+    'name' => 'demo_any',
+    'method' => 'any',
+    'format' => 'json'
+), function ($name) {
+    return $name;
+});
 
-$router->post();
-
-$router->any();
-
-$router->head();
-
-print_r($router);
+print_r($response);
