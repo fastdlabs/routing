@@ -29,6 +29,14 @@ class AnnotationContext extends \Dobee\Annotation\AnnotationContext
      */
     public function getRouteBag($method)
     {
+<<<<<<< HEAD
         return new RouteBag();
+=======
+        if ($method instanceof \ReflectionMethod) {
+            $method = $method->getName();
+        }
+
+        return $this->getParameters($method);
+>>>>>>> master
     }
 }

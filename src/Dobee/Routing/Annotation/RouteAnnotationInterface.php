@@ -16,6 +16,7 @@ namespace Dobee\Routing\Annotation;
 interface RouteAnnotationInterface
 {
     /**
+<<<<<<< HEAD
      * @param $annotation
      * @return string|null
      */
@@ -38,4 +39,22 @@ interface RouteAnnotationInterface
      * @return string
      */
 //    public function getAnnotationMethod($annotation);
+=======
+     * @param \ReflectionClass $class
+     * @return string
+     */
+    public function getRoutePrefix(\ReflectionClass $class);
+
+    /**
+     * @param \ReflectionMethod $method
+     * @return @return RouteBag|null
+     */
+    public function getRouteParameters(\ReflectionMethod $method);
+
+    /**
+     * @param \ReflectionMethod $method
+     * @return bool
+     */
+    public function hasRouteAnnotation(\ReflectionMethod $method);
+>>>>>>> master
 }

@@ -17,7 +17,11 @@ use Dobee\Routing\RouteNotFoundException;
  *
  * @package Dobee\Component\Routing\Collections
  */
+<<<<<<< HEAD
 class RouteCollections implements RouteCollectionInterface, \Iterator
+=======
+class RouteCollections implements RouteCollectionInterface, \Iterator, \Countable
+>>>>>>> master
 {
     /**
      * @var array
@@ -155,7 +159,26 @@ class RouteCollections implements RouteCollectionInterface, \Iterator
      * @return mixed
      */
     public function getRouteCollections()
+<<<<<<< HEAD
     {
         return $this->routeCollections;
+=======
+    {
+        return $this->routeCollections;
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Count elements of an object
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     * </p>
+     * <p>
+     * The return value is cast to an integer.
+     */
+    public function count()
+    {
+        return count($this->routeCollections);
+>>>>>>> master
     }
 }

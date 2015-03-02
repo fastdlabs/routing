@@ -26,6 +26,7 @@ $router->setRoute(new Route($annotation->getRouteBag('demo')));
 
 $router->setRoute(new Route($annotation->getRouteBag('test')));
 
+<<<<<<< HEAD
 $request = \Dobee\Http\Request::createGlobalRequest();
 echo '<pre>';
 print_r($router);
@@ -36,4 +37,15 @@ $route = $router->match($request->getPathInfo());
 $response = $route->getCallable();
 
 print_r($response);
+=======
+//$router->setRoute();
+
+$request = \Dobee\Http\Request::createGlobalRequest();
+
+//echo $router->generateUrl('test');
+
+$route = $router->match($request->getPathInfo());
+
+print_r($route);
+>>>>>>> master
 

@@ -16,6 +16,10 @@ use Dobee\Routing\Collections\RouteCollections;
 use Dobee\Routing\Generator\RouteGenerator;
 use Dobee\Routing\Matcher\RouteMatcher;
 use Dobee\Routing\Collections\RouteCollectionInterface;
+<<<<<<< HEAD
+=======
+use Dobee\Routing\Rest\RESTRouteSetting;
+>>>>>>> master
 
 /**
  * Class Router
@@ -36,6 +40,7 @@ class Router
 
     /**
      * @var RouteMatcher
+<<<<<<< HEAD
      */
     private $matcher;
 
@@ -44,6 +49,16 @@ class Router
      *
      * Initialize route collections and route Generator.
      */
+=======
+     */
+    private $matcher;
+
+    /**
+     * Router constructor.
+     *
+     * Initialize route collections and route Generator.
+     */
+>>>>>>> master
     public function __construct()
     {
         $this->collections = new RouteCollections();
@@ -145,7 +160,23 @@ class Router
      * @throws RouteException
      */
     public function matchFormat($format, RouteInterface $route)
+<<<<<<< HEAD
     {
         return $this->matcher->matchRequestFormat($format, $route);
+=======
+    {
+        return $this->matcher->matchRequestFormat($format, $route);
+    }
+
+    /**
+     * @param $route
+     * @param $callable
+     * @return \ReflectionParameter[]
+     */
+    public function createRoute($route, $callable)
+    {
+        $function = new \ReflectionFunction($callable);
+        return $function->getParameters();
+>>>>>>> master
     }
 }

@@ -22,6 +22,7 @@ use Dobee\Routing\Router;
 
 $router = new Router();
 
+<<<<<<< HEAD
 $router->get();
 
 $router->post();
@@ -31,3 +32,15 @@ $router->any();
 $router->head();
 
 print_r($router);
+=======
+$response = $router->createRoute(array(
+    '/hello/{name}',
+    'name' => 'demo_any',
+    'method' => 'any',
+    'format' => 'json'
+), function ($name) {
+    return $name;
+});
+
+print_r($response);
+>>>>>>> master
