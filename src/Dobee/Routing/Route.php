@@ -212,7 +212,7 @@ class Route implements RouteInterface, RESTRouteSetting
      * @param array $arguments
      * @return $this
      */
-    public function setArguments($arguments)
+    public function setArguments(array $arguments)
     {
         $this->routeParametersBag->setArguments($arguments);
 
