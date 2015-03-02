@@ -372,18 +372,4 @@ class Route implements RouteInterface, RESTRouteSetting
     {
         // TODO: Implement any() method.
     }
-
-    public static function createRoute($method, $setting, $callable)
-    {
-        if (!method_exists(self, $method)) {
-            throw new \BadMethodCallException(sprintf('Route method "%s" is not exists.', $method));
-        }
-
-        return (new self)->$method($setting, $callable);
-    }
-
-    public static function __callStatic($method, $arguments = array())
-    {
-        return call_user_func_array(array((new self), $method), $arguments);
-    }
 }
