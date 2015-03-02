@@ -27,6 +27,9 @@ class RouteAnnotation extends RulesAbstract implements RouteAnnotationInterface
      */
     private $prefix = null;
 
+    /**
+     * @var string Route mapping Controller class name.
+     */
     private $class = null;
 
     /**

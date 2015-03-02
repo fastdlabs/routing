@@ -31,6 +31,10 @@ interface RouteParameterBagInterface
      */
     public function getClass();
 
+    /**
+     * @param $action
+     * @return $this
+     */
     public function setAction($action);
 
     /**
@@ -38,6 +42,10 @@ interface RouteParameterBagInterface
      */
     public function getAction();
 
+    /**
+     * @param $route
+     * @return $this
+     */
     public function setRoute($route);
 
     /**
@@ -45,6 +53,10 @@ interface RouteParameterBagInterface
      */
     public function getRoute();
 
+    /**
+     * @param $name
+     * @return $this
+     */
     public function setName($name);
 
     /**
@@ -52,6 +64,10 @@ interface RouteParameterBagInterface
      */
     public function getName();
 
+    /**
+     * @param $prefix
+     * @return $this
+     */
     public function setPrefix($prefix);
 
     /**
@@ -59,6 +75,10 @@ interface RouteParameterBagInterface
      */
     public function getPrefix();
 
+    /**
+     * @param $method
+     * @return $this
+     */
     public function setMethod($method);
 
     /**
@@ -66,6 +86,10 @@ interface RouteParameterBagInterface
      */
     public function getMethod();
 
+    /**
+     * @param array $defaults
+     * @return $this
+     */
     public function setDefaults(array $defaults);
 
     /**
@@ -73,6 +97,10 @@ interface RouteParameterBagInterface
      */
     public function getDefaults();
 
+    /**
+     * @param array $requirements
+     * @return $this
+     */
     public function setRequirements(array $requirements);
 
     /**
@@ -80,6 +108,10 @@ interface RouteParameterBagInterface
      */
     public function getRequirements();
 
+    /**
+     * @param $format
+     * @return $this
+     */
     public function setFormat($format);
 
     /**
@@ -87,6 +119,10 @@ interface RouteParameterBagInterface
      */
     public function getFormat();
 
+    /**
+     * @param array $arguments
+     * @return $this
+     */
     public function setArguments(array $arguments);
 
     /**
@@ -94,6 +130,10 @@ interface RouteParameterBagInterface
      */
     public function getArguments();
 
+    /**
+     * @param array $parameters
+     * @return $this
+     */
     public function setParameters(array $parameters);
 
     /**
@@ -101,6 +141,10 @@ interface RouteParameterBagInterface
      */
     public function getParameters();
 
+    /**
+     * @param $pattern
+     * @return $this
+     */
     public function setPattern($pattern);
 
     /**
@@ -108,7 +152,14 @@ interface RouteParameterBagInterface
      */
     public function getPattern();
 
+    /**
+     * @param $callable
+     * @return $this
+     */
     public function setCallable($callable);
 
+    /**
+     * @return $this
+     */
     public function getCallable();
 }

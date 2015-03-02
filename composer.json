@@ -28,9 +28,9 @@
         "phpunit/phpunit": "4.5.*"
     },
     "require-dev": {
-        "dobee/http": "~1.0.9",
+        "dobee/http": "*",
         "dobee/annotation": "~1.0.2",
-        "dobee/configuration": "~1.0.1"
+        "dobee/configuration": "*"
     },
     "autoload": {
         "psr-4": {

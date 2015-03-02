@@ -20,9 +20,21 @@ namespace Dobee\Routing;
 interface RouteInterface
 {
     /**
+     * @param $name
+     * @return $this
+     */
+    public function setName($name);
+
+    /**
      * @return string
      */
     public function getName();
+
+    /**
+     * @param array $arguments
+     * @return $this
+     */
+    public function setArguments(array $arguments);
 
     /**
      * @return string|array
@@ -30,9 +42,21 @@ interface RouteInterface
     public function getArguments();
 
     /**
+     * @param array $defaults
+     * @return $this
+     */
+    public function setDefaults(array $defaults);
+
+    /**
      * @return array
      */
     public function getDefaults();
+
+    /**
+     * @param $route
+     * @return $this
+     */
+    public function setRoute($route);
 
     /**
      * @return string
@@ -40,9 +64,21 @@ interface RouteInterface
     public function getRoute();
 
     /**
+     * @param $pattern
+     * @return $this
+     */
+    public function setPattern($pattern);
+
+    /**
      * @return string
      */
     public function getPattern();
+
+    /**
+     * @param $format
+     * @return $this
+     */
+    public function setFormat($format);
 
     /**
      * @return string
@@ -50,9 +86,21 @@ interface RouteInterface
     public function getFormat();
 
     /**
+     * @param array $requirements
+     * @return $this
+     */
+    public function setRequirements(array $requirements);
+
+    /**
      * @return string|array
      */
     public function getRequirements();
+
+    /**
+     * @param $prefix
+     * @return $this
+     */
+    public function setPrefix($prefix);
 
     /**
      * @return string
@@ -60,9 +108,21 @@ interface RouteInterface
     public function getPrefix();
 
     /**
+     * @param $method
+     * @return $this
+     */
+    public function setMethod($method);
+
+    /**
      * @return string|array
      */
     public function getMethod();
+
+    /**
+     * @param $callable
+     * @return $this
+     */
+    public function setCallable($callable);
 
     /**
      * @return mixed

@@ -28,11 +28,7 @@ $router->setRoute(new Route($annotation->getRouteBag('demo')));
 
 $router->setRoute(new Route($annotation->getRouteBag('test')));
 
-echo $router->generateUrl('test') . '<br />';
-
 $route = $router->match($request->getPathInfo());
-
-$response = $route->getCallable();
 
 print_r($route);
 

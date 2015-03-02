@@ -149,15 +149,4 @@ class Router
     {
         return $this->matcher->matchRequestFormat($format, $route);
     }
-
-    /**
-     * @param $route
-     * @param $callable
-     * @return \ReflectionParameter[]
-     */
-    public function createRoute($route, $callable)
-    {
-        $function = new \ReflectionFunction($callable);
-        return $function->getParameters();
-    }
 }
