@@ -20,27 +20,19 @@ use Dobee\Routing\Router;
 
 $router = new Router();
 
+$request = \Dobee\Http\Request::createGlobalRequest();
+
 $annotation = new AnnotationContext(new RouteAnnotation('Examples\\RouteController'));
 
 $router->setRoute(new Route($annotation->getRouteBag('demo')));
 
 $router->setRoute(new Route($annotation->getRouteBag('test')));
 
-$request = \Dobee\Http\Request::createGlobalRequest();
-echo '<pre>';
-echo $router->generateUrl('test');
+echo $router->generateUrl('test') . '<br />';
 
 $route = $router->match($request->getPathInfo());
 
 $response = $route->getCallable();
 
-print_r($response);
-//$router->setRoute();
-
-$request = \Dobee\Http\Request::createGlobalRequest();
-
-//echo $router->generateUrl('test');
-
-$route = $router->match($request->getPathInfo());
-
 print_r($route);
+
