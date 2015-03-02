@@ -184,7 +184,7 @@ class Route implements RouteInterface, RESTRouteSetting
             $this->setArguments($match[1]);
         }
 
-        $this->setPattern('/^' . str_replace('/', '\/', $route) . '$/');
+        $this->setPattern('/^' . str_replace('/', '\/', $this->getPrefix() . $route) . '$/');
 
         return $this;
     }

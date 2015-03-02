@@ -24,11 +24,16 @@ $request = \Dobee\Http\Request::createGlobalRequest();
 
 $annotation = new AnnotationContext(new RouteAnnotation('Examples\\RouteController'));
 
-$router->setRoute(new Route($annotation->getRouteBag('demo')));
+$route = new Route($annotation->getRouteBag('demo'));
+
+$route->setPrefix('/demo' . $route->getPrefix());
+
+$router->setRoute($route);
 
 $router->setRoute(new Route($annotation->getRouteBag('test')));
 
 $route = $router->match($request->getPathInfo());
 
+print_r($router);
 print_r($route);
 
