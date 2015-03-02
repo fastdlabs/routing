@@ -23,46 +23,6 @@ namespace Dobee\Routing\Rest;
 interface RESTRouteSetting
 {
     /**
-<<<<<<< HEAD
-     * @return $this
-     */
-    public function get();
-
-    /**
-     * @return $this
-     */
-    public function post();
-
-    /**
-     * @return $this
-     */
-    public function put();
-
-    /**
-     * @return $this
-     */
-    public function delete();
-
-    /**
-     * @return $this
-     */
-    public function options();
-
-    /**
-     * @return $this
-     */
-    public function head();
-
-    /**
-     * @return $this
-     */
-    public function any();
-
-    /**
-     * @return void
-     */
-    public function run();
-=======
      * @param $setting
      * @param $callback
      * @return $this
@@ -110,5 +70,4 @@ interface RESTRouteSetting
      * @return $this
      */
     public function any($setting, $callback);
->>>>>>> master
 }

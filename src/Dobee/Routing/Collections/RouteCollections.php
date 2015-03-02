@@ -17,11 +17,7 @@ use Dobee\Routing\RouteNotFoundException;
  *
  * @package Dobee\Component\Routing\Collections
  */
-<<<<<<< HEAD
-class RouteCollections implements RouteCollectionInterface, \Iterator
-=======
 class RouteCollections implements RouteCollectionInterface, \Iterator, \Countable
->>>>>>> master
 {
     /**
      * @var array
@@ -159,10 +155,6 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      * @return mixed
      */
     public function getRouteCollections()
-<<<<<<< HEAD
-    {
-        return $this->routeCollections;
-=======
     {
         return $this->routeCollections;
     }
@@ -179,6 +171,5 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
     public function count()
     {
         return count($this->routeCollections);
->>>>>>> master
     }
 }

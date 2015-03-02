@@ -15,11 +15,7 @@ namespace Dobee\Routing;
 
 class RouteBag implements RouteParameterBagInterface
 {
-<<<<<<< HEAD
-    protected $className;
-=======
     protected $class;
->>>>>>> master
 
     protected $action;
 
@@ -41,36 +37,6 @@ class RouteBag implements RouteParameterBagInterface
 
     protected $parameters;
 
-<<<<<<< HEAD
-    public function __construct(
-        $className,
-        $action,
-        $route,
-        $name,
-        $prefix,
-        $method,
-        $defaults,
-        $requirements,
-        $format,
-        $arguments,
-        $parameters
-    )
-    {
-        $this->className = $className;
-        $this->action = $action;
-        $this->route = $route;
-        $this->name = $name;
-        $this->prefix = $prefix;
-        $this->method = $method;
-        $this->defaults = $defaults;
-        $this->requirements = $requirements;
-        $this->format = $format;
-        $this->arguments = $arguments;
-        $this->parameters = $parameters;
-    }
-
-    public function getClassName()
-=======
     protected $pattern;
 
     protected $callable;
@@ -91,7 +57,6 @@ class RouteBag implements RouteParameterBagInterface
     }
 
     public function getClass()
->>>>>>> master
     {
         return $this->className;
     }
@@ -145,8 +110,6 @@ class RouteBag implements RouteParameterBagInterface
     {
         return $this->parameters;
     }
-<<<<<<< HEAD
-=======
 
     public function getPattern()
     {
@@ -256,5 +219,4 @@ class RouteBag implements RouteParameterBagInterface
     {
         return $this->callable;
     }
->>>>>>> master
 }

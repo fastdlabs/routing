@@ -12,13 +12,10 @@
 
 namespace Examples;
 
-<<<<<<< HEAD
 /**
  * @Route("/route")
  * @Method("test")
  */
-=======
->>>>>>> master
 class RouteController 
 {
     /**

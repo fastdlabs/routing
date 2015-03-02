@@ -22,7 +22,6 @@ use Dobee\Routing\Router;
 
 $router = new Router();
 
-<<<<<<< HEAD
 $router->get();
 
 $router->post();
@@ -32,7 +31,7 @@ $router->any();
 $router->head();
 
 print_r($router);
-=======
+
 $response = $router->createRoute(array(
     '/hello/{name}',
     'name' => 'demo_any',
@@ -43,4 +42,4 @@ $response = $router->createRoute(array(
 });
 
 print_r($response);
->>>>>>> master
+
