@@ -22,6 +22,19 @@ $router = new Router();
 
 $request = \Dobee\Http\Request::createGlobalRequest();
 
+$finder = new \Dobee\Finder\Finder();
+
+$controllers = $finder->name('Controller%')->in(__DIR__)->files();
+
+foreach ($controllers as $controller) {
+    $methods = $controller->getAnnotation()->getMethodsAnnotation();
+    foreach ($methods as $name => $value) {
+        print_r($value);
+    }
+}
+
+die;
+
 $annotation = new AnnotationContext(new RouteAnnotation('Examples\\RouteController'));
 
 $route = new Route($annotation->getRouteBag('demo'));
