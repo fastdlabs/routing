@@ -68,6 +68,12 @@ class RouteMatcher implements RouteMatcherInterface
 
         $parameters = array_combine(array_values($route->getArguments()), $match);
 
+        array_map(function ($value) use (&$parameters) {
+            if (is_callable($value)) {
+                array_unshift($parameters, $value());
+            }
+        }, $route->getParameters());
+
         $route->setParameters($parameters);
 
         return $route;

@@ -20,7 +20,7 @@ use Dobee\Routing\RouteBag;
  *
  * @package Dobee\Routing\Annotation
  */
-class RouteAnnotation extends RulesAbstract implements RouteAnnotationInterface
+class RouteAnnotation implements RouteAnnotationInterface
 {
     /**
      * @var string

@@ -19,7 +19,7 @@ use Dobee\Routing\Rest\RESTRouteSetting;
  *
  * @package Dobee\Routing
  */
-class Route implements RouteInterface, RESTRouteSetting
+class Route implements RouteInterface
 {
     /**
      * @var RouteParameterBagInterface
@@ -301,75 +301,5 @@ class Route implements RouteInterface, RESTRouteSetting
         $this->routeParametersBag->setAction($action);
 
         return $this;
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function get($setting, $callback)
-    {
-        // TODO: Implement get() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function post($setting, $callback)
-    {
-        // TODO: Implement post() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function put($setting, $callback)
-    {
-        // TODO: Implement put() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function delete($setting, $callback)
-    {
-        // TODO: Implement delete() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function options($setting, $callback)
-    {
-        // TODO: Implement options() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function head($setting, $callback)
-    {
-        // TODO: Implement head() method.
-    }
-
-    /**
-     * @param $setting
-     * @param $callback
-     * @return $this
-     */
-    public function any($setting, $callback)
-    {
-        // TODO: Implement any() method.
     }
 }

@@ -117,7 +117,7 @@ class Router
     /**
      * @param                $uri
      * @param RouteInterface $route
-     * @return mixed
+     * @return Route
      */
     public function match($uri, RouteInterface $route = null)
     {

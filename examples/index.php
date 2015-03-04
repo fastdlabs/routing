@@ -13,40 +13,30 @@ echo '<pre>';
 $composer = include __DIR__ . '/../vendor/autoload.php';
 include __DIR__ . '/RouteController.php';
 
-use Dobee\Routing\Annotation\RouteAnnotation;
 use Dobee\Routing\Annotation\AnnotationContext;
-use Dobee\Routing\Route;
 use Dobee\Routing\Router;
-
-$router = new Router();
-
-$request = \Dobee\Http\Request::createGlobalRequest();
+use Dobee\Routing\Route;
 
 $finder = new \Dobee\Finder\Finder();
 
 $controllers = $finder->name('Controller%')->in(__DIR__)->files();
 
+$router = new Router();
+
+$annotationContext = new AnnotationContext();
+
 foreach ($controllers as $controller) {
+    $annotation = $controller->getAnnotation()->getClassAnnotation();
     $methods = $controller->getAnnotation()->getMethodsAnnotation();
     foreach ($methods as $name => $value) {
-        print_r($value);
+        $parametersBag = $annotationContext->getRouteParametersBag($value);
+        $parametersBag->setPrefix(isset($annotation['Route']['parameters'][0]) ? $annotation['Route']['parameters'][0] : "");
+        $router->setRoute(new Route($parametersBag));
     }
 }
 
-die;
-
-$annotation = new AnnotationContext(new RouteAnnotation('Examples\\RouteController'));
-
-$route = new Route($annotation->getRouteBag('demo'));
-
-$route->setPrefix('/demo' . $route->getPrefix());
-
-$router->setRoute($route);
-
-$router->setRoute(new Route($annotation->getRouteBag('test')));
+$request = \Dobee\Http\Request::createGlobalRequest();
 
 $route = $router->match($request->getPathInfo());
 
-print_r($router);
 print_r($route);
-

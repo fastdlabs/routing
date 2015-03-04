@@ -128,4 +128,15 @@ interface RouteInterface
      * @return mixed
      */
     public function getCallable();
+
+    /**
+     * @param array $parameters
+     * @return $this
+     */
+    public function setParameters(array $parameters);
+
+    /**
+     * @return mixed
+     */
+    public function getParameters();
 }
