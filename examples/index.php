@@ -39,4 +39,6 @@ $request = \Dobee\Http\Request::createGlobalRequest();
 
 $route = $router->match($request->getPathInfo());
 
-print_r($route);
+echo $router->generateUrl('test', array('name' => 123));
+
+//print_r($route);

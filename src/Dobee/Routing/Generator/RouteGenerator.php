@@ -44,10 +44,9 @@ class RouteGenerator
         }
 
         if (is_array(($format = $route->getFormat()))) {
-            $index = mt_rand(0, (count($format) - 1));
-            $format = $format[$index];
+            $format = reset($format);
         }
 
-        return $routeUrl . '.' . $format;
+        return $routeUrl . (empty($format) ? '' : ('.' . $format));
     }
 } 

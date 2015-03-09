@@ -14,15 +14,11 @@ namespace Examples;
 
 use Dobee\Routing\Annotation\AnnotationContext;
 
-/**
- * @Route("/route")
- * @Method("test")
- */
 class RouteController 
 {
     /**
-     * @Route("/test/{name}", name="test")
-     * @Route(defaults={"name": "123"}, requirements={"name": "\d+"}, format=json)
+     * @Route("/{name}", name="test")
+     * @Route(defaults={"name": "123"}, requirements={"name": "\d+"}, format=["html", "json"])
      * @Method("POST")
      */
     public function testAction(AnnotationContext $an, $name)
