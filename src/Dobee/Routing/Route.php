@@ -177,7 +177,7 @@ class Route implements RouteInterface
     {
         if (preg_match_all('/\{(\w+)\}/ui', $route, $match)) {
             foreach ($match[1] as $val) {
-                $pattern = isset($requirements[$val]) ? $requirements[$val] : '\w+';
+                $pattern = isset($requirements[$val]) ? $requirements[$val] : '.*?';
                 $route = str_replace('{' . $val . '}', '{1}(' . $pattern . ')', $route);
             }
 
