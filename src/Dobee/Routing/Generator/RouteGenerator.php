@@ -37,7 +37,7 @@ class RouteGenerator
             return '{' . $value . '}';
         }, $requirement);
 
-        $routeUrl = str_replace($replacer, $defaults, $route->getRoute());
+        $routeUrl = str_replace($replacer, $defaults, $route->getPrefix() . $route->getRoute());
 
         if (!preg_match_all($route->getPattern(), $routeUrl, $match)) {
             throw new RouteGenerateException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())));
