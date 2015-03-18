@@ -17,11 +17,11 @@ use Dobee\Routing\Router;
 
 $router = new Router();
 
-/*if ($router->getCaching()) {
+if ($router->getCaching()) {
     echo 'get for caching.<br />';
     print_r($router);
     die;
-}*/
+}
 
 
 $routes = $router->getAnnotationParser()->getRoutes('/abc', 'Examples\\RouteController');

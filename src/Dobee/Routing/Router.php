@@ -21,7 +21,7 @@ use Dobee\Routing\Matcher\RouteMatcher;
  *
  * @package Dobee\Routing
  */
-class Router extends RouterCaching
+class Router extends RouterCaching implements \Serializable
 {
     /**
      * @var RouteCollections
@@ -182,7 +182,7 @@ class Router extends RouterCaching
 
         return file_put_contents(
             realpath($this->cachePath) . DIRECTORY_SEPARATOR . $this->cacheName,
-            '<?php return ' . $this->collections->serialize() . ';'
+            $this->serialize()
         );
     }
 
@@ -204,14 +204,43 @@ class Router extends RouterCaching
         }
 
         if (false !== ($caching = $this->hasCaching())) {
-            $routes = include $caching;
-            foreach ($routes as $name => $route) {
-                $this->collections->setRoute($name, unserialize($route));
-            }
-
-            return true;
+            try {
+                $this->unserialize(file_get_contents($caching));
+                return true;
+            } catch (\LengthException $e){}
         }
 
         return false;
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     *
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        return serialize($this->collections);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     *
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     *                           The string representation of the object.
+     *                           </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        if (!empty($serialized)) {
+            $this->collections = unserialize($serialized);
+        } else {
+            throw new \LengthException(sprintf('Caching error.'));
+        }
     }
 }
