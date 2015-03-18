@@ -12,9 +12,9 @@
 
 namespace Dobee\Routing\Matcher;
 
-use Dobee\Routing\Collections\RouteCollectionInterface;
+use Dobee\Routing\RouteCollectionInterface;
 use Dobee\Routing\RouteInterface;
-use Dobee\Routing\RouteException;
+use Dobee\Routing\RouteInvalidException;
 use Dobee\Routing\RouteNotFoundException;
 
 /**
@@ -26,13 +26,13 @@ class RouteMatcher implements RouteMatcherInterface
 {
     /**
      * @param                          $uri
-     * @param RouteCollectionInterface $collection
+     * @param RouteCollectionInterface $collections
      * @return mixed
      * @throws RouteNotFoundException
      */
-    public function match($uri, RouteCollectionInterface $collection = null)
+    public function match($uri, RouteCollectionInterface $collections = null)
     {
-        foreach ($collection->getRouteCollections() as $route) {
+        foreach ($collections->getRouteCollections() as $route) {
             try {
                 $route = $this->matchRequestRoute($uri, $route);
                 return $route;
@@ -52,14 +52,14 @@ class RouteMatcher implements RouteMatcherInterface
      */
     public function matchRequestRoute($uri, RouteInterface $route = null)
     {
-        if (!preg_match($route->getPattern(), $uri, $match)) {
+        if (!preg_match($route->getPathRegex(), $uri, $match)) {
             $args = array_slice(
                 $route->getArguments(),
-                substr_count(rtrim($uri, '/'), '/') - substr_count(rtrim($route->getPrefix(), '/'), '/') - count($route->getArguments())
+                substr_count(rtrim($uri, '/'), '/') - substr_count(rtrim($route->getGroup(), '/'), '/') - count($route->getArguments())
             );
             $defaults = $this->filter($route->getDefaults(), $args);
             $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
-            if (!preg_match($route->getPattern(), $uri, $match)) {
+            if (!preg_match($route->getPathRegex(), $uri, $match)) {
                 throw new RouteNotFoundException(sprintf('Route "%s" is not found.', $uri));
             }
         }
@@ -83,7 +83,7 @@ class RouteMatcher implements RouteMatcherInterface
      * @param                $method
      * @param RouteInterface $route
      * @return RouteInterface
-     * @throws RouteException
+     * @throws RouteInvalidException
      */
     public function matchRequestMethod($method, RouteInterface $route)
     {
@@ -96,7 +96,7 @@ class RouteMatcher implements RouteMatcherInterface
         }
 
         if (!in_array($method, $methods)) {
-            throw new RouteException(sprintf('Route "%s" request method must to be ["%s"]', $route->getName(), implode('", "', $methods)));
+            throw new RouteInvalidException(sprintf('Route "%s" request method must to be ["%s"]', $route->getName(), implode('", "', $methods)));
         }
 
         return $route;
@@ -106,7 +106,7 @@ class RouteMatcher implements RouteMatcherInterface
      * @param                $format
      * @param RouteInterface $route
      * @return RouteInterface
-     * @throws RouteException
+     * @throws RouteInvalidException
      */
     public function matchRequestFormat($format, RouteInterface $route)
     {
@@ -119,7 +119,7 @@ class RouteMatcher implements RouteMatcherInterface
         }
 
         if (!in_array($format, $formats)) {
-            throw new RouteException(sprintf('Route "%s" request format must to be ["%s"]', $route->getName(), implode('", "', $formats)));
+            throw new RouteInvalidException(sprintf('Route "%s" request format must to be ["%s"]', $route->getName(), implode('", "', $formats)));
         }
 
         return $route;

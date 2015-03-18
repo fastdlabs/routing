@@ -12,11 +12,9 @@
 
 namespace Dobee\Routing;
 
-use Dobee\Routing\Collections\RouteCollections;
+use Dobee\Routing\Annotation\RouteAnnotationContext;
 use Dobee\Routing\Generator\RouteGenerator;
 use Dobee\Routing\Matcher\RouteMatcher;
-use Dobee\Routing\Collections\RouteCollectionInterface;
-use Dobee\Routing\Rest\RESTRouteSetting;
 
 /**
  * Class Router
@@ -41,6 +39,11 @@ class Router
     private $matcher;
 
     /**
+     * @var RouteAnnotationContext
+     */
+    private $annotation;
+
+    /**
      * Router constructor.
      *
      * Initialize route collections and route Generator.
@@ -52,6 +55,18 @@ class Router
         $this->generator = new RouteGenerator();
 
         $this->matcher = new RouteMatcher();
+    }
+
+    /**
+     * @return RouteAnnotationContext
+     */
+    public function getAnnotationParser()
+    {
+        if (null === $this->annotation) {
+            $this->annotation = new RouteAnnotationContext($this->collections);
+        }
+
+        return $this->annotation;
     }
 
     /**
@@ -132,7 +147,7 @@ class Router
      * @param                $method
      * @param RouteInterface $route
      * @return RouteInterface
-     * @throws RouteException
+     * @throws RouteInvalidException
      */
     public function matchMethod($method, RouteInterface $route)
     {
@@ -143,7 +158,7 @@ class Router
      * @param                $format
      * @param RouteInterface $route
      * @return RouteInterface
-     * @throws RouteException
+     * @throws RouteInvalidException
      */
     public function matchFormat($format, RouteInterface $route)
     {

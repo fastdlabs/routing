@@ -13,7 +13,7 @@
 namespace Dobee\Routing\Matcher;
 
 use Dobee\Routing\RouteInterface;
-use Dobee\Routing\Collections\RouteCollectionInterface;
+use Dobee\Routing\RouteCollectionInterface;
 
 /**
  * Interface RouteMatcherInterface

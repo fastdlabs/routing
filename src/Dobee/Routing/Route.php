@@ -12,8 +12,6 @@
 
 namespace Dobee\Routing;
 
-use Dobee\Routing\Rest\RESTRouteSetting;
-
 /**
  * Class Route
  *
@@ -22,18 +20,100 @@ use Dobee\Routing\Rest\RESTRouteSetting;
 class Route implements RouteInterface
 {
     /**
-     * @var RouteParameterBagInterface
+     * @var string
      */
-    protected $routeParametersBag;
+    protected $group;
 
     /**
-     * @param RouteParameterBagInterface $routeParametersBag
+     * @var string
      */
-    public function __construct(RouteParameterBagInterface $routeParametersBag = null)
-    {
-        $this->routeParametersBag = $routeParametersBag;
+    protected $route;
 
-        $this->parsePattern($routeParametersBag->getRoute(), $routeParametersBag->getRequirements());
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @var string|array
+     */
+    protected $format;
+
+    /**
+     * @var array
+     */
+    protected $defaults;
+
+    /**
+     * @var array
+     */
+    protected $requirements;
+
+    /**
+     * @var string
+     */
+    protected $action;
+
+    /**
+     * @var array
+     */
+    protected $arguments;
+
+    /**
+     * @var array
+     */
+    protected $parameters;
+
+    /**
+     * @var string|array
+     */
+    protected $method;
+
+    /**
+     * @var string
+     */
+    protected $class;
+
+    /**
+     * @var \Closure
+     */
+    protected $callback;
+
+    /**
+     * @var string
+     */
+    private $pathRegex;
+
+    /**
+     * @param array $routeBag
+     */
+    public function __construct(array $routeBag)
+    {
+        $this->class        = $routeBag['class'];
+        $this->action       = $routeBag['action'];
+        $this->route        = $routeBag['route'];
+        $this->name         = $routeBag['name'];
+        $this->group        = $routeBag['group'];
+        $this->method       = $routeBag['method'];
+        $this->defaults     = $routeBag['defaults'];
+        $this->requirements = $routeBag['requirements'];
+        $this->format       = $routeBag['format'];
+        $this->arguments    = $routeBag['arguments'];
+        $this->parameters   = $routeBag['parameters'];
+
+        $this->parsePathRegex($this->route, $this->requirements);
+    }
+
+    public function setGroup($group)
+    {
+        $this->group = $group;
+
+        return $this;
+    }
+
+    public function getGroup()
+    {
+        return $this->group;
     }
 
     /**
@@ -42,7 +122,7 @@ class Route implements RouteInterface
      */
     public function setRoute($route)
     {
-        $this->routeParametersBag->setRoute($route);
+        $this->route = $route;
 
         return $this;
     }
@@ -52,7 +132,7 @@ class Route implements RouteInterface
      */
     public function getRoute()
     {
-        return $this->routeParametersBag->getRoute();
+        return $this->route;
     }
 
     /**
@@ -61,7 +141,7 @@ class Route implements RouteInterface
      */
     public function setName($name)
     {
-        $this->routeParametersBag->setName($name);
+        $this->name = $name;
 
         return $this;
     }
@@ -70,27 +150,9 @@ class Route implements RouteInterface
      */
     public function getName()
     {
-        return $this->routeParametersBag->getName();
+        return $this->name;
     }
 
-    /**
-     * @param string $prefix
-     * @return $this
-     */
-    public function setPrefix($prefix)
-    {
-        $this->routeParametersBag->setPrefix($prefix);
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->routeParametersBag->getPrefix();
-    }
 
     /**
      * @param array|string $method
@@ -98,7 +160,7 @@ class Route implements RouteInterface
      */
     public function setMethod($method)
     {
-        $this->routeParametersBag->setMethod($method);
+        $this->method = $method;
 
         return $this;
     }
@@ -108,7 +170,7 @@ class Route implements RouteInterface
      */
     public function getMethod()
     {
-        return $this->routeParametersBag->getMethod();
+        return $this->method;
     }
 
     /**
@@ -117,7 +179,7 @@ class Route implements RouteInterface
      */
     public function setDefaults(array $defaults)
     {
-        $this->routeParametersBag->setDefaults($defaults);
+        $this->defaults = $defaults;
 
         return $this;
     }
@@ -127,7 +189,7 @@ class Route implements RouteInterface
      */
     public function getDefaults()
     {
-        return $this->routeParametersBag->getDefaults();
+        return $this->defaults;
     }
 
     /**
@@ -136,7 +198,7 @@ class Route implements RouteInterface
      */
     public function setRequirements(array $requirements)
     {
-        $this->routeParametersBag->setRequirements($requirements);
+        $this->requirements = $requirements;
 
         return $this;
     }
@@ -146,7 +208,7 @@ class Route implements RouteInterface
      */
     public function getRequirements()
     {
-        return $this->routeParametersBag->getRequirements();
+        return $this->requirements;
     }
 
     /**
@@ -155,7 +217,7 @@ class Route implements RouteInterface
      */
     public function setFormat($format)
     {
-        $this->routeParametersBag->setFormat($format);
+        $this->format = $format;
 
         return $this;
     }
@@ -165,7 +227,7 @@ class Route implements RouteInterface
      */
     public function getFormat()
     {
-        return $this->routeParametersBag->getFormat();
+        return $this->format;
     }
 
     /**
@@ -173,7 +235,7 @@ class Route implements RouteInterface
      * @param array  $requirements
      * @return $this
      */
-    protected function parsePattern($route, $requirements = array())
+    protected function parsePathRegex($route, $requirements = array())
     {
         if (preg_match_all('/\{(\w+)\}/ui', $route, $match)) {
             foreach ($match[1] as $val) {
@@ -184,18 +246,18 @@ class Route implements RouteInterface
             $this->setArguments($match[1]);
         }
 
-        $this->setPattern('/^' . str_replace('/', '\/', $this->getPrefix() . $route) . '$/');
+        $this->setPathRegex('/^' . str_replace('/', '\/', $this->getGroup() . $route) . '$/');
 
         return $this;
     }
 
     /**
-     * @param string $pattern
+     * @param string $regex
      * @return $this
      */
-    public function setPattern($pattern)
+    public function setPathRegex($regex)
     {
-        $this->routeParametersBag->setPattern($pattern);
+        $this->pathRegex = $regex;
 
         return $this;
     }
@@ -203,9 +265,9 @@ class Route implements RouteInterface
     /**
      * @return string
      */
-    public function getPattern()
+    public function getPathRegex()
     {
-        return $this->routeParametersBag->getPattern();
+        return $this->pathRegex;
     }
 
     /**
@@ -214,7 +276,7 @@ class Route implements RouteInterface
      */
     public function setArguments(array $arguments)
     {
-        $this->routeParametersBag->setArguments($arguments);
+        $this->arguments = $arguments;
 
         return $this;
     }
@@ -224,16 +286,16 @@ class Route implements RouteInterface
      */
     public function getArguments()
     {
-        return $this->routeParametersBag->getArguments();
+        return $this->arguments;
     }
 
     /**
-     * @param string $callable
+     * @param string $callback
      * @return $this
      */
-    public function setCallable($callable)
+    public function setCallback($callback)
     {
-        $this->routeParametersBag->setCallable($callable);
+        $this->callback = $callback;
 
         return $this;
     }
@@ -241,9 +303,9 @@ class Route implements RouteInterface
     /**
      * @return string
      */
-    public function getCallable()
+    public function getCallback()
     {
-        return $this->routeParametersBag->getCallable();
+        return $this->callback;
     }
 
     /**
@@ -252,7 +314,7 @@ class Route implements RouteInterface
      */
     public function setParameters(array $parameters)
     {
-        $this->routeParametersBag->setParameters($parameters);
+        $this->parameters = $parameters;
 
         return $this;
     }
@@ -262,7 +324,7 @@ class Route implements RouteInterface
      */
     public function getParameters()
     {
-        return $this->routeParametersBag->getParameters();
+        return $this->parameters;
     }
 
     /**
@@ -270,7 +332,7 @@ class Route implements RouteInterface
      */
     public function getClass()
     {
-        return $this->routeParametersBag->getClass();
+        return $this->class;
     }
 
     /**
@@ -279,7 +341,7 @@ class Route implements RouteInterface
      */
     public function setClass($class)
     {
-        $this->routeParametersBag->setClass($class);
+        $this->class = $class;
 
         return $this;
     }
@@ -289,7 +351,7 @@ class Route implements RouteInterface
      */
     public function getAction()
     {
-        return $this->routeParametersBag->getAction();
+        return $this->action;
     }
 
     /**
@@ -298,7 +360,7 @@ class Route implements RouteInterface
      */
     public function setAction($action)
     {
-        $this->routeParametersBag->setAction($action);
+        $this->action = $action;
 
         return $this;
     }

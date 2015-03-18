@@ -67,12 +67,12 @@ interface RouteInterface
      * @param $pattern
      * @return $this
      */
-    public function setPattern($pattern);
+    public function setPathRegex($pattern);
 
     /**
      * @return string
      */
-    public function getPattern();
+    public function getPathRegex();
 
     /**
      * @param $format
@@ -97,15 +97,15 @@ interface RouteInterface
     public function getRequirements();
 
     /**
-     * @param $prefix
+     * @param $group
      * @return $this
      */
-    public function setPrefix($prefix);
+    public function setGroup($group);
 
     /**
      * @return string
      */
-    public function getPrefix();
+    public function getGroup();
 
     /**
      * @param $method
@@ -119,15 +119,15 @@ interface RouteInterface
     public function getMethod();
 
     /**
-     * @param $callable
+     * @param $callback
      * @return $this
      */
-    public function setCallable($callable);
+    public function setCallback($callback);
 
     /**
      * @return mixed
      */
-    public function getCallable();
+    public function getCallback();
 
     /**
      * @param array $parameters

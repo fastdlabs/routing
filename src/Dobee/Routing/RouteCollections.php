@@ -6,11 +6,7 @@
  * Time: 下午1:51
  */
 
-namespace Dobee\Routing\Collections;
-
-use Dobee\Routing\RouteInterface;
-use Dobee\Routing\RouteInvalidException;
-use Dobee\Routing\RouteNotFoundException;
+namespace Dobee\Routing;
 
 /**
  * Class RouteCollections
@@ -33,7 +29,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function current()
     {
-        // TODO: Implement current() method.
+        return current($this->routeCollections);
     }
 
     /**
@@ -45,7 +41,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function next()
     {
-        // TODO: Implement next() method.
+        next($this->routeCollections);
     }
 
     /**
@@ -57,7 +53,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function key()
     {
-        // TODO: Implement key() method.
+        return key($this->routeCollections);
     }
 
     /**
@@ -70,7 +66,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function valid()
     {
-        // TODO: Implement valid() method.
+        return isset($this->routeCollections[$this->key()]);
     }
 
     /**
@@ -82,7 +78,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function rewind()
     {
-        // TODO: Implement rewind() method.
+        reset($this->routeCollections);
     }
 
     /**

@@ -20,16 +20,23 @@
         {
             "type": "git",
             "url": "https://coding.net/janhuang/configuration.git"
+        },
+        {
+            "type": "git",
+            "url": "https://coding.net/janhuang/console.git"
         }
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.3.7",
-        "phpunit/phpunit": "4.5.*"
+        "php": ">=5.4"
+    },
+    "config": {
+        "bin-dir": "bin"
     },
     "require-dev": {
         "dobee/http": "*",
         "dobee/finder": "*",
+        "dobee/console": "*",
         "dobee/configuration": "*"
     },
     "autoload": {

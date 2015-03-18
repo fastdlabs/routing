@@ -13,32 +13,54 @@ echo '<pre>';
 $composer = include __DIR__ . '/../vendor/autoload.php';
 include __DIR__ . '/RouteController.php';
 
-use Dobee\Routing\Annotation\AnnotationContext;
 use Dobee\Routing\Router;
-use Dobee\Routing\Route;
-
-$finder = new \Dobee\Finder\Finder();
-
-$controllers = $finder->name('Controller%')->in(__DIR__)->files();
 
 $router = new Router();
 
-$annotationContext = new AnnotationContext();
+$annotationContext = $router->getAnnotationParser();
+
+$routes = $annotationContext->getRoutes('/abc', 'Examples\\RouteController');
+
+$route = $routes->getRoute('test');
+
+$match = $router->match('/abc/ac', $route);
+
+echo '<hr />';
+
+echo $router->generateUrl('demo', array('age' => '你好'));
+
+echo '<hr />';
+
+print_r($match->getName());
+
+print_r($router->getRoute('demo'));
+
+
+/*$finder = new \Dobee\Finder\Finder();
+
+$controllers = $finder->name('Controller%')->in(__DIR__)->files();
 
 foreach ($controllers as $controller) {
-    $annotation = $controller->getAnnotation()->getClassAnnotation();
-    $methods = $controller->getAnnotation()->getMethodsAnnotation();
-    foreach ($methods as $name => $value) {
-        $parametersBag = $annotationContext->getRouteParametersBag($value);
-        $parametersBag->setPrefix(isset($annotation['Route']['parameters'][0]) ? $annotation['Route']['parameters'][0] : "");
-        $router->setRoute(new Route($parametersBag));
-    }
-}
+    foreach ($annotationContext->getRoutes() as $route) {
+        $router->setRoute($route);
+    }*/
 
-$request = \Dobee\Http\Request::createGlobalRequest();
+//    $annotation = $controller->getAnnotation()->getClassAnnotation();
+//    $methods = $controller->getAnnotation()->getMethodsAnnotation();
+//    print_r($methods);
+//    foreach ($methods as $name => $value) {
+//        echo '<pre>';
+//        print_r($value);
+//        echo '</pre>';
+//        $parametersBag = $annotationContext->getRouteParametersBag($value);
+//        $parametersBag->setPrefix(isset($annotation['Route']['parameters'][0]) ? $annotation['Route']['parameters'][0] : "");
+//        $router->setRoute(new Route($parametersBag));
+//    }
+//}
+//
+//$request = \Dobee\Http\Request::createGlobalRequest();
+//
+//$route = $router->match($request->getPathInfo());
+//
+//echo $router->generateUrl('test', array('name' => 123));
 
-$route = $router->match($request->getPathInfo());
-
-echo $router->generateUrl('test', array('name' => 123));
-
-//print_r($route);

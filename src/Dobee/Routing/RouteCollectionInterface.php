@@ -6,11 +6,7 @@
  * Time: 下午11:37
  */
 
-namespace Dobee\Routing\Collections;
-
-use Dobee\Routing\RouteInterface;
-use Dobee\Routing\RouteInvalidException;
-use Dobee\Routing\RouteNotFoundException;
+namespace Dobee\Routing;
 
 /**
  * Interface RouteCollectionInterface
