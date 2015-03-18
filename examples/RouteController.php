@@ -20,7 +20,7 @@ use Dobee\Routing\Annotation\AnnotationContext;
 class RouteController 
 {
     /**
-     * @Route("/{name}", name="test")
+     * @Route("/{name}", name="test", method=["POST", "GET"])
      * @Route(defaults={"name": "123"}, requirements={"name": "\w+"}, format=["html", "json"])
      * @Method("POST")
      */

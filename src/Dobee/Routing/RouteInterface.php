@@ -20,6 +20,28 @@ namespace Dobee\Routing;
 interface RouteInterface
 {
     /**
+     * @param $class
+     * @return $this
+     */
+    public function setClass($class);
+
+    /**
+     * @return string
+     */
+    public function getClass();
+
+    /**
+     * @param $action
+     * @return $this
+     */
+    public function setAction($action);
+
+    /**
+     * @return string
+     */
+    public function getAction();
+
+    /**
      * @param $name
      * @return $this
      */

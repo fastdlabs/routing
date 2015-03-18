@@ -12,6 +12,8 @@
 
 namespace Dobee\Routing;
 
+use Prophecy\Exception\InvalidArgumentException;
+
 /**
  * Class Route
  *
@@ -295,6 +297,10 @@ class Route implements RouteInterface
      */
     public function setCallback($callback)
     {
+        if (!is_callable($callback)) {
+            throw new InvalidArgumentException(sprintf('The route callback closure must be a is callable.'));
+        }
+
         $this->callback = $callback;
 
         return $this;
@@ -305,6 +311,12 @@ class Route implements RouteInterface
      */
     public function getCallback()
     {
+        if (null === $this->callback) {
+            $this->callback = function (array $parameters = array()) {
+                return call_user_func_array(array($this->class, $this->action), $parameters);
+            };
+        }
+
         return $this->callback;
     }
 

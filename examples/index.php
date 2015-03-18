@@ -17,23 +17,13 @@ use Dobee\Routing\Router;
 
 $router = new Router();
 
-$annotationContext = $router->getAnnotationParser();
-
-$routes = $annotationContext->getRoutes('/abc', 'Examples\\RouteController');
+$routes = $router->getAnnotationParser()->getRoutes('/abc', 'Examples\\RouteController');
 
 $route = $routes->getRoute('test');
 
 $match = $router->match('/abc/ac', $route);
 
-echo '<hr />';
-
-echo $router->generateUrl('demo', array('age' => '你好'));
-
-echo '<hr />';
-
-print_r($match->getName());
-
-print_r($router->getRoute('demo'));
+$router->caching();
 
 
 /*$finder = new \Dobee\Finder\Finder();

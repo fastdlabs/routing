@@ -16,6 +16,7 @@ namespace Dobee\Routing\Commands;
 use Dobee\Console\Commands\Command;
 use Dobee\Console\Format\Input;
 use Dobee\Console\Format\Output;
+use Dobee\Routing\Router;
 
 class Caching extends Command
 {
@@ -42,6 +43,8 @@ class Caching extends Command
      */
     public function execute(Input $input, Output $output)
     {
-        // TODO: Implement execute() method.
+        $router = new Router();
+
+        $router->getAnnotationParser()->getRoutes('/abc', 'Examples\\RouteController');
     }
 }

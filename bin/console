@@ -3,9 +3,6 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-$console = new \Dobee\Console\Console(array(
-    'Dobee\\Routing\\Commands\\Caching',
-    'Dobee\\Routing\\Commands\\Dump',
-));
+$console = new \Dobee\Console\Console();
 
 $console->run();

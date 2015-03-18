@@ -13,8 +13,13 @@ namespace Dobee\Routing;
  *
  * @package Dobee\Component\Routing\Collections
  */
-class RouteCollections implements RouteCollectionInterface, \Iterator, \Countable
+class RouteCollections implements RouteCollectionInterface, \Iterator, \Countable, \Serializable
 {
+    /**
+     * @var string
+     */
+    protected $separator = '@';
+
     /**
      * @var array
      */
@@ -167,5 +172,44 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
     public function count()
     {
         return count($this->routeCollections);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * String representation of object
+     *
+     * @link http://php.net/manual/en/serializable.serialize.php
+     * @return string the string representation of the object or null
+     */
+    public function serialize()
+    {
+        $serialize = array();
+
+        foreach ($this->routeCollections as $name => $value) {
+            $serialize[] = $name . $this->separator . serialize($value);
+        }
+
+        return implode(PHP_EOL, $serialize);
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Constructs the object
+     *
+     * @link http://php.net/manual/en/serializable.unserialize.php
+     * @param string $serialized <p>
+     *                           The string representation of the object.
+     *                           </p>
+     * @return void
+     */
+    public function unserialize($serialized)
+    {
+        $serialized = explode(PHP_EOL, $serialized);
+
+        foreach ($serialized as $value) {
+            list($name, $route) = explode($this->separator, $value);
+
+            $this->routeCollections[$name] = unserialize($route);
+        }
     }
 }

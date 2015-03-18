@@ -30,6 +30,9 @@
     "require": {
         "php": ">=5.4"
     },
+    "bin": [
+        "console"
+    ],
     "config": {
         "bin-dir": "bin"
     },

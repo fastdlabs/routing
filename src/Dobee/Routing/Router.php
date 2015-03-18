@@ -70,7 +70,7 @@ class Router
     }
 
     /**
-     * @return RouteCollectionInterface
+     * @return RouteCollections
      */
     public function getCollections()
     {
@@ -163,5 +163,15 @@ class Router
     public function matchFormat($format, RouteInterface $route)
     {
         return $this->matcher->matchRequestFormat($format, $route);
+    }
+
+    /**
+     * Caching route collections.
+     */
+    public function caching()
+    {
+        $serialize = $this->collections->serialize();
+
+        return $serialize;
     }
 }
