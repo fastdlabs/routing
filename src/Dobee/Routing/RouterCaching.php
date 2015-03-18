@@ -78,7 +78,6 @@ abstract class RouterCaching
         return $this;
     }
 
-
     /**
      * @param null $cachePath
      * @param null $cacheName

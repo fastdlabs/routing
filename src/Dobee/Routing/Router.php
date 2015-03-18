@@ -166,24 +166,33 @@ class Router extends RouterCaching
     }
 
     /**
-     * Caching route collections.
+     * @param null $cachePath
+     * @param null $cacheName
+     * @return bool
      */
     public function setCaching($cachePath = null, $cacheName = null)
     {
         if (null !== $cachePath) {
-            $this->cachePath = $cachePath;
+            $this->setCachePath($cachePath);
         }
 
         if (null !== $cacheName) {
-            $this->cacheName = $cacheName;
+            $this->setCacheName($cacheName);
         }
 
-        file_put_contents(
+        return file_put_contents(
             realpath($this->cachePath) . DIRECTORY_SEPARATOR . $this->cacheName,
             '<?php return ' . $this->collections->serialize() . ';'
         );
     }
 
+    /**
+     * @param null $cachePath
+     * @param null $cacheName
+     * @return bool
+     * @throws RouteInvalidException
+     * @throws \Exception
+     */
     public function getCaching($cachePath = null, $cacheName = null)
     {
         if (null !== $cachePath) {
@@ -195,7 +204,12 @@ class Router extends RouterCaching
         }
 
         if (false !== ($caching = $this->hasCaching())) {
-            return include $caching;
+            $routes = include $caching;
+            foreach ($routes as $name => $route) {
+                $this->collections->setRoute($name, unserialize($route));
+            }
+
+            return true;
         }
 
         return false;
