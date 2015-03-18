@@ -67,6 +67,9 @@ class RouteAnnotationContext
         $group = (empty($group) ? '' : $group) . $this->parseAnnotation($reflection->getDocComment())['route'];
 
         foreach ($reflection->getMethods() as $method) {
+            if (!$this->hasRouteAnnotation($method->getDocComment())) {
+                continue;
+            }
             $route = new Route(array_merge(
                 $this->parseAnnotation($method->getDocComment()),
                 array(
