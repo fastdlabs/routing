@@ -23,7 +23,7 @@ $route = $routes->getRoute('test');
 
 $match = $router->match('/abc/ac', $route);
 
-$router->caching();
+$router->setCaching();
 
 
 /*$finder = new \Dobee\Finder\Finder();

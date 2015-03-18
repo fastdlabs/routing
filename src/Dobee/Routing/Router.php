@@ -21,7 +21,7 @@ use Dobee\Routing\Matcher\RouteMatcher;
  *
  * @package Dobee\Routing
  */
-class Router
+class Router extends RouterCaching
 {
     /**
      * @var RouteCollections
@@ -168,10 +168,36 @@ class Router
     /**
      * Caching route collections.
      */
-    public function caching()
+    public function setCaching($cachePath = null, $cacheName = null)
     {
-        $serialize = $this->collections->serialize();
+        if (null !== $cachePath) {
+            $this->cachePath = $cachePath;
+        }
 
-        return $serialize;
+        if (null !== $cacheName) {
+            $this->cacheName = $cacheName;
+        }
+
+        file_put_contents(
+            realpath($this->cachePath) . DIRECTORY_SEPARATOR . $this->cacheName,
+            '<?php return ' . $this->collections->serialize() . ';'
+        );
+    }
+
+    public function getCaching($cachePath = null, $cacheName = null)
+    {
+        if (null !== $cachePath) {
+            $this->setCachePath($cachePath);
+        }
+
+        if (null !== $cacheName) {
+            $this->setCacheName($cacheName);
+        }
+
+        if (false !== ($caching = $this->hasCaching())) {
+            return include $caching;
+        }
+
+        return false;
     }
 }

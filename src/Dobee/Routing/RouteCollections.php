@@ -186,10 +186,10 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
         $serialize = array();
 
         foreach ($this->routeCollections as $name => $value) {
-            $serialize[] = $name . $this->separator . serialize($value);
+            $serialize[$name] = serialize($value);
         }
 
-        return implode(PHP_EOL, $serialize);
+        return var_export($serialize, true);
     }
 
     /**
