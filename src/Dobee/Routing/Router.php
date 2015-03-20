@@ -166,6 +166,25 @@ class Router extends RouterCaching implements \Serializable
     }
 
     /**
+     * @param Route $route
+     * @return $this
+     */
+    public function setCurrentRoute(Route $route)
+    {
+        $this->collections->setCurrentRoute($route);
+
+        return $this;
+    }
+
+    /**
+     * @return Route
+     */
+    public function getCurrentRoute()
+    {
+        return $this->collections->getCurrentRoute();
+    }
+
+    /**
      * @param null $cachePath
      * @param null $cacheName
      * @return bool

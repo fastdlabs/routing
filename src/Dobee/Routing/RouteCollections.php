@@ -26,6 +26,30 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
     private $routeCollections = array();
 
     /**
+     * @var Route
+     */
+    protected $currentRoute;
+
+    /**
+     * @return Route
+     */
+    public function getCurrentRoute()
+    {
+        return $this->currentRoute;
+    }
+
+    /**
+     * @param Route $currentRoute
+     * @return $this
+     */
+    public function setCurrentRoute(Route $currentRoute)
+    {
+        $this->currentRoute = $currentRoute;
+
+        return $this;
+    }
+
+    /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element
      *
