@@ -19,7 +19,7 @@
         },
         {
             "type": "git",
-            "url": "https://coding.net/janhuang/configuration.git"
+            "url": "https://coding.net/janhuang/config.git"
         },
         {
             "type": "git",
@@ -41,11 +41,10 @@
         "dobee/http": "*",
         "dobee/finder": "*",
         "dobee/console": "*",
-        "dobee/configuration": "*"
+        "dobee/config": "*"
     },
     "autoload": {
         "psr-4": {
-            "Examples\\": "examples",
             "Dobee\\": "src/Dobee"
         }
     }

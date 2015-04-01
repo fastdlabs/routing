@@ -29,7 +29,6 @@ class Router
 
     /**
      * Router constructor.
-     *
      * Initialize route collections and route Generator.
      */
     public function __construct()
