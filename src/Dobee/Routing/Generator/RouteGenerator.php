@@ -23,30 +23,28 @@ class RouteGenerator
      * @return string
      * @throws RouteGenerateException
      */
-    public function generateUrl(RouteInterface $route, array $parameters = array())
+    public static function generateUrl(RouteInterface $route, array $parameters = array())
     {
-        $requirement = $route->getArguments();
+        $parameters = array_merge($route->getDefaults(), $parameters);
 
-        $defaults = (null == ($defaults = $route->getDefaults())) ? $parameters : array_merge($defaults, $parameters);
+        $formats = $route->getFormat();
 
-        if (!empty($requirement) && empty($defaults)) {
-            throw new RouteGenerateException(sprintf('Route "%s" parameter ["%s"] is null or empty.', $route->getName(), implode('", "', $route->getArguments())));
+        $format = array_shift($formats);
+
+        if (empty($parameters)) {
+            return $route->getRoute() . '.' . $format;
         }
 
         $replacer = array_map(function ($value) {
             return '{' . $value . '}';
-        }, $requirement);
+        }, $route->getArguments());
 
-        $routeUrl = str_replace($replacer, $defaults, $route->getGroup() . $route->getRoute());
+        $routeUrl = str_replace($replacer, $parameters, $route->getRoute());
 
         if (!preg_match_all($route->getPathRegex(), $routeUrl, $match)) {
             throw new RouteGenerateException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())));
         }
 
-        if (is_array(($format = $route->getFormat()))) {
-            $format = reset($format);
-        }
-
-        return $routeUrl . (empty($format) ? '' : ('.' . $format));
+        return $routeUrl . '.' . $format;
     }
 } 

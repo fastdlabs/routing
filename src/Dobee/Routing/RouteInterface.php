@@ -20,28 +20,6 @@ namespace Dobee\Routing;
 interface RouteInterface
 {
     /**
-     * @param $class
-     * @return $this
-     */
-    public function setClass($class);
-
-    /**
-     * @return string
-     */
-    public function getClass();
-
-    /**
-     * @param $action
-     * @return $this
-     */
-    public function setAction($action);
-
-    /**
-     * @return string
-     */
-    public function getAction();
-
-    /**
      * @param $name
      * @return $this
      */
@@ -86,21 +64,15 @@ interface RouteInterface
     public function getRoute();
 
     /**
-     * @param $pattern
-     * @return $this
-     */
-    public function setPathRegex($pattern);
-
-    /**
      * @return string
      */
     public function getPathRegex();
 
     /**
-     * @param $format
+     * @param array $format
      * @return $this
      */
-    public function setFormat($format);
+    public function setFormat(array $format);
 
     /**
      * @return string
@@ -119,21 +91,10 @@ interface RouteInterface
     public function getRequirements();
 
     /**
-     * @param $group
+     * @param array $method
      * @return $this
      */
-    public function setGroup($group);
-
-    /**
-     * @return string
-     */
-    public function getGroup();
-
-    /**
-     * @param $method
-     * @return $this
-     */
-    public function setMethod($method);
+    public function setMethod(array $method);
 
     /**
      * @return string|array
@@ -158,7 +119,7 @@ interface RouteInterface
     public function setParameters(array $parameters);
 
     /**
-     * @return mixed
+     * @return string|array
      */
     public function getParameters();
 }

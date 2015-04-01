@@ -13,25 +13,15 @@ namespace Dobee\Routing;
  *
  * @package Dobee\Component\Routing\Collections
  */
-class RouteCollections implements RouteCollectionInterface, \Iterator, \Countable
+class RouteCollections implements \Iterator, \Countable
 {
-    /**
-     * @var string
-     */
-    protected $separator = '@';
-
     /**
      * @var array
      */
-    private $routeCollections = array();
+    private $routes = array();
 
     /**
-     * @var Route
-     */
-    protected $currentRoute;
-
-    /**
-     * @return Route
+     * @return RouteInterface
      */
     public function getCurrentRoute()
     {
@@ -39,15 +29,20 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
     }
 
     /**
-     * @param Route $currentRoute
+     * @param RouteInterface $currentRoute
      * @return $this
      */
-    public function setCurrentRoute(Route $currentRoute)
+    public function setCurrentRoute(RouteInterface $currentRoute)
     {
         $this->currentRoute = $currentRoute;
 
         return $this;
     }
+
+    /**
+     * @var RouteInterface
+     */
+    private $currentRoute;
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
@@ -58,7 +53,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function current()
     {
-        return current($this->routeCollections);
+        return current($this->routes);
     }
 
     /**
@@ -70,7 +65,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function next()
     {
-        next($this->routeCollections);
+        next($this->routes);
     }
 
     /**
@@ -82,7 +77,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function key()
     {
-        return key($this->routeCollections);
+        return key($this->routes);
     }
 
     /**
@@ -95,7 +90,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function valid()
     {
-        return isset($this->routeCollections[$this->key()]);
+        return isset($this->routes[$this->key()]);
     }
 
     /**
@@ -107,49 +102,32 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function rewind()
     {
-        reset($this->routeCollections);
+        reset($this->routes);
     }
 
     /**
-     * @param                $name
-     * @param RouteInterface $routeInterface
+     * @param RouteInterface $route
      * @return $this
-     * @throws RouteInvalidException
-     * @throws \Exception
      */
-    public function setRoute($name, RouteInterface $routeInterface = null)
+    public function setRoute(RouteInterface $route = null)
     {
-        if ($name instanceof RouteInterface && null === $routeInterface) {
-            if (null === $name->getName()) {
-                throw new RouteInvalidException(sprintf("Route '%s' route name is empty or null.", get_class($name)));
-            }
-
-            $routeInterface = $name;
-
-            $name = $name->getName();
-        }
-
-        if (array_key_exists($name, $this->routeCollections)) {
-            throw new \Exception(sprintf("Route name '%s' is exists.", $name));
-        }
-
-        $this->routeCollections[$name] = $routeInterface;
+        $this->routes[$route->getName()] = $route;
 
         return $this;
     }
 
     /**
      * @param $name
-     * @return mixed
-     * @throws RouteNotFoundException
+     * @return RouteInterface
+     * @throws RouteException
      */
     public function getRoute($name)
     {
         if (!$this->hasRoute($name)) {
-            throw new RouteNotFoundException(sprintf('Route "%s" is not found.', $name));
+            throw new RouteException(sprintf('Route "%s" is not found.', $name));
         }
 
-        return $this->routeCollections[$name];
+        return $this->routes[$name];
     }
 
     /**
@@ -159,7 +137,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function hasRoute($name)
     {
-        return isset($this->routeCollections[$name]);
+        return isset($this->routes[$name]);
     }
 
     /**
@@ -170,7 +148,7 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
     public function removeRoute($name)
     {
         if ($this->hasRoute($name)) {
-            unset($this->routeCollections[$name]);
+            unset($this->routes[$name]);
         }
 
         return true;
@@ -179,9 +157,9 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
     /**
      * @return mixed
      */
-    public function getRouteCollections()
+    public function getCollections()
     {
-        return $this->routeCollections;
+        return $this->routes;
     }
 
     /**
@@ -195,6 +173,6 @@ class RouteCollections implements RouteCollectionInterface, \Iterator, \Countabl
      */
     public function count()
     {
-        return count($this->routeCollections);
+        return count($this->routes);
     }
 }

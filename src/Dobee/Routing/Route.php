@@ -24,11 +24,6 @@ class Route implements RouteInterface
     /**
      * @var string
      */
-    protected $group;
-
-    /**
-     * @var string
-     */
     protected $route;
 
     /**
@@ -52,11 +47,6 @@ class Route implements RouteInterface
     protected $requirements;
 
     /**
-     * @var string
-     */
-    protected $action;
-
-    /**
      * @var array
      */
     protected $arguments;
@@ -72,11 +62,6 @@ class Route implements RouteInterface
     protected $method;
 
     /**
-     * @var string
-     */
-    protected $class;
-
-    /**
      * @var \Closure
      */
     protected $callback;
@@ -87,35 +72,39 @@ class Route implements RouteInterface
     private $pathRegex;
 
     /**
-     * @param array $routeBag
+     * @param string $route
+     * @param string $name
+     * @param array  $method
+     * @param array  $defaults
+     * @param array  $requirements
+     * @param array  $format
+     * @param null   $callback
      */
-    public function __construct(array $routeBag)
+    public function __construct(
+        $route,
+        $name,
+        array $defaults     = array(),
+        array $method       = array('ANY'),
+        array $requirements = array(),
+        array $format       = array('php'),
+        $callback           = null
+    )
     {
-        $this->class        = $routeBag['class'];
-        $this->action       = $routeBag['action'];
-        $this->route        = $routeBag['route'];
-        $this->name         = $routeBag['name'];
-        $this->group        = $routeBag['group'];
-        $this->method       = $routeBag['method'];
-        $this->defaults     = $routeBag['defaults'];
-        $this->requirements = $routeBag['requirements'];
-        $this->format       = $routeBag['format'];
-        $this->arguments    = $routeBag['arguments'];
-        $this->parameters   = $routeBag['parameters'];
+        $this->route = $route;
 
-        $this->parsePathRegex($this->route, $this->requirements);
-    }
+        $this->name = $name;
 
-    public function setGroup($group)
-    {
-        $this->group = $group;
+        $this->defaults = $defaults;
 
-        return $this;
-    }
+        $this->method = $method;
 
-    public function getGroup()
-    {
-        return $this->group;
+        $this->requirements = $requirements;
+
+        $this->format = $format;
+
+        $this->callback = $callback;
+
+        $this->parsePathRegex($route, $requirements);
     }
 
     /**
@@ -155,12 +144,11 @@ class Route implements RouteInterface
         return $this->name;
     }
 
-
     /**
      * @param array|string $method
      * @return $this
      */
-    public function setMethod($method)
+    public function setMethod(array $method)
     {
         $this->method = $method;
 
@@ -214,10 +202,10 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param string $format
+     * @param array $format
      * @return $this
      */
-    public function setFormat($format)
+    public function setFormat(array $format)
     {
         $this->format = $format;
 
@@ -239,30 +227,22 @@ class Route implements RouteInterface
      */
     protected function parsePathRegex($route, $requirements = array())
     {
-        if (preg_match_all('/\{(\w+)\}/ui', $route, $match)) {
+        if (preg_match_all('/\{(\w+)\}/i', $route, $match)) {
+
             foreach ($match[1] as $val) {
-                $pattern = isset($requirements[$val]) ? $requirements[$val] : '.*?';
+                $pattern = isset($requirements[$val]) ? $requirements[$val] : '?P<' . $val . '>.+';
                 $route = str_replace('{' . $val . '}', '{1}(' . $pattern . ')', $route);
             }
 
-            $this->setArguments($match[1]);
+            $this->arguments = $match[1];
+
         }
 
-        $this->setPathRegex('/^' . str_replace('/', '\/', $this->getGroup() . $route) . '$/');
+        $this->pathRegex = '/^' . str_replace('/', '\/', $route) . '$/';
 
         return $this;
     }
 
-    /**
-     * @param string $regex
-     * @return $this
-     */
-    public function setPathRegex($regex)
-    {
-        $this->pathRegex = $regex;
-
-        return $this;
-    }
 
     /**
      * @return string
@@ -311,24 +291,7 @@ class Route implements RouteInterface
      */
     public function getCallback()
     {
-        if (null === $this->callback) {
-            $this->callback = function (array $parameters = array()) {
-                return call_user_func_array(array($this->class, $this->action), $parameters);
-            };
-        }
-
         return $this->callback;
-    }
-
-    /**
-     * @param $parameters
-     * @return $this
-     */
-    public function setParameters(array $parameters)
-    {
-        $this->parameters = $parameters;
-
-        return $this;
     }
 
     /**
@@ -340,39 +303,12 @@ class Route implements RouteInterface
     }
 
     /**
-     * @return string
-     */
-    public function getClass()
-    {
-        return $this->class;
-    }
-
-    /**
-     * @param string $class
+     * @param array $parameters
      * @return $this
      */
-    public function setClass($class)
+    public function setParameters(array $parameters)
     {
-        $this->class = $class;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAction()
-    {
-        return $this->action;
-    }
-
-    /**
-     * @param string $action
-     * @return $this
-     */
-    public function setAction($action)
-    {
-        $this->action = $action;
+        $this->parameters = $parameters;
 
         return $this;
     }
