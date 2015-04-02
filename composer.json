@@ -24,6 +24,10 @@
         {
             "type": "git",
             "url": "https://coding.net/janhuang/console.git"
+        },
+        {
+            "type": "git",
+            "url": "https://coding.net/janhuang/annotation.git"
         }
     ],
     "minimum-stability": "dev",
@@ -41,7 +45,7 @@
         "dobee/http": "*",
         "dobee/finder": "*",
         "dobee/console": "*",
-        "dobee/config": "*"
+        "dobee/annotation": "dev-dev"
     },
     "autoload": {
         "psr-4": {
