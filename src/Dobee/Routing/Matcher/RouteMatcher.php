@@ -54,7 +54,7 @@ class RouteMatcher implements RouteMatcherInterface
 
             $args = array_slice(
                 $route->getArguments(),
-                substr_count(rtrim($uri, '/'), '/') - substr_count(rtrim($route->getRoute(), '/'), '/')
+                substr_count($uri, '/') - substr_count($route->getRoute(), '/')
             );
 
             $defaults = self::filter($route->getDefaults(), $args);
@@ -108,11 +108,11 @@ class RouteMatcher implements RouteMatcherInterface
     }
 
     /**
-     * @param $defaults
-     * @param $args
+     * @param array $defaults
+     * @param array $args
      * @return array
      */
-    public static function filter($defaults, $args)
+    public static function filter(array $defaults, array $args)
     {
         $parameters = array();
 

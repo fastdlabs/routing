@@ -37,7 +37,7 @@ interface RouteInterface
     public function setArguments(array $arguments);
 
     /**
-     * @return string|array
+     * @return array
      */
     public function getArguments();
 

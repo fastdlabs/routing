@@ -34,32 +34,32 @@ class Route implements RouteInterface
     /**
      * @var string|array
      */
-    protected $format;
+    protected $format = array('php');
 
     /**
      * @var array
      */
-    protected $defaults;
+    protected $defaults = array();
 
     /**
      * @var array
      */
-    protected $requirements;
+    protected $requirements = array();
 
     /**
      * @var array
      */
-    protected $arguments;
+    protected $arguments = array();
 
     /**
      * @var array
      */
-    protected $parameters;
+    protected $parameters = array();
 
     /**
      * @var string|array
      */
-    protected $method;
+    protected $method = array('ANY');
 
     /**
      * @var \Closure
