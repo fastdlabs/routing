@@ -32,6 +32,11 @@ class Route implements RouteInterface
     protected $name;
 
     /**
+     * @var string
+     */
+    protected $group;
+
+    /**
      * @var string|array
      */
     protected $format = array('php');
@@ -105,6 +110,25 @@ class Route implements RouteInterface
         $this->setCallback($callback);
 
         $this->parsePathRegex($route, $requirements);
+    }
+
+    /**
+     * @return string
+     */
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    /**
+     * @param string $group
+     * @return $this
+     */
+    public function setGroup($group)
+    {
+        $this->group = $group;
+
+        return $this;
     }
 
     /**
