@@ -16,7 +16,7 @@ namespace Dobee\Routing;
 class RouteCollections implements \Iterator, \Countable
 {
     /**
-     * @var array
+     * @var RouteInterface[]
      */
     private $routes = array();
 
