@@ -102,7 +102,7 @@ class Route implements RouteInterface
 
         $this->format = $format;
 
-        $this->callback = $callback;
+        $this->setCallback($callback);
 
         $this->parsePathRegex($route, $requirements);
     }
@@ -291,7 +291,9 @@ class Route implements RouteInterface
      */
     public function getCallback()
     {
-        return $this->callback;
+        $callback = $this->callback;
+
+        return null === $callback ? null : $callback();
     }
 
     /**
