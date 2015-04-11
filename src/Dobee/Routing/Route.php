@@ -95,17 +95,17 @@ class Route implements RouteInterface
         $callback           = null
     )
     {
-        $this->route = $route;
+        $this->route        = $route;
 
-        $this->name = $name;
+        $this->name         = $name;
 
-        $this->defaults = $defaults;
+        $this->defaults     = $defaults;
 
-        $this->method = $method;
+        $this->method       = $method;
 
         $this->requirements = $requirements;
 
-        $this->format = $format;
+        $this->format       = $format;
 
         $this->setCallback($callback);
 
@@ -259,7 +259,6 @@ class Route implements RouteInterface
             }
 
             $this->arguments = $match[1];
-
         }
 
         $this->pathRegex = '/^' . str_replace('/', '\/', $route) . '$/';
@@ -299,9 +298,9 @@ class Route implements RouteInterface
      * @param string $callback
      * @return $this
      */
-    public function setCallback($callback)
+    public function setCallback($callback = null)
     {
-        if (!is_callable($callback)) {
+        if (null !== $callback && !is_callable($callback)) {
             throw new InvalidArgumentException(sprintf('The route callback closure must be a is callable.'));
         }
 

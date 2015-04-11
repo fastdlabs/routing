@@ -37,9 +37,9 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
     {
         $url = RouteGenerator::generateUrl($this->collection->getRoute('demo'));
 
-        $this->assertEquals('/demo/jan.php', $url);
-        $this->assertEquals('/method.json', RouteGenerator::generateUrl($this->collection->getRoute('method')));
-        $this->assertEquals('/test/jan/22.php', RouteGenerator::generateUrl($this->collection->getRoute('test')));
-        $this->assertEquals('/test/dylan/23.php', RouteGenerator::generateUrl($this->collection->getRoute('test'), array('name' => 'dylan', 'age' => 23)));
+        $this->assertEquals('/demo/jan', $url);
+        $this->assertEquals('/method.json', RouteGenerator::generateUrl($this->collection->getRoute('method'), array(), true));
+        $this->assertEquals('/test/jan/22', RouteGenerator::generateUrl($this->collection->getRoute('test')));
+        $this->assertEquals('/test/dylan/23', RouteGenerator::generateUrl($this->collection->getRoute('test'), array('name' => 'dylan', 'age' => 23)));
     }
 }

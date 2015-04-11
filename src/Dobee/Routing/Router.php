@@ -47,11 +47,12 @@ class Router
     /**
      * @param       $name
      * @param array $parameters
-     * @return mixed
+     * @param bool $suffix
+     * @return string
      */
-    public function generateUrl($name, array $parameters = array())
+    public function generateUrl($name, array $parameters = array(), $suffix = false)
     {
-        return RouteGenerator::generateUrl($this->collections->getRoute($name), $parameters);
+        return RouteGenerator::generateUrl($this->collections->getRoute($name), $parameters, $suffix);
     }
 
     /**

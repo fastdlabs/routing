@@ -8,6 +8,7 @@
 
 namespace Dobee\Routing\Generator;
 
+use Dobee\Routing\RouteException;
 use Dobee\Routing\RouteInterface;
 
 /**
@@ -20,19 +21,29 @@ class RouteGenerator
     /**
      * @param RouteInterface $route
      * @param array          $parameters
+     * @param bool           $suffix
      * @return string
-     * @throws RouteGenerateException
+     * @throws RouteException
      */
-    public static function generateUrl(RouteInterface $route, array $parameters = array())
+    public static function generateUrl(RouteInterface $route, array $parameters = array(), $suffix = false)
     {
         $parameters = array_merge($route->getDefaults(), $parameters);
 
-        $formats = $route->getFormat();
+        $format = '';
 
-        $format = array_shift($formats);
+        if ($suffix) {
+
+            $formats = $route->getFormat();
+
+            $format = array_shift($formats);
+
+            $format = '.' . $format;
+
+            unset($formats);
+        }
 
         if (empty($parameters)) {
-            return $route->getRoute() . '.' . $format;
+            return $route->getRoute() . $format;
         }
 
         $replacer = array_map(function ($value) {
@@ -42,9 +53,9 @@ class RouteGenerator
         $routeUrl = str_replace($replacer, $parameters, $route->getRoute());
 
         if (!preg_match_all($route->getPathRegex(), $routeUrl, $match)) {
-            throw new RouteGenerateException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())));
+            throw new RouteException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())));
         }
 
-        return $routeUrl . '.' . $format;
+        return $routeUrl . $format;
     }
 } 

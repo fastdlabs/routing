@@ -66,7 +66,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerator()
     {
-        $this->assertEquals('/demo/jan.php', $this->router->generateUrl('demo', array('jan')));
-        $this->assertEquals('/test/jan.php', $this->router->generateUrl('test', array('jan')));
+        $this->assertEquals('/demo/jan.php', $this->router->generateUrl('demo', array('jan'), true));
+        $this->assertEquals('/test/jan.php', $this->router->generateUrl('test', array('jan'), true));
     }
 }
