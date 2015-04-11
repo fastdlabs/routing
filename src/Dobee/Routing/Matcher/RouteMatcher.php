@@ -31,6 +31,10 @@ class RouteMatcher implements RouteMatcherInterface
      */
     public static function match($path, RouteCollections $collections = null)
     {
+        if ($collections->hasRoute($path)) {
+            return $collections->getRoute($path);
+        }
+
         foreach ($collections as $route) {
             try {
                 return self::matchRequestRoute($path, $route);

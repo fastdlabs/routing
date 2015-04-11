@@ -300,10 +300,6 @@ class Route implements RouteInterface
      */
     public function setCallback($callback = null)
     {
-        if (null !== $callback && !is_callable($callback)) {
-            throw new InvalidArgumentException(sprintf('The route callback closure must be a is callable.'));
-        }
-
         $this->callback = $callback;
 
         return $this;
@@ -314,9 +310,7 @@ class Route implements RouteInterface
      */
     public function getCallback()
     {
-        $callback = $this->callback;
-
-        return null === $callback ? null : $callback();
+        return $this->callback;
     }
 
     /**

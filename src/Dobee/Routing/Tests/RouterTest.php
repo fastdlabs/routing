@@ -69,4 +69,13 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/demo/jan.php', $this->router->generateUrl('demo', array('jan'), true));
         $this->assertEquals('/test/jan.php', $this->router->generateUrl('test', array('jan'), true));
     }
+
+    public function testStaticRoute()
+    {
+        $route = $this->router->match('demo');
+
+        $this->assertEquals('demo', $route->getName());
+        $this->assertEquals('/demo/{name}', $route->getRoute());
+
+    }
 }

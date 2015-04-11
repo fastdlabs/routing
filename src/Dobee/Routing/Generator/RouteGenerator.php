@@ -42,6 +42,10 @@ class RouteGenerator
             unset($formats);
         }
 
+        if (0 === count($route->getArguments())) {
+            return '/' . $route->getName() . $format;
+        }
+
         if (empty($parameters)) {
             return $route->getRoute() . $format;
         }
