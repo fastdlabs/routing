@@ -31,19 +31,18 @@ class RouteMatcher implements RouteMatcherInterface
      */
     public static function match($path, RouteCollections $collections = null)
     {
-        if ($collections->hasRoute($path)) {
-            return $collections->getRoute($path);
-        }
+        try {
+            return $collections->getRoute(ltrim($path, '/'));
+        } catch (\Exception $e) {
+            foreach ($collections as $route) {
+                try {
+                    return self::matchRequestRoute($path, $route);
+                } catch (RouteException $e) {
 
-        foreach ($collections as $route) {
-            try {
-                return self::matchRequestRoute($path, $route);
-            } catch (RouteException $e) {
-                continue;
+                }
             }
+            throw $e;
         }
-
-        throw new RouteException(sprintf('Route "%s" is not found.', $path));
     }
 
     /**
