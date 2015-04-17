@@ -60,9 +60,8 @@ class RouteMatcher implements RouteMatcherInterface
                 substr_count($uri, '/') - substr_count($route->getRoute(), '/')
             );
 
-            if (!empty($args)) {
-                $defaults = self::filter($route->getDefaults(), $args);
-
+            $defaults = self::filter($route->getDefaults(), $args);
+            if (!empty($defaults)) {
                 $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
             }
 
