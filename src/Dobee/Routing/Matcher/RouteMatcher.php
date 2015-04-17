@@ -60,19 +60,26 @@ class RouteMatcher implements RouteMatcherInterface
                 substr_count($uri, '/') - substr_count($route->getRoute(), '/')
             );
 
-            $defaults = self::filter($route->getDefaults(), $args);
+            if (!empty($args)) {
+                $defaults = self::filter($route->getDefaults(), $args);
 
-            $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
+                $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
+            }
 
             if (!preg_match($route->getPathRegex(), $uri, $match)) {
                 throw new RouteException(sprintf('Route "%s" is not found.', $uri));
             }
         }
 
-        $parameters = $route->getDefaults();
+        $arguments = $route->getArguments();
 
-        foreach ($parameters as $key => $value) {
-            $parameters[$key] = isset($match[$key]) ? $match[$key] : $value;
+        $defaults = $route->getDefaults();
+
+        $parameters = array();
+
+        foreach ($arguments as $value) {
+            $default = isset($defaults[$value]) ? $defaults[$value] : null;
+            $parameters[$value] = isset($match[$value]) ? $match[$value] : $default;
         }
 
         $route->setParameters($parameters);
