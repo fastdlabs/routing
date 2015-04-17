@@ -4,7 +4,7 @@
  * User: janhuang
  * Date: 15/1/29
  * Time: 下午2:32
- * Github: https://www.github.com/janhuang 
+ * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
  * Blog: http://segmentfault.com/blog/janhuang
@@ -32,7 +32,12 @@ class RouteMatcher implements RouteMatcherInterface
     public static function match($path, RouteCollections $collections = null)
     {
         try {
-            return $collections->getRoute(ltrim($path, '/'));
+            $route = $collections->getRoute(ltrim($path, '/'));
+            $arguments = $route->getArguments();
+            if (empty($arguments)) {
+                return $route;
+            }
+            return self::matchRequestRoute($path, $route);
         } catch (\Exception $e) {
             foreach ($collections as $route) {
                 try {
@@ -61,6 +66,7 @@ class RouteMatcher implements RouteMatcherInterface
             );
 
             $defaults = self::filter($route->getDefaults(), $args);
+
             if (!empty($defaults)) {
                 $uri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
             }
@@ -70,20 +76,7 @@ class RouteMatcher implements RouteMatcherInterface
             }
         }
 
-        $arguments = $route->getArguments();
-
-        $defaults = $route->getDefaults();
-
-        $parameters = array();
-
-        foreach ($arguments as $value) {
-            $default = isset($defaults[$value]) ? $defaults[$value] : null;
-            $parameters[$value] = isset($match[$value]) ? $match[$value] : $default;
-        }
-
-        $route->setParameters($parameters);
-
-        return $route;
+        return self::setParameters($route, $match);
     }
 
     /**
@@ -114,6 +107,24 @@ class RouteMatcher implements RouteMatcherInterface
         }
 
         throw new RouteException(sprintf('Route "%s" request format must to be ["%s"]', $route->getName(), implode('", "', $route->getFormat())));
+    }
+
+    public static function setParameters(RouteInterface $route, array $match)
+    {
+        $arguments = $route->getArguments();
+
+        $defaults = $route->getDefaults();
+
+        $parameters = array();
+
+        foreach ($arguments as $value) {
+            $default = isset($defaults[$value]) ? $defaults[$value] : null;
+            $parameters[$value] = isset($match[$value]) ? $match[$value] : $default;
+        }
+
+        $route->setParameters($parameters);
+
+        return $route;
     }
 
     /**
