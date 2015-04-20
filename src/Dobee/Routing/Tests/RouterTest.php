@@ -72,7 +72,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testStaticRoute()
     {
-        $route = $this->router->match('demo');
+        $route = $this->router->getRoute('demo');
 
         $this->assertEquals('demo', $route->getName());
         $this->assertEquals('/demo/{name}', $route->getRoute());
