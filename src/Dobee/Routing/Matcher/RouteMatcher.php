@@ -74,7 +74,7 @@ class RouteMatcher implements RouteMatcherInterface
             }
 
             if (!preg_match($route->getPathRegex(), $defaultsUri, $match)) {
-                throw new RouteException(sprintf('Route "%s" is not found.', $uri));
+                throw new RouteException(sprintf('Route "%s" is not found.', $uri), 404);
             }
         }
 
@@ -93,7 +93,7 @@ class RouteMatcher implements RouteMatcherInterface
             return true;
         }
 
-        throw new RouteException(sprintf('Route "%s" request method must to be ["%s"]', $route->getName(), implode('", "', $route->getMethod())));
+        throw new RouteException(sprintf('Route "%s" request method must to be ["%s"]', $route->getName(), implode('", "', $route->getMethod())), 404);
     }
 
     /**
@@ -108,7 +108,7 @@ class RouteMatcher implements RouteMatcherInterface
             return true;
         }
 
-        throw new RouteException(sprintf('Route "%s" request format must to be ["%s"]', $route->getName(), implode('", "', $route->getFormat())));
+        throw new RouteException(sprintf('Route "%s" request format must to be ["%s"]', $route->getName(), implode('", "', $route->getFormat())), 404);
     }
 
     public static function setParameters(RouteInterface $route, array $match)
