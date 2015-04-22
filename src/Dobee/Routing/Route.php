@@ -12,8 +12,6 @@
 
 namespace Dobee\Routing;
 
-use Prophecy\Exception\InvalidArgumentException;
-
 /**
  * Class Route
  *
@@ -79,8 +77,8 @@ class Route implements RouteInterface
     /**
      * @param string $route
      * @param string $name
-     * @param array  $method
      * @param array  $defaults
+     * @param array  $method
      * @param array  $requirements
      * @param array  $format
      * @param null   $callback
@@ -107,7 +105,7 @@ class Route implements RouteInterface
 
         $this->format       = $format;
 
-        $this->setCallback($callback);
+        $this->callback     = $callback;
 
         $this->parsePathRegex($route, $requirements);
     }

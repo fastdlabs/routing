@@ -93,12 +93,23 @@ class Router
     }
 
     /**
-     * @param                $uri
+     * @param  string $path
      * @return Route
      */
-    public function match($uri)
+    public function match($path)
     {
-        return RouteMatcher::match($uri, $this->collections);
+        return RouteMatcher::match($path, $this->collections);
+    }
+
+    /**
+     * @param string         $path
+     * @param RouteInterface $route
+     * @return RouteInterface
+     * @throws RouteException
+     */
+    public function matchRoute($path, RouteInterface $route)
+    {
+        return RouteMatcher::matchRequestRoute($path, $route);
     }
 
     /**

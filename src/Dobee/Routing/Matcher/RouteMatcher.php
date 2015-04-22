@@ -24,57 +24,50 @@ use Dobee\Routing\RouteException;
 class RouteMatcher implements RouteMatcherInterface
 {
     /**
-     * @param                          $path
+     * @param                  $path
      * @param RouteCollections $collections
-     * @return RouteInterface
+     * @return RouteInterface|mixed
      * @throws RouteException
+     * @throws \Exception
      */
     public static function match($path, RouteCollections $collections = null)
     {
         try {
-            $route = $collections->getRoute(ltrim($path, '/'));
-            $arguments = $route->getArguments();
-            if (empty($arguments)) {
-                return $route;
-            }
-            return self::matchRequestRoute($path, $route);
-        } catch (\Exception $e) {
+            return self::extract($path, $collections->getRoute($path));
+        } catch (RouteException $e) {
             foreach ($collections as $route) {
-                try {
-                    return self::matchRequestRoute($path, $route);
-                } catch (RouteException $e) {
-
-                }
+                return self::matchRequestRoute($path, $route);
             }
+
             throw $e;
         }
     }
 
     /**
-     * @param                $uri
-     * @param RouteInterface $route
+     * @param string          $path
+     * @param RouteInterface  $route
      * @return RouteInterface
      * @throws RouteException
      */
-    public static function matchRequestRoute($uri, RouteInterface $route = null)
+    public static function matchRequestRoute($path, RouteInterface $route = null)
     {
-        if (!preg_match($route->getPathRegex(), $uri, $match)) {
+        if (!preg_match($route->getPathRegex(), $path, $match)) {
 
             $args = array_slice(
                 $route->getArguments(),
-                substr_count($uri, '/') - substr_count($route->getRoute(), '/')
+                substr_count($path, '/') - substr_count($route->getRoute(), '/')
             );
 
-            $defaults = self::filter($route->getDefaults(), $args);
+            $defaults = self::fill($route->getDefaults(), $args);
 
-            $defaultsUri = $uri;
+            $defaultsUri = $path;
 
             if (!empty($defaults)) {
-                $defaultsUri = str_replace('//', '/', $uri . '/' . implode('/', array_values($defaults)));
+                $defaultsUri = str_replace('//', '/', $path . '/' . implode('/', array_values($defaults)));
             }
 
             if (!preg_match($route->getPathRegex(), $defaultsUri, $match)) {
-                throw new RouteException(sprintf('Route "%s" is not found.', $uri), 404);
+                throw new RouteException(sprintf('Route "%s" is not found.', $path), 404);
             }
         }
 
@@ -93,7 +86,11 @@ class RouteMatcher implements RouteMatcherInterface
             return true;
         }
 
-        throw new RouteException(sprintf('Route "%s" request method must to be ["%s"]', $route->getName(), implode('", "', $route->getMethod())), 404);
+        throw new RouteException(sprintf(
+            'Route "%s" request method must to be ["%s"]',
+            $route->getName(),
+            implode('", "', $route->getMethod())
+        ), 404);
     }
 
     /**
@@ -108,10 +105,19 @@ class RouteMatcher implements RouteMatcherInterface
             return true;
         }
 
-        throw new RouteException(sprintf('Route "%s" request format must to be ["%s"]', $route->getName(), implode('", "', $route->getFormat())), 404);
+        throw new RouteException(sprintf(
+            'Route "%s" request format must to be ["%s"]',
+            $route->getName(),
+            implode('", "', $route->getFormat())
+        ), 403);
     }
 
-    public static function setParameters(RouteInterface $route, array $match)
+    /**
+     * @param RouteInterface $route
+     * @param array          $match
+     * @return RouteInterface
+     */
+    protected static function setParameters(RouteInterface $route, array $match)
     {
         $arguments = $route->getArguments();
 
@@ -134,7 +140,7 @@ class RouteMatcher implements RouteMatcherInterface
      * @param array $args
      * @return array
      */
-    public static function filter(array $defaults, array $args)
+    protected static function fill(array $defaults, array $args)
     {
         $parameters = array();
 
@@ -147,5 +153,21 @@ class RouteMatcher implements RouteMatcherInterface
         unset($defaults, $args);
 
         return $parameters;
+    }
+
+    /**
+     * @param                $path
+     * @param RouteInterface $route
+     * @return RouteInterface
+     */
+    protected static function extract($path, RouteInterface $route)
+    {
+        $arguments = $route->getArguments();
+
+        if (empty($arguments)) {
+            return $route;
+        }
+
+        return self::matchRequestRoute($path, $route);
     }
 }
