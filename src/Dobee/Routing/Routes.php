@@ -154,7 +154,7 @@ class Routes
      * @param string $method
      * @return \Dobee\Routing\Route
      */
-    private static function createRoute($route, $callback, $method)
+    public static function createRoute($route, $callback, $method)
     {
         $name = '';
 
