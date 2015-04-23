@@ -75,21 +75,31 @@ class Route implements RouteInterface
     private $pathRegex;
 
     /**
+     * @var array
+     */
+    protected $ips = array();
+
+    /**
+     * @var array
+     */
+    protected $hosts = array();
+
+    /**
      * @param string $route
      * @param string $name
      * @param array  $defaults
-     * @param array  $method
+     * @param array  $methods
      * @param array  $requirements
-     * @param array  $format
+     * @param array  $formats
      * @param null   $callback
      */
     public function __construct(
         $route,
         $name,
         array $defaults     = array(),
-        array $method       = array('ANY'),
+        array $methods      = array('ANY'),
         array $requirements = array(),
-        array $format       = array('php'),
+        array $formats      = array('php'),
         $callback           = null
     )
     {
@@ -99,11 +109,11 @@ class Route implements RouteInterface
 
         $this->defaults     = $defaults;
 
-        $this->method       = $method;
+        $this->method       = empty($methods) ? array('ANY') : $methods;
 
         $this->requirements = $requirements;
 
-        $this->format       = $format;
+        $this->format       = empty($formats) ? array('php') : $formats;
 
         $this->callback     = $callback;
 
@@ -170,7 +180,7 @@ class Route implements RouteInterface
      * @param array|string $method
      * @return $this
      */
-    public function setMethod(array $method)
+    public function setMethods(array $method)
     {
         $this->method = $method;
 
@@ -180,7 +190,7 @@ class Route implements RouteInterface
     /**
      * @return array
      */
-    public function getMethod()
+    public function getMethods()
     {
         return $this->method;
     }
@@ -227,7 +237,7 @@ class Route implements RouteInterface
      * @param array $format
      * @return $this
      */
-    public function setFormat(array $format)
+    public function setFormats(array $format)
     {
         $this->format = $format;
 
@@ -237,7 +247,7 @@ class Route implements RouteInterface
     /**
      * @return array|string
      */
-    public function getFormat()
+    public function getFormats()
     {
         return $this->format;
     }
@@ -304,7 +314,7 @@ class Route implements RouteInterface
     }
 
     /**
-     * @return string
+     * @return \Closure
      */
     public function getCallback()
     {
@@ -328,5 +338,43 @@ class Route implements RouteInterface
         $this->parameters = $parameters;
 
         return $this;
+    }
+
+    /**
+     * @param array $hosts
+     * @return $this
+     */
+    public function setHosts(array $hosts)
+    {
+        $this->hosts = $hosts;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHosts()
+    {
+        return $this->hosts;
+    }
+
+    /**
+     * @param array $ips
+     * @return $this
+     */
+    public function setIps(array $ips)
+    {
+        $this->ips = $ips;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIps()
+    {
+        return $this->ips;
     }
 }

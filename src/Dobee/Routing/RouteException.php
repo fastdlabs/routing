@@ -13,7 +13,7 @@
 
 namespace Dobee\Routing;
 
-class RouteException extends \Exception
+class RouteException extends \ErrorException
 {
 
 }

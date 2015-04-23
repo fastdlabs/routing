@@ -20,6 +20,28 @@ namespace Dobee\Routing;
 interface RouteInterface
 {
     /**
+     * @param array $hosts
+     * @return $this
+     */
+    public function setHosts(array $hosts);
+
+    /**
+     * @return array
+     */
+    public function getHosts();
+
+    /**
+     * @param array $ips
+     * @return $this
+     */
+    public function setIps(array $ips);
+
+    /**
+     * @return array
+     */
+    public function getIps();
+
+    /**
      * @param $name
      * @return $this
      */
@@ -72,12 +94,12 @@ interface RouteInterface
      * @param array $format
      * @return $this
      */
-    public function setFormat(array $format);
+    public function setFormats(array $format);
 
     /**
      * @return string
      */
-    public function getFormat();
+    public function getFormats();
 
     /**
      * @param array $requirements
@@ -94,12 +116,12 @@ interface RouteInterface
      * @param array $method
      * @return $this
      */
-    public function setMethod(array $method);
+    public function setMethods(array $method);
 
     /**
      * @return string|array
      */
-    public function getMethod();
+    public function getMethods();
 
     /**
      * @param $callback
@@ -108,7 +130,7 @@ interface RouteInterface
     public function setCallback($callback);
 
     /**
-     * @return mixed
+     * @return \Closure
      */
     public function getCallback();
 

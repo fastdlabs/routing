@@ -33,10 +33,12 @@ class RouteMatcher implements RouteMatcherInterface
     public static function match($path, RouteCollections $collections = null)
     {
         try {
-            return self::extract($path, $collections->getRoute($path));
+            return $collections->getRoute($path);
         } catch (RouteException $e) {
             foreach ($collections as $route) {
-                return self::matchRequestRoute($path, $route);
+                try {
+                    return self::matchRequestRoute($path, $route);
+                } catch (RouteException $e){}
             }
 
             throw $e;
@@ -51,24 +53,25 @@ class RouteMatcher implements RouteMatcherInterface
      */
     public static function matchRequestRoute($path, RouteInterface $route = null)
     {
+        $originPath = $path;
+
         if (!preg_match($route->getPathRegex(), $path, $match)) {
 
-            $args = array_slice(
-                $route->getArguments(),
-                substr_count($path, '/') - substr_count($route->getRoute(), '/')
-            );
+            if (array() !== ($arguments = $route->getArguments())) {
 
-            $defaults = self::fill($route->getDefaults(), $args);
+                $arguments = array_slice($arguments, (substr_count($path, '/') - substr_count($route->getRoute(), '/')));
 
-            $defaultsUri = $path;
-
-            if (!empty($defaults)) {
-                $defaultsUri = str_replace('//', '/', $path . '/' . implode('/', array_values($defaults)));
+                if (array() !== ($defaults = $route->getDefaults())) {
+                    $defaults = self::fill($defaults, $arguments);
+                    $path = str_replace('//', '/', $path . '/' . implode('/', array_values($defaults)));
+                }
             }
 
-            if (!preg_match($route->getPathRegex(), $defaultsUri, $match)) {
-                throw new RouteException(sprintf('Route "%s" is not found.', $path), 404);
+            if (!preg_match($route->getPathRegex(), $path, $match)) {
+                throw new RouteException(sprintf('Route "%s" is not found.', $originPath), 404);
             }
+
+            unset($originPath, $defaults, $args);
         }
 
         return self::setParameters($route, $match);
@@ -119,18 +122,18 @@ class RouteMatcher implements RouteMatcherInterface
      */
     protected static function setParameters(RouteInterface $route, array $match)
     {
-        $arguments = $route->getArguments();
-
         $defaults = $route->getDefaults();
 
         $parameters = array();
 
-        foreach ($arguments as $value) {
+        foreach ($route->getArguments() as $value) {
             $default = isset($defaults[$value]) ? $defaults[$value] : null;
             $parameters[$value] = isset($match[$value]) ? $match[$value] : $default;
         }
 
         $route->setParameters($parameters);
+
+        unset($parameters, $defaults, $default, $match);
 
         return $route;
     }
@@ -153,21 +156,5 @@ class RouteMatcher implements RouteMatcherInterface
         unset($defaults, $args);
 
         return $parameters;
-    }
-
-    /**
-     * @param                $path
-     * @param RouteInterface $route
-     * @return RouteInterface
-     */
-    protected static function extract($path, RouteInterface $route)
-    {
-        $arguments = $route->getArguments();
-
-        if (empty($arguments)) {
-            return $route;
-        }
-
-        return self::matchRequestRoute($path, $route);
     }
 }

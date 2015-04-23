@@ -21,6 +21,13 @@ class RouteCollections implements \Iterator, \Countable
     private $routes = array();
 
     /**
+     * The route alias maps.
+     *
+     * @var array
+     */
+    private $alias = array();
+
+    /**
      * @return RouteInterface
      */
     public function getCurrentRoute()
@@ -113,6 +120,8 @@ class RouteCollections implements \Iterator, \Countable
     {
         $this->routes[$route->getName()] = $route;
 
+        $this->alias[$route->getRoute()] = $route->getName();
+
         return $this;
     }
 
@@ -124,7 +133,10 @@ class RouteCollections implements \Iterator, \Countable
     public function getRoute($name)
     {
         if (!$this->hasRoute($name)) {
-            throw new RouteException(sprintf('Route "%s" is not found.', $name));
+            if (!isset($this->alias[$name])) {
+                throw new RouteException(sprintf('Route "%s" is not found.', $name));
+            }
+            $name = $this->alias[$name];
         }
 
         return $this->routes[$name];
