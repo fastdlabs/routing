@@ -28,6 +28,11 @@ class Router
     private $collections;
 
     /**
+     * @var string
+     */
+    private $group = '';
+
+    /**
      * Router constructor.
      * Initialize route collections and route Generator.
      */
@@ -90,6 +95,48 @@ class Router
     public function removeRoute($name)
     {
         return $this->collections->removeRoute($name);
+    }
+
+    /**
+     * @param $route
+     * @param $callback
+     * @param $method
+     * @return Route
+     */
+    public function createRoute($route, $callback, $method)
+    {
+        $name = '';
+
+        if (is_array($route)) {
+            $name = isset($route['name']) ? $route['name'] : '';
+            $route = $route[0];
+        }
+
+        $route = new Route($route, $name, array(), array($method), array(), array(), $callback);
+
+        $this->setRoute($route);
+
+        unset($name);
+
+        return $route;
+    }
+
+    /**
+     * @param $group
+     * @param $closure
+     * @return void
+     */
+    public function group($group, $closure)
+    {
+        if (!is_callable($closure)) {
+            throw new \InvalidArgumentException(sprintf('Argument 2 must be a Closure.'));
+        }
+
+        $this->group = $group;
+
+        $closure();
+
+        $this->group = '';
     }
 
     /**
