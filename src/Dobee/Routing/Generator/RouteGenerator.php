@@ -33,7 +33,7 @@ class RouteGenerator
 
         if ($suffix) {
 
-            $formats = $route->getFormat();
+            $formats = $route->getFormats();
 
             $format = array_shift($formats);
 
@@ -47,14 +47,14 @@ class RouteGenerator
         }
 
         if (empty($parameters)) {
-            return $route->getRoute() . $format;
+            return $route->getPath() . $format;
         }
 
         $replacer = array_map(function ($value) {
             return '{' . $value . '}';
         }, $route->getArguments());
 
-        $routeUrl = str_replace($replacer, $parameters, $route->getRoute());
+        $routeUrl = str_replace($replacer, $parameters, $route->getPath());
 
         if (!preg_match_all($route->getPathRegex(), $routeUrl, $match)) {
             throw new RouteException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())), 500);

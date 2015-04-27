@@ -22,7 +22,7 @@ class Route implements RouteInterface
     /**
      * @var string
      */
-    protected $route;
+    protected $path;
 
     /**
      * @var string
@@ -85,7 +85,7 @@ class Route implements RouteInterface
     protected $hosts = array();
 
     /**
-     * @param string $route
+     * @param string $path
      * @param string $name
      * @param array  $defaults
      * @param array  $methods
@@ -94,7 +94,7 @@ class Route implements RouteInterface
      * @param null   $callback
      */
     public function __construct(
-        $route,
+        $path,
         $name,
         array $defaults     = array(),
         array $methods      = array('ANY'),
@@ -103,7 +103,7 @@ class Route implements RouteInterface
         $callback           = null
     )
     {
-        $this->route        = $route;
+        $this->path         = $path;
 
         $this->name         = $name;
 
@@ -117,7 +117,7 @@ class Route implements RouteInterface
 
         $this->callback     = $callback;
 
-        $this->parsePathRegex($route, $requirements);
+        $this->parsePathRegex($path, $requirements);
     }
 
     /**
@@ -140,12 +140,12 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param string $route
+     * @param string $path
      * @return $this
      */
-    public function setRoute($route)
+    public function setPath($path)
     {
-        $this->route = $route;
+        $this->path = $path;
 
         return $this;
     }
@@ -153,9 +153,9 @@ class Route implements RouteInterface
     /**
      * @return string
      */
-    public function getRoute()
+    public function getPath()
     {
-        return $this->route;
+        return $this->path;
     }
 
     /**

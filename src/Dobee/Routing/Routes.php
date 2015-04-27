@@ -116,6 +116,17 @@ class Routes
     }
 
     /**
+     * @param $route
+     * @param $callback
+     * @param $methods
+     * @return \Dobee\Routing\Route
+     */
+    public static function create($route, $callback, $methods)
+    {
+        return self::getRouter()->createRoute($route, $callback, $methods);
+    }
+
+    /**
      * @param $name
      * @return \Dobee\Routing\RouteInterface
      */

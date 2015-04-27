@@ -59,7 +59,7 @@ class RouteMatcher implements RouteMatcherInterface
 
             if (array() !== ($arguments = $route->getArguments())) {
 
-                $arguments = array_slice($arguments, (substr_count($path, '/') - substr_count($route->getRoute(), '/')));
+                $arguments = array_slice($arguments, (substr_count($path, '/') - substr_count($route->getPath(), '/')));
 
                 if (array() !== ($defaults = $route->getDefaults())) {
                     $defaults = self::fill($defaults, $arguments);

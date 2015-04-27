@@ -69,4 +69,23 @@ class RoutesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('name'), $route->getArguments());
         $this->assertEquals(array('name' => 'jan'), $route->getParameters());
     }
+
+    public function testMethods()
+    {
+        \Routes::create(['/method', 'name' => 'method'], function () {}, array('POST',"GET"));
+
+        $this->assertEquals(array('POST', 'GET'), $this->router->getRoute('method')->getMethods());
+    }
+
+    public function testGroup()
+    {
+        \Routes::group('/admin', function () {
+           \Routes::get(['/login', 'name' => 'admin_login'], '');
+        });
+
+        $route = $this->router->getRoute('admin_login');
+
+        $this->assertEquals('/admin/login', $route->getPath());
+        $this->assertEquals('/admin', $route->getGroup());
+    }
 }

@@ -120,7 +120,7 @@ class RouteCollections implements \Iterator, \Countable
     {
         $this->routes[$route->getName()] = $route;
 
-        $this->alias[$route->getRoute()] = $route->getName();
+        $this->alias[$route->getPath()] = $route->getName();
 
         return $this;
     }

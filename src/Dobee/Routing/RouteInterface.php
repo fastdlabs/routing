@@ -78,12 +78,12 @@ interface RouteInterface
      * @param $route
      * @return $this
      */
-    public function setRoute($route);
+    public function setPath($route);
 
     /**
      * @return string
      */
-    public function getRoute();
+    public function getPath();
 
     /**
      * @return string
@@ -144,4 +144,15 @@ interface RouteInterface
      * @return string|array
      */
     public function getParameters();
+
+    /**
+     * @param $group
+     * @return $this
+     */
+    public function setGroup($group);
+
+    /**
+     * @return string
+     */
+    public function getGroup();
 }

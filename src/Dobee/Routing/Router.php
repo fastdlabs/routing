@@ -112,7 +112,11 @@ class Router
             $route = $route[0];
         }
 
-        $route = new Route($route, $name, array(), array($method), array(), array(), $callback);
+        $method = is_array($method) ? $method : array($method);
+
+        $route = new Route($this->group . $route, $name, array(), $method, array(), array(), $callback);
+
+        $route->setGroup($this->group);
 
         $this->setRoute($route);
 
