@@ -85,15 +85,15 @@ class RouteMatcher implements RouteMatcherInterface
      */
     public static function matchRequestMethod($method, RouteInterface $route)
     {
-        if (in_array('ANY', $route->getMethod()) || in_array($method, $route->getMethod())) {
+        if (in_array('ANY', $route->getMethods()) || in_array($method, $route->getMethods())) {
             return true;
         }
 
         throw new RouteException(sprintf(
             'Route "%s" request method must to be ["%s"]',
             $route->getName(),
-            implode('", "', $route->getMethod())
-        ), 404);
+            implode('", "', $route->getMethods())
+        ), 403);
     }
 
     /**
@@ -104,14 +104,14 @@ class RouteMatcher implements RouteMatcherInterface
      */
     public static function matchRequestFormat($format = 'php', RouteInterface $route)
     {
-        if (in_array(empty($format) ? 'php' : $format, $route->getFormat())) {
+        if (in_array(empty($format) ? 'php' : $format, $route->getFormats())) {
             return true;
         }
 
         throw new RouteException(sprintf(
             'Route "%s" request format must to be ["%s"]',
             $route->getName(),
-            implode('", "', $route->getFormat())
+            implode('", "', $route->getFormats())
         ), 403);
     }
 
