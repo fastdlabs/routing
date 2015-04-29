@@ -105,7 +105,7 @@ class Router
      */
     public function createRoute($route, $callback, $method)
     {
-        $name = '';
+        $name = $route;
 
         if (is_array($route)) {
             $name = isset($route['name']) ? $route['name'] : '';
