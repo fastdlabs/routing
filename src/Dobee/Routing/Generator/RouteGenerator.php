@@ -42,11 +42,7 @@ class RouteGenerator
             unset($formats);
         }
 
-        if (0 === count($route->getArguments())) {
-            return '/' . $route->getName() . $format;
-        }
-
-        if (empty($parameters)) {
+        if (empty($parameters) || 0 === count($route->getArguments())) {
             return $route->getPath() . $format;
         }
 
