@@ -33,11 +33,11 @@ class RouteMatcher implements RouteMatcherInterface
     public static function match($path, RouteCollections $collections = null)
     {
         try {
-            return $collections->getRoute($path);
+            return $collections->setCurrentRoute($collections->getRoute($path))->getCurrentRoute();
         } catch (RouteException $e) {
             foreach ($collections as $route) {
                 try {
-                    return self::matchRequestRoute($path, $route);
+                    return $collections->setCurrentRoute(self::matchRequestRoute($path, $route))->getCurrentRoute();
                 } catch (RouteException $e){}
             }
 
