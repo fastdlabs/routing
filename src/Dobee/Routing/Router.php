@@ -105,16 +105,16 @@ class Router
      */
     public function createRoute($route, $callback, $method)
     {
-        $name = $route;
-
         if (is_array($route)) {
             $name = isset($route['name']) ? $route['name'] : '';
-            $route = $route[0];
+            $route = $this->group . $route[0];
+        } else if (is_string($route)) {
+            $name = $route = $this->group . $route;
         }
 
         $method = is_array($method) ? $method : array($method);
 
-        $route = new Route($this->group . $route, $name, array(), $method, array(), array(), $callback);
+        $route = new Route($route, $name, array(), $method, array(), array(), $callback);
 
         $route->setGroup($this->group);
 
