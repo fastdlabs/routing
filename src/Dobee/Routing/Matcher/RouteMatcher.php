@@ -32,6 +32,9 @@ class RouteMatcher implements RouteMatcherInterface
      */
     public static function match($path, RouteCollections $collections = null)
     {
+        if ('' != pathinfo($path, PATHINFO_EXTENSION)) {
+            $path = pathinfo($path, PATHINFO_BASENAME);
+        }
         try {
             return $collections->setCurrentRoute($collections->getRoute($path))->getCurrentRoute();
         } catch (RouteException $e) {
