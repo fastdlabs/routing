@@ -111,7 +111,7 @@ class Router
             $name = isset($route['name']) ? $route['name'] : '';
             $route = $this->group . $route[0];
         } else if (is_string($route)) {
-            $name = $route = $this->group . $route;
+            $name = $route = str_replace('//', '/', $this->group . $route);
         }
 
         $method = is_array($method) ? $method : array($method);

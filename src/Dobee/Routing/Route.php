@@ -103,7 +103,7 @@ class Route implements RouteInterface
         $callback           = null
     )
     {
-        $this->path         = str_replace('//', '/', $path);
+        $this->path         = $path;
 
         $this->name         = $name;
 
