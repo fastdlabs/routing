@@ -20,15 +20,26 @@ namespace Dobee\Routing;
 interface RouteInterface
 {
     /**
-     * @param array $hosts
+     * @return string
+     */
+    public function getHttpProtocol();
+
+    /**
+     * @param $httpProtocol
      * @return $this
      */
-    public function setHosts(array $hosts);
+    public function setHttpProtocol($httpProtocol);
+
+    /**
+     * @param array $host
+     * @return $this
+     */
+    public function setHost($host);
 
     /**
      * @return array
      */
-    public function getHosts();
+    public function getHost();
 
     /**
      * @param array $ips

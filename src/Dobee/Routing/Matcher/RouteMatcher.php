@@ -100,6 +100,21 @@ class RouteMatcher implements RouteMatcherInterface
     }
 
     /**
+     * @param                $host
+     * @param RouteInterface $route
+     * @return bool
+     * @throws RouteException
+     */
+    public static function matchRequestHost($host, RouteInterface $route)
+    {
+        if ('' == $route->getHost() || $host === $route->getHost()) {
+            return true;
+        }
+
+        throw new RouteException(sprintf('Route allow %s access.', $route->getHost()), 403);
+    }
+
+    /**
      * @param                $format
      * @param RouteInterface $route
      * @return bool

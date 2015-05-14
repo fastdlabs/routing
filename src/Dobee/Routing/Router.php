@@ -138,7 +138,7 @@ class Router
             throw new \InvalidArgumentException(sprintf('Argument 2 must be a Closure.'));
         }
 
-        $this->group = $group;
+        $this->group .= $group;
 
         $closure();
 
@@ -152,6 +152,17 @@ class Router
     public function match($path)
     {
         return RouteMatcher::match($path, $this->collections);
+    }
+
+    /**
+     * @param                $host
+     * @param RouteInterface $route
+     * @return bool
+     * @throws RouteException
+     */
+    public function matchHost($host, RouteInterface $route)
+    {
+        return RouteMatcher::matchRequestHost($host, $route);
     }
 
     /**

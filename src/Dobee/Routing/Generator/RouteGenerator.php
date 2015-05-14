@@ -42,8 +42,14 @@ class RouteGenerator
             unset($formats);
         }
 
+        $host = '';
+
+        if ('' != $route->getHost()) {
+            $host = $route->getHttpProtocol() . '://' . $route->getHost();
+        }
+
         if (empty($parameters) || 0 === count($route->getArguments())) {
-            return $route->getPath() . $format;
+            return $host . $route->getPath() . $format;
         }
 
         $replacer = array_map(function ($value) {
@@ -56,6 +62,7 @@ class RouteGenerator
             throw new RouteException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())), 500);
         }
 
-        return $routeUrl . $format;
+
+        return $host . $routeUrl . $format;
     }
 } 

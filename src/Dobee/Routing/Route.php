@@ -80,9 +80,14 @@ class Route implements RouteInterface
     protected $ips = array();
 
     /**
-     * @var array
+     * @var string
      */
-    protected $hosts = array();
+    protected $host = '';
+
+    /**
+     * @var string
+     */
+    protected $protocol = 'http';
 
     /**
      * @param string $path
@@ -341,12 +346,12 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param array $hosts
+     * @param array $host
      * @return $this
      */
-    public function setHosts(array $hosts)
+    public function setHost($host)
     {
-        $this->hosts = $hosts;
+        $this->host = $host;
 
         return $this;
     }
@@ -354,9 +359,9 @@ class Route implements RouteInterface
     /**
      * @return array
      */
-    public function getHosts()
+    public function getHost()
     {
-        return $this->hosts;
+        return $this->host;
     }
 
     /**
@@ -376,5 +381,24 @@ class Route implements RouteInterface
     public function getIps()
     {
         return $this->ips;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHttpProtocol()
+    {
+        return $this->protocol;
+    }
+
+    /**
+     * @param $httpProtocol
+     * @return $this
+     */
+    public function setHttpProtocol($httpProtocol)
+    {
+        $this->protocol = $httpProtocol;
+
+        return $this;
     }
 }
