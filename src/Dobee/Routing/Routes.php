@@ -42,7 +42,7 @@ class Routes
      */
     public static function get($route, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, 'GET');
+        return self::getRouter()->createRoute($route, $callback, ['GET']);
     }
 
     /**
@@ -52,7 +52,7 @@ class Routes
      */
     public static function post($route, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, 'POST');
+        return self::getRouter()->createRoute($route, $callback, ['POST']);
     }
 
     /**
@@ -62,7 +62,7 @@ class Routes
      */
     public static function put($route, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, 'PUT');
+        return self::getRouter()->createRoute($route, $callback, ['PUT']);
     }
 
     /**
@@ -72,7 +72,7 @@ class Routes
      */
     public static function delete($route, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, 'DELETE');
+        return self::getRouter()->createRoute($route, $callback, ['DELETE']);
     }
 
     /**
@@ -82,7 +82,7 @@ class Routes
      */
     public static function head($route, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, 'HEAD');
+        return self::getRouter()->createRoute($route, $callback, ['HEAD']);
     }
 
     /**
@@ -92,7 +92,7 @@ class Routes
      */
     public static function options($route, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, 'OPTIONS');
+        return self::getRouter()->createRoute($route, $callback, ['OPTIONS']);
     }
 
     /**
@@ -102,7 +102,7 @@ class Routes
      */
     public static function any($route, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, 'ANY');
+        return self::getRouter()->createRoute($route, $callback, ['ANY']);
     }
 
     /**
@@ -121,7 +121,7 @@ class Routes
      * @param $methods
      * @return \Dobee\Routing\Route
      */
-    public static function create($route, $callback, $methods)
+    public static function create($route, $callback, array $methods)
     {
         return self::getRouter()->createRoute($route, $callback, $methods);
     }

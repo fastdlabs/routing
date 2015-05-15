@@ -87,5 +87,17 @@ class RoutesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('/admin/login', $route->getPath());
         $this->assertEquals('/admin', $route->getGroup());
+
+        \Routes::group(['/api', 'host' => 'api.demo.com'], function () {
+            \Routes::group('/v1', function () {
+                \Routes::get('/demo', function () {
+                    return 'api demo';
+                });
+            });
+        });
+
+        $route = \Routes::getRoute('/api/v1/demo');
+        $this->assertEquals('http://api.demo.com/v1/demo', \Routes::getRouter()->generateUrl('/api/v1/demo'));
+        $this->assertEquals('/v1/demo', $route->getPath());
     }
 }

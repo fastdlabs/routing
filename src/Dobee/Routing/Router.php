@@ -28,9 +28,28 @@ class Router
     private $collections;
 
     /**
+     * Full group name.
+     *
      * @var string
      */
-    private $group = '';
+    private $group = [];
+
+    /**
+     * @var string
+     */
+    private $protocol = 'http';
+
+    /**
+     * @var string
+     */
+    private $host = '';
+
+    /**
+     * Host group name
+     *
+     * @var string
+     */
+    private $hostGroup = [];
 
     /**
      * Router constructor.
@@ -100,29 +119,37 @@ class Router
     /**
      * @param $route
      * @param $callback
-     * @param $method
+     * @param $methods
      * @return Route
      */
-    public function createRoute($route, $callback, $method)
+    public function createRoute($route, $callback, $methods)
     {
         $name = '';
 
+        $group = implode('', $this->group);
+
         if (is_array($route)) {
             $name = isset($route['name']) ? $route['name'] : '';
-            $route = $this->group . $route[0];
+            $routeName = $route[0];
+            $route = $group . $route[0];
         } else if (is_string($route)) {
-            $name = $route = str_replace('//', '/', $this->group . $route);
+            $routeName = $route;
+            $route = str_replace('//', '/', $group . $route);
+            $name = $route;
         }
 
-        $method = is_array($method) ? $method : array($method);
+        $route = new Route($route, $name, array(), $methods, array(), array(), $callback);
 
-        $route = new Route($route, $name, array(), $method, array(), array(), $callback);
-
-        $route->setGroup($this->group);
+        $route
+            ->setPath(implode('', $this->hostGroup) . $routeName)
+            ->setGroup($group)
+            ->setHttpProtocol($this->protocol)
+            ->setHost($this->host)
+        ;
 
         $this->setRoute($route);
 
-        unset($name);
+        unset($name, $routeName);
 
         return $route;
     }
@@ -138,11 +165,33 @@ class Router
             throw new \InvalidArgumentException(sprintf('Argument 2 must be a Closure.'));
         }
 
-        $this->group .= $group;
+        $groupInfo = $group;
+
+        if (is_array($groupInfo)) {
+            foreach ($groupInfo as $name => $value) {
+                if (isset($this->$name)) {
+                    $this->$name = $value;
+                }
+            }
+
+            if (isset($groupInfo[0])) {
+                $group = $groupInfo[0];
+            }
+        }
+
+        $this->group[] = $group;
+
+        if (!isset($groupInfo['host'])) {
+            $this->hostGroup[] = $group;
+        }
+
+        unset($group);
 
         $closure();
 
-        $this->group = '';
+        array_pop($this->group);
+        array_pop($this->hostGroup);
+        $this->host = '';
     }
 
     /**
