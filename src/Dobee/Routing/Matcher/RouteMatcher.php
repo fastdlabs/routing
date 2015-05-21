@@ -59,17 +59,13 @@ class RouteMatcher implements RouteMatcherInterface
         $originPath = $path;
 
         if (!preg_match($route->getPathRegex(), $path, $match)) {
-
             if (array() !== ($arguments = $route->getArguments())) {
-
-                $arguments = array_slice($arguments, (substr_count($path, '/') - substr_count($route->getPath(), '/')));
-
+                $arguments = array_slice($arguments, (substr_count($path, '/') - substr_count(('' === $route->getHost() ? '' : $route->getGroup()) . $route->getPath(), '/')));
                 if (array() !== ($defaults = $route->getDefaults())) {
                     $defaults = self::fill($defaults, $arguments);
                     $path = str_replace('//', '/', $path . '/' . implode('/', array_values($defaults)));
                 }
             }
-
             if (!preg_match($route->getPathRegex(), $path, $match)) {
                 throw new RouteException(sprintf('Route "%s" is not found.', $originPath), 404);
             }
