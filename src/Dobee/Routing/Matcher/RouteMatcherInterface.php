@@ -25,28 +25,35 @@ interface RouteMatcherInterface
     /**
      * @param                $uri
      * @param RouteCollections $collections
-     * @return mixed
+     * @return RouteInterface
      */
     public static function match($uri, RouteCollections $collections = null);
 
     /**
      * @param                $uri
      * @param RouteInterface $route
-     * @return mixed
+     * @return RouteInterface
      */
     public static function matchRequestRoute($uri, RouteInterface $route);
 
     /**
      * @param                $method
      * @param RouteInterface $route
-     * @return mixed
+     * @return RouteInterface
      */
     public static function matchRequestMethod($method, RouteInterface $route);
 
     /**
      * @param                $format
      * @param RouteInterface $route
-     * @return mixed
+     * @return RouteInterface
      */
     public static function matchRequestFormat($format, RouteInterface $route);
+
+    /**
+     * @param                $ips
+     * @param RouteInterface $route
+     * @return RouteInterface
+     */
+    public static function matchRequesetIps($ips, RouteInterface $route);
 }

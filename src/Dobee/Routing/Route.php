@@ -82,7 +82,7 @@ class Route implements RouteInterface
     /**
      * @var string
      */
-    protected $host = '';
+    protected $domain = '';
 
     /**
      * @var string
@@ -346,22 +346,22 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param array $host
-     * @return $this
+     * @return string
      */
-    public function setHost($host)
+    public function getDomain()
     {
-        $this->host = $host;
-
-        return $this;
+        return $this->domain;
     }
 
     /**
-     * @return array
+     * @param string $domain
+     * @return $this
      */
-    public function getHost()
+    public function setDomain($domain)
     {
-        return $this->host;
+        $this->domain = $domain;
+
+        return $this;
     }
 
     /**

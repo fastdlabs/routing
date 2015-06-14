@@ -40,12 +40,14 @@ class Router
     private $protocol = 'http';
 
     /**
+     * Route group domain.
+     *
      * @var string
      */
-    private $host = '';
+    private $domain = '';
 
     /**
-     * Host group name
+     * Domain group name
      *
      * @var string
      */
@@ -128,6 +130,8 @@ class Router
 
         $group = implode('', $this->group);
 
+        $routeName = $route;
+
         if (is_array($route)) {
             $name = isset($route['name']) ? $route['name'] : '';
             $routeName = $route[0];
@@ -144,7 +148,7 @@ class Router
             ->setPath(implode('', $this->domainGroup) . $routeName)
             ->setGroup($group)
             ->setHttpProtocol($this->protocol)
-            ->setHost($this->host)
+            ->setDomain($this->domain)
         ;
 
         $this->setRoute($route);
@@ -191,7 +195,7 @@ class Router
 
         array_pop($this->group);
         array_pop($this->domainGroup);
-        $this->host = '';
+        $this->domain = '';
     }
 
     /**
@@ -245,6 +249,16 @@ class Router
     public function matchFormat($format, RouteInterface $route)
     {
         return RouteMatcher::matchRequestFormat($format, $route);
+    }
+
+    /**
+     * @param                $ip
+     * @param RouteInterface $route
+     * @return RouteInterface
+     */
+    public function matchIp($ip, RouteInterface $route)
+    {
+        return RouteMatcher::matchRequesetIps($ip, $route);
     }
 
     /**

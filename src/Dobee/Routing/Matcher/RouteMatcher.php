@@ -60,7 +60,7 @@ class RouteMatcher implements RouteMatcherInterface
 
         if (!preg_match($route->getPathRegex(), $path, $match)) {
             if (array() !== ($arguments = $route->getArguments())) {
-                $arguments = array_slice($arguments, (substr_count($path, '/') - substr_count(('' === $route->getHost() ? '' : $route->getGroup()) . $route->getPath(), '/')));
+                $arguments = array_slice($arguments, (substr_count($path, '/') - substr_count(('' === $route->getDomain() ? '' : $route->getGroup()) . $route->getPath(), '/')));
                 if (array() !== ($defaults = $route->getDefaults())) {
                     $defaults = self::fill($defaults, $arguments);
                     $path = str_replace('//', '/', $path . '/' . implode('/', array_values($defaults)));
@@ -103,11 +103,11 @@ class RouteMatcher implements RouteMatcherInterface
      */
     public static function matchRequestHost($host, RouteInterface $route)
     {
-        if ('' == $route->getHost() || $host === $route->getHost()) {
+        if ('' == $route->getDomain() || $host === $route->getDomain()) {
             return true;
         }
 
-        throw new RouteException(sprintf('Route allow %s access.', $route->getHost()), 403);
+        throw new RouteException(sprintf('Route allow %s access.', $route->getDomain()), 403);
     }
 
     /**
@@ -170,5 +170,15 @@ class RouteMatcher implements RouteMatcherInterface
         unset($defaults, $args);
 
         return $parameters;
+    }
+
+    /**
+     * @param                $ips
+     * @param RouteInterface $route
+     * @return RouteInterface
+     */
+    public static function matchRequesetIps($ips, RouteInterface $route)
+    {
+        // TODO: Implement matchRequesetIps() method.
     }
 }

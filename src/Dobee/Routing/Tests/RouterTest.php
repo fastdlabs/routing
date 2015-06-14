@@ -40,7 +40,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->routes['requires2']  = new Route('/welcome/{require2}', 'welcome_post', array(), array('GET'), array('require2' => '\d+')); // 带访问参数格式限制路由
         $this->routes['requires3']  = new Route('/welcome/{require3}', 'welcome_post', array(), array('GET'), array('require3' => '\w+')); // 带访问参数格式限制路由
         $this->routes['format']     = new Route('/format', 'format', array(), array(), array(), array('json', 'php', 'xml')); // 普通静态路由
-        $this->routes['host']       = (new Route('/host', 'host'))->setHost('localhost');
+        $this->routes['host']       = (new Route('/host', 'host'))->setDomain('localhost');
 
         foreach ($this->routes as $route) {
             $this->router->setRoute($route);

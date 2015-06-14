@@ -18,11 +18,6 @@
     "config": {
         "bin-dir": "bin"
     },
-    "require-dev": {
-        "dobee/protocol": "dev-master",
-        "dobee/finder": "dev-master",
-        "dobee/console": "dev-master"
-    },
     "autoload": {
         "psr-4": {
             "Dobee\\": "src/Dobee"

@@ -72,7 +72,7 @@ class RoutesTest extends \PHPUnit_Framework_TestCase
 
     public function testMethods()
     {
-        \Routes::create(['/method', 'name' => 'method'], function () {}, array('POST',"GET"));
+        \Routes::getRouter()->createRoute(['/method', 'name' => 'method'], function () {}, array('POST',"GET"));
 
         $this->assertEquals(array('POST', 'GET'), $this->router->getRoute('method')->getMethods());
     }
@@ -88,16 +88,16 @@ class RoutesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/admin/login', $route->getPath());
         $this->assertEquals('/admin', $route->getGroup());
 
-        \Routes::group(['/api', 'host' => 'api.demo.com'], function () {
+        \Routes::group(['/api', 'domain' => 'api.demo.com'], function () {
             \Routes::group('/v1', function () {
-                \Routes::get('/demo', function () {
+                \Routes::get(['/demo', 'name' => 'api_v1_domain'], function () {
                     return 'api demo';
                 });
             });
         });
 
-        $route = \Routes::getRoute('/api/v1/demo');
-        $this->assertEquals('http://api.demo.com/v1/demo', \Routes::getRouter()->generateUrl('/api/v1/demo'));
+        $route = \Routes::getRouter()->getRoute('api_v1_domain');
+        $this->assertEquals('http://api.demo.com/v1/demo', \Routes::getRouter()->generateUrl('api_v1_domain'));
         $this->assertEquals('/v1/demo', $route->getPath());
     }
 }

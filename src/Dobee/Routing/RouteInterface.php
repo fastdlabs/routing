@@ -31,15 +31,15 @@ interface RouteInterface
     public function setHttpProtocol($httpProtocol);
 
     /**
-     * @param array $host
+     * @param array $domain
      * @return $this
      */
-    public function setHost($host);
+    public function setDomain($domain);
 
     /**
      * @return array
      */
-    public function getHost();
+    public function getDomain();
 
     /**
      * @param array $ips

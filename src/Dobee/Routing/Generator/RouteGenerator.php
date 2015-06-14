@@ -44,8 +44,8 @@ class RouteGenerator
 
         $host = '';
 
-        if ('' != $route->getHost()) {
-            $host = $route->getHttpProtocol() . '://' . $route->getHost();
+        if ('' != $route->getDomain()) {
+            $host = $route->getHttpProtocol() . '://' . $route->getDomain();
         }
 
         if (empty($parameters) || 0 === count($route->getArguments())) {

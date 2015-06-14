@@ -46,7 +46,7 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
         $this->routes['arguments']  = new Route('/arguments/{arg1}/{arg2}', 'arguments'); // 无默认值动态路由
         $this->routes['once']       = new Route('/once/{name}', 'once', array('name' => 'jan'));  // 有默认值动态路由
         $this->routes['host']       = new Route('/host', 'host');
-        $this->routes['host']->setHost('localhost');
+        $this->routes['host']->setDomain('localhost');
 
         foreach ($this->routes as $name => $route) {
             $this->router->setRoute($route);
