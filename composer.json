@@ -1,7 +1,9 @@
 {
     "name": "dobee/routing",
-    "description": "dobee router component",
+    "description": "dobee routing component",
+    "type": "library",
     "license": "MIT",
+    "keywords": ["routing", "router", "route", "dobee framework"],
     "authors": [
         {
             "name": "janhuang",
@@ -11,12 +13,6 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=5.4"
-    },
-    "bin": [
-        "console"
-    ],
-    "config": {
-        "bin-dir": "bin"
     },
     "autoload": {
         "psr-4": {
