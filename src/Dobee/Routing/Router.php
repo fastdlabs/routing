@@ -49,7 +49,7 @@ class Router
      *
      * @var string
      */
-    private $hostGroup = [];
+    private $domainGroup = [];
 
     /**
      * Router constructor.
@@ -141,7 +141,7 @@ class Router
         $route = new Route($route, $name, array(), $methods, array(), array(), $callback);
 
         $route
-            ->setPath(implode('', $this->hostGroup) . $routeName)
+            ->setPath(implode('', $this->domainGroup) . $routeName)
             ->setGroup($group)
             ->setHttpProtocol($this->protocol)
             ->setHost($this->host)
@@ -181,8 +181,8 @@ class Router
 
         $this->group[] = $group;
 
-        if (!isset($groupInfo['host'])) {
-            $this->hostGroup[] = $group;
+        if (!isset($groupInfo['domain'])) {
+            $this->domainGroup[] = $group;
         }
 
         unset($group);
@@ -190,7 +190,7 @@ class Router
         $closure();
 
         array_pop($this->group);
-        array_pop($this->hostGroup);
+        array_pop($this->domainGroup);
         $this->host = '';
     }
 
