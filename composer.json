@@ -1,5 +1,5 @@
 {
-    "name": "FastD/routing",
+    "name": "fastd/routing",
     "description": "FastD routing component",
     "type": "library",
     "license": "MIT",
