@@ -11,7 +11,7 @@
  * Gmail: bboyjanhuang@gmail.com
  */
 
-namespace Dobee\Routing;
+namespace FastD\Routing;
 
 class RouteException extends \ErrorException
 {

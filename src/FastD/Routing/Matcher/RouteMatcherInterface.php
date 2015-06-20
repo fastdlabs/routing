@@ -10,15 +10,15 @@
  * Blog: http://segmentfault.com/blog/janhuang
  */
 
-namespace Dobee\Routing\Matcher;
+namespace FastD\Routing\Matcher;
 
-use Dobee\Routing\RouteInterface;
-use Dobee\Routing\RouteCollections;
+use FastD\Routing\RouteInterface;
+use FastD\Routing\RouteCollections;
 
 /**
  * Interface RouteMatcherInterface
  *
- * @package Dobee\Routing\Matcher
+ * @package FastD\Routing\Matcher
  */
 interface RouteMatcherInterface
 {

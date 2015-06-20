@@ -10,15 +10,15 @@
  * Blog: http://segmentfault.com/blog/janhuang
  */
 
-namespace Dobee\Routing;
+namespace FastD\Routing;
 
-use Dobee\Routing\Generator\RouteGenerator;
-use Dobee\Routing\Matcher\RouteMatcher;
+use FastD\Routing\Generator\RouteGenerator;
+use FastD\Routing\Matcher\RouteMatcher;
 
 /**
  * Class Router
  *
- * @package Dobee\Routing
+ * @package FastD\Routing
  */
 class Router
 {

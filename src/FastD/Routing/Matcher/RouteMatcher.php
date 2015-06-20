@@ -10,16 +10,16 @@
  * Blog: http://segmentfault.com/blog/janhuang
  */
 
-namespace Dobee\Routing\Matcher;
+namespace FastD\Routing\Matcher;
 
-use Dobee\Routing\RouteCollections;
-use Dobee\Routing\RouteInterface;
-use Dobee\Routing\RouteException;
+use FastD\Routing\RouteCollections;
+use FastD\Routing\RouteInterface;
+use FastD\Routing\RouteException;
 
 /**
  * Class RouteMatcher
  *
- * @package Dobee\Routing\Matcher
+ * @package FastD\Routing\Matcher
  */
 class RouteMatcher implements RouteMatcherInterface
 {

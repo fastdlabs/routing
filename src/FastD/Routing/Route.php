@@ -10,12 +10,12 @@
  * Blog: http://segmentfault.com/blog/janhuang
  */
 
-namespace Dobee\Routing;
+namespace FastD\Routing;
 
 /**
  * Class Route
  *
- * @package Dobee\Routing
+ * @package FastD\Routing
  */
 class Route implements RouteInterface
 {

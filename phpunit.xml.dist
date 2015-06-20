@@ -11,8 +11,8 @@
         <ini name="error_reporting" value="-16385"/>
     </php>
     <testsuites>
-        <testsuite name="Dobee php simple framework Routing Component Tests">
-            <directory>./src/Dobee/Routing/Tests/</directory>
+        <testsuite name="FastD php simple framework Routing Component Tests">
+            <directory>./src/FastD/Routing/Tests/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

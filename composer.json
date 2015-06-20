@@ -1,9 +1,9 @@
 {
-    "name": "dobee/routing",
-    "description": "dobee routing component",
+    "name": "FastD/routing",
+    "description": "FastD routing component",
     "type": "library",
     "license": "MIT",
-    "keywords": ["routing", "router", "route", "dobee framework"],
+    "keywords": ["routing", "router", "route", "FastD framework"],
     "authors": [
         {
             "name": "janhuang",
@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Dobee\\": "src/Dobee"
+            "FastD\\": "src/FastD"
         }
     }
 }

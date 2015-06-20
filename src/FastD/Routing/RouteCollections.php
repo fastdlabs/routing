@@ -6,12 +6,12 @@
  * Time: 下午1:51
  */
 
-namespace Dobee\Routing;
+namespace FastD\Routing;
 
 /**
  * Class RouteCollections
  *
- * @package Dobee\Component\Routing\Collections
+ * @package FastD\Component\Routing\Collections
  */
 class RouteCollections implements \Iterator, \Countable
 {

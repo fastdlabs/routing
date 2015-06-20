@@ -6,15 +6,15 @@
  * Time: 下午10:08
  */
 
-namespace Dobee\Routing\Generator;
+namespace FastD\Routing\Generator;
 
-use Dobee\Routing\RouteException;
-use Dobee\Routing\RouteInterface;
+use FastD\Routing\RouteException;
+use FastD\Routing\RouteInterface;
 
 /**
  * Class RouteGenerator
  *
- * @package Dobee\Routing\Generator
+ * @package FastD\Routing\Generator
  */
 class RouteGenerator
 {

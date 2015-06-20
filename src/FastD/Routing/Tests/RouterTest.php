@@ -11,15 +11,15 @@
  * Gmail: bboyjanhuang@gmail.com
  */
 
-namespace Dobee\Routing\Tests;
+namespace FastD\Routing\Tests;
 
-use Dobee\Routing\Route;
-use Dobee\Routing\Router;
+use FastD\Routing\Route;
+use FastD\Routing\Router;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \Dobee\Routing\Router
+     * @var \FastD\Routing\Router
      */
     private $router;
 

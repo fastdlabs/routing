@@ -24,7 +24,7 @@ class Routes
     const METHOD_ANY = 'ANY';
 
     /**
-     * @var \Dobee\Routing\Router
+     * @var \FastD\Routing\Router
      */
     protected static $router;
 
@@ -34,12 +34,12 @@ class Routes
     protected function __construct(){}
 
     /**
-     * @return \Dobee\Routing\Router
+     * @return \FastD\Routing\Router
      */
     public static function getRouter()
     {
         if (null === self::$router) {
-            self::$router = new \Dobee\Routing\Router();
+            self::$router = new \FastD\Routing\Router();
         }
 
         return self::$router;
@@ -48,7 +48,7 @@ class Routes
     /**
      * @param $route
      * @param $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function get($route, $callback)
     {
@@ -58,7 +58,7 @@ class Routes
     /**
      * @param $route
      * @param $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function post($route, $callback)
     {
@@ -68,7 +68,7 @@ class Routes
     /**
      * @param $route
      * @param $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function put($route, $callback)
     {
@@ -78,7 +78,7 @@ class Routes
     /**
      * @param $route
      * @param $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function delete($route, $callback)
     {
@@ -88,7 +88,7 @@ class Routes
     /**
      * @param $route
      * @param $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function head($route, $callback)
     {
@@ -98,7 +98,7 @@ class Routes
     /**
      * @param $route
      * @param $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function options($route, $callback)
     {
@@ -108,7 +108,7 @@ class Routes
     /**
      * @param $route
      * @param $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function trace($route, $callback)
     {
@@ -118,7 +118,7 @@ class Routes
     /**
      * @param $route
      * @param $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function patch($route, $callback)
     {
@@ -128,7 +128,7 @@ class Routes
     /**
      * @param $route
      * @param $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function any($route, $callback)
     {
@@ -139,7 +139,7 @@ class Routes
      * @param array $methods
      * @param       $route
      * @param       $callback
-     * @return \Dobee\Routing\Route
+     * @return \FastD\Routing\Route
      */
     public static function match(array $methods = [], $route, $callback)
     {
