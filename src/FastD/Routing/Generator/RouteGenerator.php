@@ -59,7 +59,9 @@ class RouteGenerator
         $routeUrl = str_replace($replacer, $parameters, $route->getPath());
 
         if (!preg_match_all($route->getPathRegex(), $routeUrl, $match)) {
-            throw new RouteException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())), 500);
+            if (!preg_match_all($route->getPathRegex(), $route->getGroup() . $routeUrl, $match)) {
+                throw new RouteException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $route->getName(), implode('", "', $route->getArguments())), 500);
+            }
         }
 
 
