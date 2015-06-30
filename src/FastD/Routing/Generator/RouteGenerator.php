@@ -31,6 +31,8 @@ class RouteGenerator
 
         $format = '';
 
+        $query = '';
+
         if ($suffix) {
 
             $formats = $route->getFormats();
@@ -48,15 +50,21 @@ class RouteGenerator
             $host = $route->getHttpProtocol() . '://' . $route->getDomain();
         }
 
-        if (empty($parameters) || 0 === count($route->getArguments())) {
-            return $host . $route->getPath() . $format;
+        if (0 === count($route->getArguments())) {
+            if (!empty($parameters)) {
+                $query = '?' . http_build_query($parameters);
+            }
+            return $host . $route->getPath() . $format . $query;
         }
 
-        $replacer = array_map(function ($value) {
+        $replacer = $parameters;
+
+        $search = array_map(function ($value) use (&$parameters) {
+            unset($parameters[$value]);
             return '{' . $value . '}';
         }, $route->getArguments());
 
-        $routeUrl = str_replace($replacer, $parameters, $route->getPath());
+        $routeUrl = str_replace($search, $replacer, $route->getPath());
 
         if (!preg_match_all($route->getPathRegex(), $routeUrl, $match)) {
             if (!preg_match_all($route->getPathRegex(), $route->getGroup() . $routeUrl, $match)) {
@@ -64,7 +72,10 @@ class RouteGenerator
             }
         }
 
+        if (!empty($parameters)) {
+            $query = '?' . http_build_query($parameters);
+        }
 
-        return $host . $routeUrl . $format;
+        return $host . $routeUrl . $format . $query;
     }
 } 

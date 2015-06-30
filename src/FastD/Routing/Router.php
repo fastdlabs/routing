@@ -124,7 +124,7 @@ class Router
      * @param $methods
      * @return Route
      */
-    public function createRoute($route, $callback, $methods)
+    public function createRoute($route, $callback, array $methods = ['GET'])
     {
         $name = '';
 
