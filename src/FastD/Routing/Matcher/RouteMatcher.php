@@ -38,7 +38,7 @@ class RouteMatcher implements RouteMatcherInterface
         try {
             return $collections->setCurrentRoute($collections->getRoute($path))->getCurrentRoute();
         } catch (RouteException $e) {
-            foreach ($collections as $route) {
+            foreach ($collections->getCollections() as $route) {
                 try {
                     return $collections->setCurrentRoute(self::matchRequestRoute($path, $route))->getCurrentRoute();
                 } catch (RouteException $e){}
