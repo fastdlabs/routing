@@ -22,10 +22,6 @@ class RoutesTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        if (!class_exists('\Routes')) {
-            include __DIR__ . '/../Routes.php';
-        }
-
         $this->router = \Routes::getRouter();
     }
 
