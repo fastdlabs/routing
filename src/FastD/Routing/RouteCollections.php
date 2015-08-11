@@ -7,6 +7,7 @@
  */
 
 namespace FastD\Routing;
+use FastD\Debug\Exceptions\NotFoundHttpException;
 
 /**
  * Class RouteCollections
@@ -128,13 +129,13 @@ class RouteCollections implements \Iterator, \Countable
     /**
      * @param $name
      * @return RouteInterface
-     * @throws RouteException
+     * @throws NotFoundHttpException
      */
     public function getRoute($name)
     {
         if (!$this->hasRoute($name)) {
             if (!isset($this->alias[$name])) {
-                throw new RouteException(sprintf('Route "%s" is not found.', $name));
+                throw new NotFoundHttpException(sprintf('Route "%s" is not found.', $name));
             }
             $name = $this->alias[$name];
         }

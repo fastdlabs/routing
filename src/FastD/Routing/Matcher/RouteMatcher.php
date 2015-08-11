@@ -12,9 +12,10 @@
 
 namespace FastD\Routing\Matcher;
 
+use FastD\Debug\Exceptions\ForbiddenHttpException;
+use FastD\Debug\Exceptions\NotFoundHttpException;
 use FastD\Routing\RouteCollections;
 use FastD\Routing\RouteInterface;
-use FastD\Routing\RouteException;
 
 /**
  * Class RouteMatcher
@@ -37,11 +38,11 @@ class RouteMatcher implements RouteMatcherInterface
         }
         try {
             return $collections->setCurrentRoute($collections->getRoute($path))->getCurrentRoute();
-        } catch (RouteException $e) {
+        } catch (NotFoundHttpException $e) {
             foreach ($collections->getCollections() as $route) {
                 try {
                     return $collections->setCurrentRoute(self::matchRequestRoute($path, $route))->getCurrentRoute();
-                } catch (RouteException $e){}
+                } catch (NotFoundHttpException $e){}
             }
 
             throw $e;
@@ -52,7 +53,7 @@ class RouteMatcher implements RouteMatcherInterface
      * @param string          $path
      * @param RouteInterface  $route
      * @return RouteInterface
-     * @throws RouteException
+     * @throws NotFoundHttpException
      */
     public static function matchRequestRoute($path, RouteInterface $route = null)
     {
@@ -67,7 +68,7 @@ class RouteMatcher implements RouteMatcherInterface
                 }
             }
             if (!preg_match($route->getPathRegex(), $path, $match)) {
-                throw new RouteException(sprintf('Route "%s" is not found.', $originPath), 404);
+                throw new NotFoundHttpException(sprintf('Route "%s" is not found.', $originPath));
             }
 
             unset($originPath, $defaults, $args);
@@ -80,7 +81,7 @@ class RouteMatcher implements RouteMatcherInterface
      * @param                $method
      * @param RouteInterface $route
      * @return bool
-     * @throws RouteException
+     * @throws ForbiddenHttpException
      */
     public static function matchRequestMethod($method, RouteInterface $route)
     {
@@ -88,18 +89,18 @@ class RouteMatcher implements RouteMatcherInterface
             return true;
         }
 
-        throw new RouteException(sprintf(
+        throw new ForbiddenHttpException(sprintf(
             'Route "%s" request method must to be ["%s"]',
             $route->getName(),
             implode('", "', $route->getMethods())
-        ), 403);
+        ));
     }
 
     /**
      * @param                $host
      * @param RouteInterface $route
      * @return bool
-     * @throws RouteException
+     * @throws NotFoundHttpException
      */
     public static function matchRequestHost($host, RouteInterface $route)
     {
@@ -107,14 +108,14 @@ class RouteMatcher implements RouteMatcherInterface
             return true;
         }
 
-        throw new RouteException(sprintf('Route allow %s access.', $route->getDomain()), 403);
+        throw new NotFoundHttpException(sprintf('Route allow %s access.', $route->getDomain()));
     }
 
     /**
      * @param                $format
      * @param RouteInterface $route
      * @return bool
-     * @throws RouteException
+     * @throws ForbiddenHttpException
      */
     public static function matchRequestFormat($format = 'php', RouteInterface $route)
     {
@@ -122,11 +123,11 @@ class RouteMatcher implements RouteMatcherInterface
             return true;
         }
 
-        throw new RouteException(sprintf(
+        throw new ForbiddenHttpException(sprintf(
             'Route "%s" request format must to be ["%s"]',
             $route->getName(),
             implode('", "', $route->getFormats())
-        ), 403);
+        ));
     }
 
     /**
