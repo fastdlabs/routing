@@ -21,27 +21,22 @@ class RouteGenerator
     /**
      * @param RouteInterface $route
      * @param array          $parameters
-     * @param bool           $suffix
+     * @param string         $format
      * @return string
      * @throws RouteException
      */
-    public static function generateUrl(RouteInterface $route, array $parameters = array(), $suffix = false)
+    public static function generateUrl(RouteInterface $route, array $parameters = array(), $format = '')
     {
         $parameters = array_merge($route->getDefaults(), $parameters);
 
-        $format = '';
-
         $query = '';
 
-        if ($suffix) {
-
-            $formats = $route->getFormats();
-
-            $format = array_shift($formats);
+        if ($format) {
+            if (!in_array($format, $route->getFormats())) {
+                $format = array_shift($route->getFormats());
+            }
 
             $format = '.' . $format;
-
-            unset($formats);
         }
 
         $host = '';

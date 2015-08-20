@@ -18,7 +18,7 @@ $router = new \FastD\Routing\Router();
 
 $router->createRoute('/', function () {
     echo 'hello world';
-});
+})->setFormats(['html']);
 
 $router->createRoute(['/{name}', 'name' => 'jan'], function () {
     echo 'hello jan';
@@ -30,7 +30,7 @@ print_r($route);
 $callback = $route->getCallback();
 $callback();
 echo '<br />';
-echo $router->generateUrl('/', ['name' => 'janhuang']);
+echo $router->generateUrl('/', ['name' => 'janhuang'], 'html');
 echo '<br />';
 echo $router->generateUrl('jan', ['name' => 'janhuang', 'age' => 12]);
 
