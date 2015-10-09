@@ -3,7 +3,12 @@
     "description": "FastD routing component",
     "type": "library",
     "license": "MIT",
-    "keywords": ["routing", "router", "route", "FastD framework"],
+    "keywords": [
+        "routing",
+        "router",
+        "route",
+        "FastD framework"
+    ],
     "authors": [
         {
             "name": "janhuang",
@@ -13,11 +18,15 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=5.4",
-        "fastd/debug": "~1.0.1"
+        "fastd/debug": "~1.0.0"
+    },
+    "require-dev": {
+
+        "fastd/http": "~1.0.0"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "2.0.x-dev"
         }
     },
     "autoload": {
