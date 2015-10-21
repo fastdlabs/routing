@@ -17,12 +17,10 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": ">=5.4",
-        "fastd/debug": "~1.0.0"
+        "php": ">=5.4"
     },
     "require-dev": {
-
-        "fastd/http": "~1.0.0"
+        "fastd/debug": "~1.0.0"
     },
     "extra": {
         "branch-alias": {
