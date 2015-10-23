@@ -16,13 +16,11 @@ include __DIR__ . '/../vendor/autoload.php';
 
 $router = new \FastD\Routing\Router();
 
-\FastD\Debug\Debug::enable();
-
 $router->createRoute('/', function () {
     echo 'hello world';
 });
 
-$route = $router->match('/a/sdfasdf');
+$route = $router->match('/');
 
 echo '<pre>';
 print_r($route);
