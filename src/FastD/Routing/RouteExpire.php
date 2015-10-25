@@ -1,0 +1,37 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: janhuang
+ * Date: 15/10/25
+ * Time: 上午10:41
+ * Github: https://www.github.com/janhuang
+ * Coding: https://www.coding.net/janhuang
+ * SegmentFault: http://segmentfault.com/u/janhuang
+ * Blog: http://segmentfault.com/blog/janhuang
+ * Gmail: bboyjanhuang@gmail.com
+ * WebSite: http://www.janhuang.me
+ */
+
+namespace FastD\Routing;
+
+use DateTimeZone;
+
+class RouteExpire
+{
+    protected $start;
+
+    protected $end;
+
+    /**
+     * @param string       $start
+     * @param string       $end
+     * @param DateTimeZone $timezone
+     */
+    public function __construct($start = 'now', $end = 'now', DateTimeZone $timezone = 'PRC')
+    {
+        $this->start = new \DateTime($start, $timezone);
+        $this->end = new \DateTime($end, $timezone);
+    }
+
+
+}

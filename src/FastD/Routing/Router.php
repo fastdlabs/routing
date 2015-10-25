@@ -12,6 +12,7 @@
 
 namespace FastD\Routing;
 
+use FastD\Routing\Exception\RouteException;
 use FastD\Routing\Generator\RouteGenerator;
 use FastD\Routing\Matcher\RouteMatcher;
 
@@ -25,33 +26,26 @@ class Router
     /**
      * @var RouteCollections
      */
-    private $collections;
+    protected $collections;
 
     /**
      * Full group name.
      *
      * @var string
      */
-    private $group = [];
+    protected $group = [];
 
     /**
      * @var string
      */
-    private $protocol = 'http';
+    protected $schema = 'http';
 
     /**
      * Route group domain.
      *
      * @var string
      */
-    private $domain = '';
-
-    /**
-     * Domain group name
-     *
-     * @var string
-     */
-    private $domainGroup = [];
+    protected $domain;
 
     /**
      * Router constructor.

@@ -11,7 +11,7 @@
  * Gmail: bboyjanhuang@gmail.com
  */
 
-namespace FastD\Routing;
+namespace FastD\Routing\Exception;
 
 class RouteException extends \ErrorException
 {

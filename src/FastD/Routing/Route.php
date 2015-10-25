@@ -12,8 +12,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Routing\Expire\RouteExpire;
-
 /**
  * Class Route
  *
@@ -39,32 +37,32 @@ class Route implements RouteInterface
     /**
      * @var string|array
      */
-    protected $format = array('php');
+    protected $format = ['php'];
 
     /**
      * @var array
      */
-    protected $defaults = array();
+    protected $defaults = [];
 
     /**
      * @var array
      */
-    protected $requirements = array();
+    protected $requirements = [];
 
     /**
      * @var array
      */
-    protected $arguments = array();
+    protected $arguments = [];
 
     /**
      * @var array
      */
-    protected $parameters = array();
+    protected $parameters = [];
 
     /**
      * @var string|array
      */
-    protected $method = array('ANY');
+    protected $method = ['ANY'];
 
     /**
      * @var \Closure
@@ -79,12 +77,12 @@ class Route implements RouteInterface
     /**
      * @var array
      */
-    protected $ips = array();
+    protected $ips = [];
 
     /**
      * @var string
      */
-    protected $domain = '';
+    protected $domain;
 
     /**
      * @var string
@@ -385,20 +383,14 @@ class Route implements RouteInterface
         return $this;
     }
 
-    public function __toString()
-    {
-        return '';
-    }
-
     /**
      * Setting route access date expire.
-     * {@inheritdoc}
      *
-     * @param RouteExpire $start
-     * @param RouteExpire $end
+     * {@inheritdoc}
+     * @param RouteExpire $routeExpire
      * @return RouteInterface
      */
-    public function setExpire(RouteExpire $start, RouteExpire $end)
+    public function setExpire(RouteExpire $routeExpire)
     {
         // TODO: Implement setExpire() method.
     }
@@ -409,4 +401,24 @@ class Route implements RouteInterface
     public function getExpire()
     {
         // TODO: Implement getExpire() method.
-    }}
+    }
+
+    /**
+     * Merge route parameters. Default merge route initialize's default values.
+     *
+     * {@inheritdoc}
+     * @param array $parameters
+     * @return RouteInterface
+     */
+    public function mergeParameters(array $parameters)
+    {
+        $this->setParameters(array_merge($this->parameters, $parameters));
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return '';
+    }
+}

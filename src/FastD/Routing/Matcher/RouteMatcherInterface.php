@@ -55,5 +55,5 @@ interface RouteMatcherInterface
      * @param RouteInterface $route
      * @return RouteInterface
      */
-    public static function matchRequesetIps($ips, RouteInterface $route);
+    public static function matchRequestIps($ips, RouteInterface $route);
 }

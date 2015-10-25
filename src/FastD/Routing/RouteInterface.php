@@ -12,8 +12,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Routing\Expire\RouteExpire;
-
 /**
  * Interface RouteInterface
  *
@@ -21,6 +19,28 @@ use FastD\Routing\Expire\RouteExpire;
  */
 interface RouteInterface
 {
+    /**
+     * Init once standard route.
+     *
+     * {@inheritdoc}
+     * @param       $path
+     * @param       $name
+     * @param array $defaults
+     * @param array $methods
+     * @param array $requirements
+     * @param array $formats
+     * @param null  $callback
+     */
+    public function __construct(
+        $path,
+        $name,
+        array $defaults     = [],
+        array $methods      = ['ANY'],
+        array $requirements = [],
+        array $formats      = ['php'],
+        $callback           = null
+    );
+
     /**
      * Return route schema: http or https.
      *
@@ -68,11 +88,10 @@ interface RouteInterface
     /**
      * Setting route access date expire.
      * {@inheritdoc}
-     * @param RouteExpire $start
-     * @param RouteExpire $end
+     * @param RouteExpire $routeExpire
      * @return RouteInterface
      */
-    public function setExpire(RouteExpire $start, RouteExpire $end);
+    public function setExpire(RouteExpire $routeExpire);
 
     /**
      * @return RouteExpire

@@ -12,8 +12,6 @@
 
 namespace FastD\Routing\Matcher;
 
-use FastD\Debug\Exceptions\ForbiddenHttpException;
-use FastD\Debug\Exceptions\NotFoundHttpException;
 use FastD\Routing\RouteCollections;
 use FastD\Routing\RouteInterface;
 
@@ -178,8 +176,8 @@ class RouteMatcher implements RouteMatcherInterface
      * @param RouteInterface $route
      * @return RouteInterface
      */
-    public static function matchRequesetIps($ips, RouteInterface $route)
+    public static function matchRequestIps($ips, RouteInterface $route)
     {
-        // TODO: Implement matchRequesetIps() method.
+        // TODO: Implement matchRequestIps() method.
     }
 }

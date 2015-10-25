@@ -42,10 +42,10 @@ class RouteGenerator
         $host = '';
 
         if ('' != $route->getDomain()) {
-            $host = $route->getHttpProtocol() . '://' . $route->getDomain();
+            $host = $route->getSchema() . '://' . $route->getDomain();
         }
 
-        if (0 === count($route->getArguments())) {
+        if (0 === count($route->getParameters())) {
             if (!empty($parameters)) {
                 $query = '?' . http_build_query($parameters);
             }
@@ -57,7 +57,7 @@ class RouteGenerator
         $search = array_map(function ($value) use (&$parameters) {
             unset($parameters[$value]);
             return '{' . $value . '}';
-        }, $route->getArguments());
+        }, $route->getParameters());
 
         $routeUrl = str_replace($search, $replacer, $route->getPath());
 

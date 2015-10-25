@@ -7,26 +7,32 @@
  */
 
 namespace FastD\Routing;
-use FastD\Debug\Exceptions\NotFoundHttpException;
+
+use FastD\Routing\Exception\RouteException;
 
 /**
  * Class RouteCollections
  *
- * @package FastD\Component\Routing\Collections
+ * @package FastD\Routing
  */
 class RouteCollections implements \Iterator, \Countable
 {
     /**
      * @var RouteInterface[]
      */
-    private $routes = array();
+    protected $routes = array();
 
     /**
      * The route alias maps.
      *
      * @var array
      */
-    private $alias = array();
+    protected $alias = array();
+
+    /**
+     * @var RouteInterface
+     */
+    protected $currentRoute;
 
     /**
      * @return RouteInterface
@@ -48,9 +54,58 @@ class RouteCollections implements \Iterator, \Countable
     }
 
     /**
-     * @var RouteInterface
+     * @param RouteInterface $route
+     * @return $this
      */
-    private $currentRoute;
+    public function setRoute(RouteInterface $route = null)
+    {
+        $this->routes[$route->getName()] = $route;
+
+        $this->alias[$route->getPath()] = $route->getName();
+
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @return RouteInterface
+     * @throws RouteException
+     */
+    public function getRoute($name)
+    {
+        if (!$this->hasRoute($name)) {
+            if (!isset($this->alias[$name])) {
+                throw new RouteException(sprintf('Route "%s" is not found.', $name));
+            }
+            $name = $this->alias[$name];
+        }
+
+        return $this->routes[$name];
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     * @throw RouteNotFoundException
+     */
+    public function hasRoute($name)
+    {
+        return isset($this->routes[$name]);
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     * @throw RouteNotFoundException
+     */
+    public function removeRoute($name)
+    {
+        if ($this->hasRoute($name)) {
+            unset($this->routes[$name]);
+        }
+
+        return true;
+    }
 
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
@@ -111,68 +166,6 @@ class RouteCollections implements \Iterator, \Countable
     public function rewind()
     {
         reset($this->routes);
-    }
-
-    /**
-     * @param RouteInterface $route
-     * @return $this
-     */
-    public function setRoute(RouteInterface $route = null)
-    {
-        $this->routes[$route->getName()] = $route;
-
-        $this->alias[$route->getPath()] = $route->getName();
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     * @return RouteInterface
-     * @throws NotFoundHttpException
-     */
-    public function getRoute($name)
-    {
-        if (!$this->hasRoute($name)) {
-            if (!isset($this->alias[$name])) {
-                throw new NotFoundHttpException(sprintf('Route "%s" is not found.', $name));
-            }
-            $name = $this->alias[$name];
-        }
-
-        return $this->routes[$name];
-    }
-
-    /**
-     * @param $name
-     * @return bool
-     * @throw RouteNotFoundException
-     */
-    public function hasRoute($name)
-    {
-        return isset($this->routes[$name]);
-    }
-
-    /**
-     * @param $name
-     * @return bool
-     * @throw RouteNotFoundException
-     */
-    public function removeRoute($name)
-    {
-        if ($this->hasRoute($name)) {
-            unset($this->routes[$name]);
-        }
-
-        return true;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCollections()
-    {
-        return $this->routes;
     }
 
     /**
