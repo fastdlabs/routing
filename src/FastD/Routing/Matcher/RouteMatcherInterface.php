@@ -23,37 +23,36 @@ use FastD\Routing\RouteCollections;
 interface RouteMatcherInterface
 {
     /**
-     * @param                $uri
-     * @param RouteCollections $collections
-     * @return RouteInterface
-     */
-    public static function match($uri, RouteCollections $collections = null);
-
-    /**
-     * @param                $uri
+     * Match base request url from route collection.
+     *
+     * {@inheritdoc}
+     * @param                $url
      * @param RouteInterface $route
      * @return RouteInterface
      */
-    public static function matchRequestRoute($uri, RouteInterface $route);
+    public function matchUrl($url, RouteInterface $route = null);
 
     /**
+     * {@inheritdoc}
      * @param                $method
      * @param RouteInterface $route
      * @return RouteInterface
      */
-    public static function matchRequestMethod($method, RouteInterface $route);
+    public function matchMethod($method, RouteInterface $route = null);
 
     /**
+     * {@inheritdoc}
      * @param                $format
      * @param RouteInterface $route
      * @return RouteInterface
      */
-    public static function matchRequestFormat($format, RouteInterface $route);
+    public function matchFormat($format, RouteInterface $route = null);
 
     /**
+     * {@inheritdoc}
      * @param                $ips
      * @param RouteInterface $route
      * @return RouteInterface
      */
-    public static function matchRequestIps($ips, RouteInterface $route);
+    public function matchRequestIps($ips, RouteInterface $route = null);
 }

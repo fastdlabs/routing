@@ -16,4 +16,10 @@ composer require fastd/routing "1.0.x-dev"
 
 ```
 
+##Testing
 
+```
+cd path/to/routing
+composer install
+phpunit
+```

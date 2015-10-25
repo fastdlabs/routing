@@ -14,6 +14,7 @@ namespace FastD\Routing\Matcher;
 
 use FastD\Routing\RouteCollections;
 use FastD\Routing\RouteInterface;
+use FastD\Routing\Exception\RouteException;
 
 /**
  * Class RouteMatcher
@@ -22,6 +23,25 @@ use FastD\Routing\RouteInterface;
  */
 class RouteMatcher implements RouteMatcherInterface
 {
+    const MATCH_ALL = 0;
+
+    const MATCH_PATH = 1;
+
+    const MATCH_METHOD = 2;
+
+    const MATCH_HOST = 3;
+
+    const MATCH_FORMAT = 4;
+
+    const MATCH_IP = 5;
+
+    protected $collection;
+
+    public function __construct(RouteCollections $routeCollections = null)
+    {
+        $this->collection = $routeCollections;
+    }
+
     /**
      * @param                  $path
      * @param RouteCollections $collections
@@ -29,18 +49,18 @@ class RouteMatcher implements RouteMatcherInterface
      * @throws RouteException
      * @throws \Exception
      */
-    public static function match($path, RouteCollections $collections = null)
+    public function match($path, RouteCollections $collections = null)
     {
-        if ('' != pathinfo($path, PATHINFO_EXTENSION)) {
+        if (false !== strpos('.', $path)) {
             $path = pathinfo($path, PATHINFO_BASENAME);
         }
         try {
             return $collections->setCurrentRoute($collections->getRoute($path))->getCurrentRoute();
-        } catch (NotFoundHttpException $e) {
-            foreach ($collections->getCollections() as $route) {
+        } catch (RouteException $e) {
+            foreach ($collections as $route) {
                 try {
                     return $collections->setCurrentRoute(self::matchRequestRoute($path, $route))->getCurrentRoute();
-                } catch (NotFoundHttpException $e){}
+                } catch (RouteException $e){}
             }
 
             throw $e;
@@ -51,9 +71,9 @@ class RouteMatcher implements RouteMatcherInterface
      * @param string          $path
      * @param RouteInterface  $route
      * @return RouteInterface
-     * @throws NotFoundHttpException
+     * @throws RouteException
      */
-    public static function matchRequestRoute($path, RouteInterface $route = null)
+    public function matchRequestRoute($path, RouteInterface $route = null)
     {
         $originPath = $path;
 
@@ -66,7 +86,7 @@ class RouteMatcher implements RouteMatcherInterface
                 }
             }
             if (!preg_match($route->getPathRegex(), $path, $match)) {
-                throw new NotFoundHttpException(sprintf('Route "%s" is not found.', $originPath));
+                throw new RouteException(sprintf('Route "%s" is not found.', $originPath));
             }
 
             unset($originPath, $defaults, $args);
@@ -81,7 +101,7 @@ class RouteMatcher implements RouteMatcherInterface
      * @return bool
      * @throws ForbiddenHttpException
      */
-    public static function matchRequestMethod($method, RouteInterface $route)
+    public function matchRequestMethod($method, RouteInterface $route)
     {
         if (in_array('ANY', $route->getMethods()) || in_array($method, $route->getMethods())) {
             return true;
