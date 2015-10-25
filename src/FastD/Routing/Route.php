@@ -273,7 +273,7 @@ class Route implements RouteInterface
                 $route = str_replace('{' . $val . '}', '{1}(' . $pattern . ')', $route);
             }
 
-            $this->arguments = $match[1];
+            $this->parameters = $match[1];
         }
 
         $this->pathRegex = '/^' . str_replace('/', '\/', $route) . '$/';
@@ -288,25 +288,6 @@ class Route implements RouteInterface
     public function getPathRegex()
     {
         return $this->pathRegex;
-    }
-
-    /**
-     * @param array $arguments
-     * @return $this
-     */
-    public function setArguments(array $arguments)
-    {
-        $this->arguments = $arguments;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getArguments()
-    {
-        return $this->arguments;
     }
 
     /**

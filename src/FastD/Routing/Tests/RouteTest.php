@@ -22,7 +22,6 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         $baseRoute = new Route('/', 'root');
         $this->assertEquals($baseRoute->getParameters(), []);
-        $this->assertEquals($baseRoute->getArguments(), []);
         $this->assertEquals($baseRoute->getCallback(), null);
         $this->assertEquals($baseRoute->getDefaults(), []);
         $this->assertEquals($baseRoute->getDomain(), '');
@@ -40,22 +39,19 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     public function testRouteArgument()
     {
         $argRoute = new Route('/{id}', 'article');
-        $this->assertEquals($argRoute->getParameters(), []);
-        $this->assertEquals($argRoute->getArguments(), ['id']);
+        $this->assertEquals($argRoute->getParameters(), ['id']);
         $this->assertEquals($argRoute->getDefaults(), []);
         $this->assertEquals($argRoute->getRequirements(), []);
         $this->assertEquals($argRoute->getPathRegex(), '/^\/{1}(?P<id>.+)$/');
 
         $argRoute = new Route('/{id}', 'article', ['id' => 1]);
-        $this->assertEquals($argRoute->getParameters(), []);
-        $this->assertEquals($argRoute->getArguments(), ['id']);
+        $this->assertEquals($argRoute->getParameters(), ['id']);
         $this->assertEquals($argRoute->getDefaults(), ['id' => 1]);
         $this->assertEquals($argRoute->getRequirements(), []);
         $this->assertEquals($argRoute->getPathRegex(), '/^\/{1}(?P<id>.+)$/');
 
         $argRoute = new Route('/{id}', 'article', ['id' => 1], ['ANY'], ['id' => '\d+']);
-        $this->assertEquals($argRoute->getParameters(), []);
-        $this->assertEquals($argRoute->getArguments(), ['id']);
+        $this->assertEquals($argRoute->getParameters(), ['id']);
         $this->assertEquals($argRoute->getDefaults(), ['id' => 1]);
         $this->assertEquals($argRoute->getRequirements(), ['id' => '\d+']);
         $this->assertEquals($argRoute->getPathRegex(), '/^\/{1}(?P<id>\d+)$/');

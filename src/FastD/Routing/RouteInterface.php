@@ -91,17 +91,6 @@ interface RouteInterface
     public function getName();
 
     /**
-     * @param array $arguments
-     * @return RouteInterface
-     */
-    public function setArguments(array $arguments);
-
-    /**
-     * @return array
-     */
-    public function getArguments();
-
-    /**
      * @param array $defaults
      * @return RouteInterface
      */
@@ -135,7 +124,7 @@ interface RouteInterface
     public function setFormats(array $format);
 
     /**
-     * @return string
+     * @return array
      */
     public function getFormats();
 
@@ -163,7 +152,7 @@ interface RouteInterface
 
     /**
      * @param $callback
-     * @return $this
+     * @return RouteInterface
      */
     public function setCallback($callback);
 
@@ -174,25 +163,45 @@ interface RouteInterface
 
     /**
      * @param array $parameters
-     * @return $this
+     * @return RouteInterface
      */
     public function setParameters(array $parameters);
 
     /**
-     * @return string|array
+     * @return array
      */
     public function getParameters();
 
     /**
+     *
+     * {@inheritdoc}
      * @param $group
-     * @return $this
+     * @return RouteInterface
      */
     public function setGroup($group);
 
     /**
+     * Return route group suffix.
+     *
+     * {@inheritdoc}
      * @return string
      */
     public function getGroup();
 
+    /**
+     * Merge route parameters. Default merge route initialize's default values.
+     *
+     * {@inheritdoc}
+     * @param array $parameters
+     * @return RouteInterface
+     */
+    public function mergeParameters(array $parameters);
+
+    /**
+     * Return route list. Use debug it.
+     *
+     * {@inheritdoc}
+     * @return string
+     */
     public function __toString();
 }
