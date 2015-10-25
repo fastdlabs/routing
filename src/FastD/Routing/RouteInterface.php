@@ -12,6 +12,8 @@
 
 namespace FastD\Routing;
 
+use FastD\Routing\Expire\RouteExpire;
+
 /**
  * Interface RouteInterface
  *
@@ -20,37 +22,62 @@ namespace FastD\Routing;
 interface RouteInterface
 {
     /**
+     * Return route schema: http or https.
+     *
+     * {@inheritdoc}
      * @return string
      */
-    public function getHttpProtocol();
+    public function getSchema();
 
     /**
-     * @param $httpProtocol
-     * @return $this
+     * {@inheritdoc}
+     * @param $schema
+     * @return RouteInterface
      */
-    public function setHttpProtocol($httpProtocol);
+    public function setSchema($schema);
 
     /**
-     * @param array $domain
-     * @return $this
+     * {@inheritdoc}
+     * @param $domain
+     * @return RouteInterface
      */
     public function setDomain($domain);
 
     /**
-     * @return array
+     * Return route setting domain. Examples, "www.google.com". Default NULL.
+     * {@inheritdoc}
+     * @return string
      */
     public function getDomain();
 
     /**
+     * Setting this route access ips.
+     * {@inheritdoc}
      * @param array $ips
-     * @return $this
+     * @return RouteInterface
      */
     public function setIps(array $ips);
 
     /**
+     * Return setting access ip list.
+     * {@inheritdoc}
      * @return array
      */
     public function getIps();
+
+    /**
+     * Setting route access date expire.
+     * {@inheritdoc}
+     * @param RouteExpire $start
+     * @param RouteExpire $end
+     * @return RouteInterface
+     */
+    public function setExpire(RouteExpire $start, RouteExpire $end);
+
+    /**
+     * @return RouteExpire
+     */
+    public function getExpire();
 
     /**
      * @param $name
@@ -65,7 +92,7 @@ interface RouteInterface
 
     /**
      * @param array $arguments
-     * @return $this
+     * @return RouteInterface
      */
     public function setArguments(array $arguments);
 
@@ -76,7 +103,7 @@ interface RouteInterface
 
     /**
      * @param array $defaults
-     * @return $this
+     * @return RouteInterface
      */
     public function setDefaults(array $defaults);
 
@@ -87,7 +114,7 @@ interface RouteInterface
 
     /**
      * @param $route
-     * @return $this
+     * @return RouteInterface
      */
     public function setPath($route);
 
@@ -103,7 +130,7 @@ interface RouteInterface
 
     /**
      * @param array $format
-     * @return $this
+     * @return RouteInterface
      */
     public function setFormats(array $format);
 
@@ -114,23 +141,23 @@ interface RouteInterface
 
     /**
      * @param array $requirements
-     * @return $this
+     * @return RouteInterface
      */
     public function setRequirements(array $requirements);
 
     /**
-     * @return string|array
+     * @return array
      */
     public function getRequirements();
 
     /**
      * @param array $method
-     * @return $this
+     * @return RouteInterface
      */
     public function setMethods(array $method);
 
     /**
-     * @return string|array
+     * @return array
      */
     public function getMethods();
 
@@ -166,4 +193,6 @@ interface RouteInterface
      * @return string
      */
     public function getGroup();
+
+    public function __toString();
 }

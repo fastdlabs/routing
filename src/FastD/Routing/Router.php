@@ -147,7 +147,7 @@ class Router
         $route
             ->setPath(implode('', $this->domainGroup) . $routeName)
             ->setGroup($group)
-            ->setHttpProtocol($this->protocol)
+            ->setSchema($this->protocol)
             ->setDomain($this->domain)
         ;
 

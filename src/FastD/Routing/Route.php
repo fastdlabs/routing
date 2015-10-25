@@ -12,6 +12,8 @@
 
 namespace FastD\Routing;
 
+use FastD\Routing\Expire\RouteExpire;
+
 /**
  * Class Route
  *
@@ -87,7 +89,7 @@ class Route implements RouteInterface
     /**
      * @var string
      */
-    protected $protocol = 'http';
+    protected $schema = 'http';
 
     /**
      * @param string $path
@@ -101,10 +103,10 @@ class Route implements RouteInterface
     public function __construct(
         $path,
         $name,
-        array $defaults     = array(),
-        array $methods      = array('ANY'),
-        array $requirements = array(),
-        array $formats      = array('php'),
+        array $defaults     = [],
+        array $methods      = ['ANY'],
+        array $requirements = [],
+        array $formats      = ['php'],
         $callback           = null
     )
     {
@@ -114,11 +116,11 @@ class Route implements RouteInterface
 
         $this->defaults     = $defaults;
 
-        $this->method       = empty($methods) ? array('ANY') : $methods;
+        $this->method       = $methods;
 
         $this->requirements = $requirements;
 
-        $this->format       = empty($formats) ? array('php') : $formats;
+        $this->format       = $formats;
 
         $this->callback     = $callback;
 
@@ -134,7 +136,7 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param string $group
+     * @param $group
      * @return $this
      */
     public function setGroup($group)
@@ -145,7 +147,7 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param string $path
+     * @param $path
      * @return $this
      */
     public function setPath($path)
@@ -164,7 +166,7 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param string $name
+     * @param $name
      * @return $this
      */
     public function setName($name)
@@ -267,7 +269,7 @@ class Route implements RouteInterface
         if (preg_match_all('/\{(\w+)\}/i', $route, $match)) {
 
             foreach ($match[1] as $val) {
-                $pattern = isset($requirements[$val]) ? $requirements[$val] : '?P<' . $val . '>.+';
+                $pattern = '?P<' . $val . '>' . (isset($requirements[$val]) ? $requirements[$val] : '.+');
                 $route = str_replace('{' . $val . '}', '{1}(' . $pattern . ')', $route);
             }
 
@@ -386,19 +388,44 @@ class Route implements RouteInterface
     /**
      * @return string
      */
-    public function getHttpProtocol()
+    public function getSchema()
     {
-        return $this->protocol;
+        return $this->schema;
     }
 
     /**
-     * @param $httpProtocol
-     * @return $this
+     * @param $schema
+     * @return RouteInterface
      */
-    public function setHttpProtocol($httpProtocol)
+    public function setSchema($schema)
     {
-        $this->protocol = $httpProtocol;
+        $this->schema = $schema;
 
         return $this;
     }
-}
+
+    public function __toString()
+    {
+        return '';
+    }
+
+    /**
+     * Setting route access date expire.
+     * {@inheritdoc}
+     *
+     * @param RouteExpire $start
+     * @param RouteExpire $end
+     * @return RouteInterface
+     */
+    public function setExpire(RouteExpire $start, RouteExpire $end)
+    {
+        // TODO: Implement setExpire() method.
+    }
+
+    /**
+     * @return RouteExpire
+     */
+    public function getExpire()
+    {
+        // TODO: Implement getExpire() method.
+    }}
