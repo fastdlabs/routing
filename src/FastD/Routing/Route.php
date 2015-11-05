@@ -101,11 +101,11 @@ class Route implements RouteInterface
     public function __construct(
         $path,
         $name,
+        $callback           = null,
         array $defaults     = [],
         array $methods      = ['ANY'],
         array $requirements = [],
-        array $formats      = ['php'],
-        $callback           = null
+        array $formats      = ['php']
     )
     {
         $this->path         = $path;
@@ -417,8 +417,11 @@ class Route implements RouteInterface
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
-        return '';
+        return $this->path;
     }
 }

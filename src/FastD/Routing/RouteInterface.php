@@ -34,11 +34,11 @@ interface RouteInterface
     public function __construct(
         $path,
         $name,
+        $callback           = null,
         array $defaults     = [],
         array $methods      = ['ANY'],
         array $requirements = [],
-        array $formats      = ['php'],
-        $callback           = null
+        array $formats      = ['php']
     );
 
     /**

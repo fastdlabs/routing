@@ -16,16 +16,54 @@ namespace FastD\Routing;
 
 class RouteGroup
 {
-    public function __construct($group, $routes = null)
-    {
+    protected $group;
 
+    protected $func;
+
+    protected $domain;
+
+    protected $schema;
+
+    public function __construct($group, $func)
+    {
+        $this->group = $group;
+
+        $this->func = $func;
     }
 
-    public function setDomain()
-    {}
-
-    public function setSchema()
+    public function setGroup($group)
     {
+        $this->group = $group;
 
+        return $this;
+    }
+
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    public function setDomain($domain)
+    {
+        $this->domain = $domain;
+
+        return $this;
+    }
+
+    public function getDomain()
+    {
+        return $this->domain;
+    }
+
+    public function setSchema($schema)
+    {
+        $this->schema = $schema;
+
+        return $this;
+    }
+
+    public function getSchema()
+    {
+        return $this->schema;
     }
 }

@@ -192,11 +192,47 @@ class RouteMatcher implements RouteMatcherInterface
     }
 
     /**
+     * Match base request url from route collection.
+     *
+     * {@inheritdoc}
+     * @param                $url
+     * @param RouteInterface $route
+     * @return RouteInterface
+     */
+    public function matchUrl($url, RouteInterface $route = null)
+    {
+        // TODO: Implement matchUrl() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     * @param                $method
+     * @param RouteInterface $route
+     * @return RouteInterface
+     */
+    public function matchMethod($method, RouteInterface $route = null)
+    {
+        // TODO: Implement matchMethod() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     * @param                $format
+     * @param RouteInterface $route
+     * @return RouteInterface
+     */
+    public function matchFormat($format, RouteInterface $route = null)
+    {
+        // TODO: Implement matchFormat() method.
+    }
+
+    /**
+     * {@inheritdoc}
      * @param                $ips
      * @param RouteInterface $route
      * @return RouteInterface
      */
-    public static function matchRequestIps($ips, RouteInterface $route)
+    public function matchRequestIps($ips, RouteInterface $route = null)
     {
         // TODO: Implement matchRequestIps() method.
     }
