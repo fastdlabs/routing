@@ -32,6 +32,4 @@ class RouteExpire
         $this->start = new \DateTime($start, $timezone);
         $this->end = new \DateTime($end, $timezone);
     }
-
-
 }

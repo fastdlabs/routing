@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: janhuang
  * Date: 15/11/6
- * Time: 下午6:54
+ * Time: 下午10:14
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -14,11 +14,9 @@
 
 namespace FastD\Routing;
 
-interface RouteCollectionInterface extends \Countable, \Iterator
+interface RouteGroupInterface extends \Countable, \Iterator
 {
-    public function getGroupRoute($group);
-
-    public function setGroupRoute(RouteGroup $routeGroup);
+    public function getRoute($name);
 
     public function setRoute(RouteInterface $routeInterface);
 
@@ -26,9 +24,21 @@ interface RouteCollectionInterface extends \Countable, \Iterator
 
     public function removeRoute($name);
 
-    public function getRoute($name);
+    public function count();
 
-    public function setCurrentRoute(RouteInterface $routeInterface);
+    public function getGroupName($group);
 
-    public function getCurrentRoute();
+    public function setGroupName();
+
+    public function setDomain($domain);
+
+    public function getDomain();
+
+    public function setSchema($schema);
+
+    public function getSchema();
+
+    public function setIp(array $ip);
+
+    public function getIp();
 }

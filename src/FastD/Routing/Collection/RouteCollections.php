@@ -6,9 +6,10 @@
  * Time: 下午1:51
  */
 
-namespace FastD\Routing;
+namespace FastD\Routing\Collection;
 
 use FastD\Routing\Exception\RouteException;
+use FastD\Routing\RouteInterface;
 
 /**
  * Class RouteCollections
