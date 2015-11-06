@@ -13,7 +13,7 @@
 
 namespace FastD\Routing\Exception;
 
-class RouteException extends \ErrorException
+class RouteException extends \Exception
 {
 
 }

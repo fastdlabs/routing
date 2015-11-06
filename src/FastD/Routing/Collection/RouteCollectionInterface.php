@@ -17,7 +17,7 @@ namespace FastD\Routing\Collection;
 use FastD\Routing\RouteInterface;
 use FastD\Routing\RouteGroup;
 
-interface RouteCollectionInterface extends \Countable, \RecursiveIterator, \Traversable
+interface RouteCollectionInterface extends \Countable, \RecursiveIterator
 {
     public function getGroupRoute($group);
 

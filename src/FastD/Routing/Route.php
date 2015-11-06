@@ -92,11 +92,11 @@ class Route implements RouteInterface
     /**
      * @param string $path
      * @param string $name
+     * @param array  $callback
      * @param array  $defaults
      * @param array  $methods
      * @param array  $requirements
      * @param array  $formats
-     * @param null   $callback
      */
     public function __construct(
         $path,

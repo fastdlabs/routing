@@ -14,7 +14,12 @@
 
 namespace FastD\Routing;
 
-interface RouteGroupInterface extends \Countable, \Iterator
+/**
+ * Interface RouteGroupInterface
+ *
+ * @package FastD\Routing
+ */
+interface RouteGroupInterface extends RouteInterface, \Countable, \Iterator
 {
     public function getRoute($name);
 
@@ -23,22 +28,4 @@ interface RouteGroupInterface extends \Countable, \Iterator
     public function hasRoute($name);
 
     public function removeRoute($name);
-
-    public function count();
-
-    public function getGroupName($group);
-
-    public function setGroupName();
-
-    public function setDomain($domain);
-
-    public function getDomain();
-
-    public function setSchema($schema);
-
-    public function getSchema();
-
-    public function setIp(array $ip);
-
-    public function getIp();
 }

@@ -20,28 +20,6 @@ namespace FastD\Routing;
 interface RouteInterface
 {
     /**
-     * Init once standard route.
-     *
-     * {@inheritdoc}
-     * @param       $path
-     * @param       $name
-     * @param array $defaults
-     * @param array $methods
-     * @param array $requirements
-     * @param array $formats
-     * @param null  $callback
-     */
-    public function __construct(
-        $path,
-        $name,
-        $callback           = null,
-        array $defaults     = [],
-        array $methods      = ['ANY'],
-        array $requirements = [],
-        array $formats      = ['php']
-    );
-
-    /**
      * Return route schema: http or https.
      *
      * {@inheritdoc}
@@ -179,48 +157,4 @@ interface RouteInterface
      * @return \Closure
      */
     public function getCallback();
-
-    /**
-     * @param array $parameters
-     * @return RouteInterface
-     */
-    public function setParameters(array $parameters);
-
-    /**
-     * @return array
-     */
-    public function getParameters();
-
-    /**
-     *
-     * {@inheritdoc}
-     * @param $group
-     * @return RouteInterface
-     */
-    public function setGroup($group);
-
-    /**
-     * Return route group suffix.
-     *
-     * {@inheritdoc}
-     * @return string
-     */
-    public function getGroup();
-
-    /**
-     * Merge route parameters. Default merge route initialize's default values.
-     *
-     * {@inheritdoc}
-     * @param array $parameters
-     * @return RouteInterface
-     */
-    public function mergeParameters(array $parameters);
-
-    /**
-     * Return route list. Use debug it.
-     *
-     * {@inheritdoc}
-     * @return string
-     */
-    public function __toString();
 }

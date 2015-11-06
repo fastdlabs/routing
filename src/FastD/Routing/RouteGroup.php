@@ -14,69 +14,43 @@
 
 namespace FastD\Routing;
 
-class RouteGroup implements RouteGroupInterface
+use FastD\Routing\Exception\RouteException;
+
+/**
+ * Class RouteGroup
+ *
+ * @package FastD\Routing
+ */
+class RouteGroup extends Route implements RouteGroupInterface
 {
-    protected $group;
+    /**
+     * @var Route[]
+     */
+    protected $routes = [];
 
-    protected $func;
-
-    protected $domain;
-
-    protected $schema;
-
-    public function __construct($group, $func)
-    {
-        $this->group = $group;
-
-        $this->func = $func;
-    }
-
-    public function setGroup($group)
-    {
-        $this->group = $group;
-
-        return $this;
-    }
-
-    public function getGroup()
-    {
-        return $this->group;
-    }
-
-    public function setDomain($domain)
-    {
-        $this->domain = $domain;
-
-        return $this;
-    }
-
-    public function getDomain()
-    {
-        return $this->domain;
-    }
-
-    public function setSchema($schema)
-    {
-        $this->schema = $schema;
-
-        return $this;
-    }
-
-    public function getSchema()
-    {
-        return $this->schema;
+    /**
+     * @param string $path
+     * @param string $name
+     * @param        $callback
+     */
+    public function __construct(
+        $path,
+        $name,
+        $callback = null
+    ) {
+        parent::__construct($path, $name, $callback, [], ['ANY'], [], ['php']);
     }
 
     /**
      * Return the current element
      *
      * @link  http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * @return Route
      * @since 5.0.0
      */
     public function current()
     {
-        // TODO: Implement current() method.
+        return current($this->routes);
     }
 
     /**
@@ -88,7 +62,7 @@ class RouteGroup implements RouteGroupInterface
      */
     public function next()
     {
-        // TODO: Implement next() method.
+        next($this->routes);
     }
 
     /**
@@ -100,7 +74,7 @@ class RouteGroup implements RouteGroupInterface
      */
     public function key()
     {
-        // TODO: Implement key() method.
+        return key($this->routes);
     }
 
     /**
@@ -113,7 +87,7 @@ class RouteGroup implements RouteGroupInterface
      */
     public function valid()
     {
-        // TODO: Implement valid() method.
+        return isset($this->routes[$this->key()]);
     }
 
     /**
@@ -125,51 +99,70 @@ class RouteGroup implements RouteGroupInterface
      */
     public function rewind()
     {
-        // TODO: Implement rewind() method.
+        reset($this->routes);
     }
 
+    /**
+     * @param $name
+     * @return Route
+     * @throws RouteException
+     */
     public function getRoute($name)
     {
-        // TODO: Implement getRoute() method.
+        if (!$this->hasRoute($name)) {
+            throw new RouteException(sprintf('Route "%s" is not exists.', $name));
+        }
+
+        return $this->routes[$name];
     }
 
+    /**
+     * @param RouteInterface $routeInterface
+     * @return $this
+     */
     public function setRoute(RouteInterface $routeInterface)
     {
-        // TODO: Implement setRoute() method.
+        $routeInterface->setSchema($this->getSchema());
+        $routeInterface->setDomain($this->getDomain());
+        $this->routes[$routeInterface->getName()] = $routeInterface;
+
+        return $this;
     }
 
+    /**
+     * @param $name
+     * @return bool
+     */
     public function hasRoute($name)
     {
-        // TODO: Implement hasRoute() method.
+        return isset($this->routes[$name]) ? true : false;
     }
 
+    /**
+     * @param $name
+     * @return $this
+     */
     public function removeRoute($name)
     {
-        // TODO: Implement removeRoute() method.
+        if ($this->hasRoute($name)) {
+            unset($this->routes[$name]);
+        }
+
+        return $this;
     }
 
+    /**
+     * Count elements of an object
+     *
+     * @link  http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     *        </p>
+     *        <p>
+     *        The return value is cast to an integer.
+     * @since 5.1.0
+     */
     public function count()
     {
-        // TODO: Implement count() method.
-    }
-
-    public function getGroupName($group)
-    {
-        // TODO: Implement getGroupName() method.
-    }
-
-    public function setGroupName()
-    {
-        // TODO: Implement setGroupName() method.
-    }
-
-    public function setIp(array $ip)
-    {
-        // TODO: Implement setIp() method.
-    }
-
-    public function getIp()
-    {
-        // TODO: Implement getIp() method.
+        return count($this->routes);
     }
 }
