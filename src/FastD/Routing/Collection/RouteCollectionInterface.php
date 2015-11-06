@@ -15,14 +15,9 @@
 namespace FastD\Routing\Collection;
 
 use FastD\Routing\RouteInterface;
-use FastD\Routing\RouteGroup;
 
 interface RouteCollectionInterface extends \Countable, \RecursiveIterator
 {
-    public function getGroupRoute($group);
-
-    public function setGroupRoute(RouteGroup $routeGroup);
-
     public function setRoute(RouteInterface $routeInterface);
 
     public function hasRoute($name);
@@ -30,8 +25,4 @@ interface RouteCollectionInterface extends \Countable, \RecursiveIterator
     public function removeRoute($name);
 
     public function getRoute($name);
-
-    public function setCurrentRoute(RouteInterface $routeInterface);
-
-    public function getCurrentRoute();
 }

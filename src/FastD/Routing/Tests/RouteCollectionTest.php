@@ -17,7 +17,7 @@ namespace FastD\Routing\Tests;
 use FastD\Routing\Route;
 use FastD\Routing\RouteGroup;
 
-class RouteGroupTest extends \PHPUnit_Framework_TestCase
+class RouteCollection extends \PHPUnit_Framework_TestCase
 {
     public function testGroup()
     {

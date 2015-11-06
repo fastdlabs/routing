@@ -16,10 +16,17 @@
 include __DIR__ . '/../vendor/autoload.php';
 
 /**
- * $route = new Route('/', 'root');
- * $collection = new RouteCollection();
- * $collection->addRoute($route);
- * $router = new Router($collection);
- * $router->generateUrl('root'); // "/"
- * $router->match('/'); // RouteInterface to 'root'
+ * $router = new Router();
+ * $router->addRoute(new Route());
+ * $router->addGroup(new RouteGroup());
+ * $router->get('/', 'name', function () {});
+ * $router->match('/', Router::MATCH_ALL);
+ * $response = $router->dispatch('name');
+ */
+
+/**
+ * Composite pattern
+ * Decorator pattern
+ * Prototype pattern
+ * Factory pattern
  */

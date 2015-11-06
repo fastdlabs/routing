@@ -183,3 +183,4 @@ class RouteCollections implements \Iterator, \Countable
         return count($this->routes);
     }
 }
+

@@ -14,14 +14,16 @@
 
 namespace FastD\Routing;
 
+use FastD\Routing\Collection\RouteCollectionInterface;
 use FastD\Routing\Exception\RouteException;
+use RecursiveIterator;
 
 /**
  * Class RouteGroup
  *
  * @package FastD\Routing
  */
-class RouteGroup extends Route implements RouteGroupInterface
+class RouteGroup extends Route implements RouteCollectionInterface
 {
     /**
      * @var Route[]
@@ -164,5 +166,29 @@ class RouteGroup extends Route implements RouteGroupInterface
     public function count()
     {
         return count($this->routes);
+    }
+
+    /**
+     * Returns if an iterator can be created for the current entry.
+     *
+     * @link  http://php.net/manual/en/recursiveiterator.haschildren.php
+     * @return bool true if the current entry can be iterated over, otherwise returns false.
+     * @since 5.1.0
+     */
+    public function hasChildren()
+    {
+        // TODO: Implement hasChildren() method.
+    }
+
+    /**
+     * Returns an iterator for the current entry.
+     *
+     * @link  http://php.net/manual/en/recursiveiterator.getchildren.php
+     * @return RecursiveIterator An iterator for the current entry.
+     * @since 5.1.0
+     */
+    public function getChildren()
+    {
+        // TODO: Implement getChildren() method.
     }
 }

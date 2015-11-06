@@ -12,6 +12,8 @@
 
 namespace FastD\Routing;
 
+use FastD\Routing\Collection\RouteCollectionInterface;
+
 /**
  * Class Route
  *
@@ -134,12 +136,12 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param $group
+     * @param RouteCollectionInterface $routeCollectionInterface
      * @return $this
      */
-    public function setGroup($group)
+    public function setGroup(RouteCollectionInterface $routeCollectionInterface)
     {
-        $this->group = $group;
+        $this->group = $routeCollectionInterface;
 
         return $this;
     }

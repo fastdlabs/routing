@@ -273,4 +273,9 @@ class Router
     {
         return $this->collections->getCurrentRoute();
     }
+
+    public function dispatch($route)
+    {
+
+    }
 }
