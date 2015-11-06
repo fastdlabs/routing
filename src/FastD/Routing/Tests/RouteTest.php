@@ -20,9 +20,8 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 {
     public function testRouteBaseProperty()
     {
-        $baseRoute = new Route('/', 'root');
+        $baseRoute = new Route('/', 'root', function () {return 'hello world';});
         $this->assertEquals($baseRoute->getParameters(), []);
-        $this->assertEquals($baseRoute->getCallback(), null);
         $this->assertEquals($baseRoute->getDefaults(), []);
         $this->assertEquals($baseRoute->getDomain(), '');
         $this->assertEquals($baseRoute->getFormats(), ['php']);
@@ -44,13 +43,13 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($argRoute->getRequirements(), []);
         $this->assertEquals($argRoute->getPathRegex(), '/^\/{1}(?P<id>.+)$/');
 
-        $argRoute = new Route('/{id}', 'article', ['id' => 1]);
+        $argRoute = new Route('/{id}', 'article', null, ['id' => 1]);
         $this->assertEquals($argRoute->getParameters(), ['id']);
         $this->assertEquals($argRoute->getDefaults(), ['id' => 1]);
         $this->assertEquals($argRoute->getRequirements(), []);
         $this->assertEquals($argRoute->getPathRegex(), '/^\/{1}(?P<id>.+)$/');
 
-        $argRoute = new Route('/{id}', 'article', ['id' => 1], ['ANY'], ['id' => '\d+']);
+        $argRoute = new Route('/{id}', 'article', null, ['id' => 1], ['ANY'], ['id' => '\d+']);
         $this->assertEquals($argRoute->getParameters(), ['id']);
         $this->assertEquals($argRoute->getDefaults(), ['id' => 1]);
         $this->assertEquals($argRoute->getRequirements(), ['id' => '\d+']);

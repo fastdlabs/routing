@@ -112,7 +112,7 @@ class RouteCollections implements \Iterator, \Countable
      * Return the current element
      *
      * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * @return Route
      */
     public function current()
     {

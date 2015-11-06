@@ -22,11 +22,6 @@ class RouteMatcherTest extends \PHPUnit_Framework_TestCase
 {
     public function testBaseMatch()
     {
-        $route = new Route('/', 'root');
-        $collection = new RouteCollections();
-        $collection->setRoute($route);
-        $matcher = new RouteMatcher($collection);
-        $matcher->match('/');
-        print_r($route);
+
     }
 }

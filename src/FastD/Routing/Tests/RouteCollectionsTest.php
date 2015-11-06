@@ -21,9 +21,11 @@ class RouteCollectionsTest extends \PHPUnit_Framework_TestCase
 {
     public function testAddRoute()
     {
-        $route = new Route('/', 'root');
         $collection = new RouteCollections();
-        $collection->setRoute($route);
-        $this->assertEquals($collection->getRoute('root'), $route);
+        $demoRoute = new Route('/demo', 'demo', function () {});
+        $collection->setRoute($demoRoute);
+        foreach ($collection as $route) {
+            $this->assertEquals('/demo', $route->getPath());
+        }
     }
 }
