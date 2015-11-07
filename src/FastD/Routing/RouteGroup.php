@@ -14,9 +14,7 @@
 
 namespace FastD\Routing;
 
-use FastD\Routing\Collection\RouteCollectionInterface;
 use FastD\Routing\Exception\RouteException;
-use RecursiveIterator;
 
 /**
  * Class RouteGroup
@@ -31,16 +29,81 @@ class RouteGroup extends Route implements RouteCollectionInterface
     protected $routes = [];
 
     /**
-     * @param string $path
-     * @param string $name
-     * @param        $callback
+     * @var array
      */
-    public function __construct(
-        $path,
-        $name,
-        $callback = null
-    ) {
-        parent::__construct($path, $name, $callback, [], ['ANY'], [], ['php']);
+    protected $hashTable = [];
+
+    /**
+     * @return array
+     */
+    public function getHashTable()
+    {
+        return $this->hashTable;
+    }
+
+    public function getRoutes()
+    {
+        return $this->routes;
+    }
+
+    /**
+     * @param $name
+     * @return Route
+     * @throws RouteException
+     */
+    public function getRoute($name)
+    {
+        if (!$this->hasRoute($name)) {
+            throw new RouteException(sprintf('Route "%s" is not exists.', $name));
+        }
+
+        return $this->routes[$name];
+    }
+
+    /**
+     * Reinitialize route.
+     *
+     * @param RouteInterface $routeInterface
+     * @return $this
+     */
+    public function setRoute(RouteInterface $routeInterface)
+    {
+        $routeInterface->setGroup($this);
+
+//        $routeInterface->setSchema($this->getSchema());
+//        $routeInterface->setPath($this->getPath() . $routeInterface->getPath());
+//        $routeInterface->setDomain($this->getDomain());
+//        $routeInterface->setExpire($this->getExpire());
+//        $routeInterface->setMethods($this->getMethods());
+//        $routeInterface->setIps(array_merge($this->getIps(), $routeInterface->getIps()));
+//        $routeInterface->parsePathRegex($routeInterface->getPath(), $routeInterface->getRequirements());
+
+        $this->hashTable[$routeInterface->getPath()] = $routeInterface->getName();
+        $this->routes[$routeInterface->getName()] = $routeInterface;
+
+        return $this;
+    }
+
+    /**
+     * @param $name
+     * @return bool
+     */
+    public function hasRoute($name)
+    {
+        return isset($this->routes[$name]) ? true : false;
+    }
+
+    /**
+     * @param $name
+     * @return $this
+     */
+    public function removeRoute($name)
+    {
+        if ($this->hasRoute($name)) {
+            unset($this->routes[$name]);
+        }
+
+        return $this;
     }
 
     /**
@@ -102,55 +165,6 @@ class RouteGroup extends Route implements RouteCollectionInterface
     public function rewind()
     {
         reset($this->routes);
-    }
-
-    /**
-     * @param $name
-     * @return Route
-     * @throws RouteException
-     */
-    public function getRoute($name)
-    {
-        if (!$this->hasRoute($name)) {
-            throw new RouteException(sprintf('Route "%s" is not exists.', $name));
-        }
-
-        return $this->routes[$name];
-    }
-
-    /**
-     * @param RouteInterface $routeInterface
-     * @return $this
-     */
-    public function setRoute(RouteInterface $routeInterface)
-    {
-        $routeInterface->setSchema($this->getSchema());
-        $routeInterface->setDomain($this->getDomain());
-        $this->routes[$routeInterface->getName()] = $routeInterface;
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     * @return bool
-     */
-    public function hasRoute($name)
-    {
-        return isset($this->routes[$name]) ? true : false;
-    }
-
-    /**
-     * @param $name
-     * @return $this
-     */
-    public function removeRoute($name)
-    {
-        if ($this->hasRoute($name)) {
-            unset($this->routes[$name]);
-        }
-
-        return $this;
     }
 
     /**

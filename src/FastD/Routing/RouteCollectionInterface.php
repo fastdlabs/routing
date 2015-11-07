@@ -12,9 +12,7 @@
  * WebSite: http://www.janhuang.me
  */
 
-namespace FastD\Routing\Collection;
-
-use FastD\Routing\RouteInterface;
+namespace FastD\Routing;
 
 interface RouteCollectionInterface extends \Countable, \RecursiveIterator
 {

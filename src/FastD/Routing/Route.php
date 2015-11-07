@@ -12,8 +12,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Routing\Collection\RouteCollectionInterface;
-
 /**
  * Class Route
  *
@@ -92,11 +90,16 @@ class Route implements RouteInterface
     protected $schema = 'http';
 
     /**
+     * @var RouteExpire
+     */
+    protected $expire;
+
+    /**
      * @param string $path
      * @param string $name
      * @param array  $callback
-     * @param array  $defaults
      * @param array  $methods
+     * @param array  $defaults
      * @param array  $requirements
      * @param array  $formats
      */
@@ -104,8 +107,8 @@ class Route implements RouteInterface
         $path,
         $name,
         $callback           = null,
-        array $defaults     = [],
         array $methods      = ['ANY'],
+        array $defaults     = [],
         array $requirements = [],
         array $formats      = ['php']
     )
@@ -136,12 +139,13 @@ class Route implements RouteInterface
     }
 
     /**
-     * @param RouteCollectionInterface $routeCollectionInterface
+     * @param RouteGroup $routeGroup
      * @return $this
      */
-    public function setGroup(RouteCollectionInterface $routeCollectionInterface)
+    public function setGroup(RouteGroup $routeGroup)
     {
-        $this->group = $routeCollectionInterface;
+        $this->group = $routeGroup;
+
 
         return $this;
     }
@@ -264,7 +268,7 @@ class Route implements RouteInterface
      * @param array  $requirements
      * @return $this
      */
-    protected function parsePathRegex($route, $requirements = array())
+    public function parsePathRegex($route, $requirements = array())
     {
         if (preg_match_all('/\{(\w+)\}/i', $route, $match)) {
 
@@ -276,9 +280,13 @@ class Route implements RouteInterface
             $this->parameters = $match[1];
         }
 
+        if ('/' === substr($route, -1, 1)) {
+            $route .= '{0,1}';
+        }
+
         $this->pathRegex = '/^' . str_replace('/', '\/', $route) . '$/';
 
-        return $this;
+        return $this->pathRegex;
     }
 
 
@@ -392,9 +400,11 @@ class Route implements RouteInterface
      * @param RouteExpire $routeExpire
      * @return RouteInterface
      */
-    public function setExpire(RouteExpire $routeExpire)
+    public function setExpire(RouteExpire $routeExpire = null)
     {
-        // TODO: Implement setExpire() method.
+        $this->expire = $routeExpire;
+
+        return $this;
     }
 
     /**
@@ -402,7 +412,7 @@ class Route implements RouteInterface
      */
     public function getExpire()
     {
-        // TODO: Implement getExpire() method.
+        return $this->expire;
     }
 
     /**
@@ -417,13 +427,5 @@ class Route implements RouteInterface
         $this->setParameters(array_merge($this->parameters, $parameters));
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->path;
     }
 }

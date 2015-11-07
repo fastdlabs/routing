@@ -12,8 +12,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Routing\Collection\RouteCollectionInterface;
-
 /**
  * Interface RouteInterface
  *
@@ -161,13 +159,13 @@ interface RouteInterface
     public function getCallback();
 
     /**
-     * @return RouteCollectionInterface
+     * @param RouteGroup $routeGroup
+     * @return RouteInterface
      */
-    public function getGroup();
+    public function setGroup(RouteGroup $routeGroup);
 
     /**
-     * @param RouteCollectionInterface $routeCollectionInterface
-     * @return $this
+     * @return RouteGroup
      */
-    public function setGroup(RouteCollectionInterface $routeCollectionInterface);
+    public function getGroup();
 }

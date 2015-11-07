@@ -3,3 +3,4 @@
  * Compatible PHP7 and requirement >= php7
  * New routing request is valid
  * Add route group object
+ * Fixed root path regex bug

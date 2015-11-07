@@ -12,10 +12,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Routing\Exception\RouteException;
-use FastD\Routing\Generator\RouteGenerator;
-use FastD\Routing\Matcher\RouteMatcher;
-
 /**
  * Class Router
  *
@@ -24,254 +20,137 @@ use FastD\Routing\Matcher\RouteMatcher;
 class Router
 {
     /**
-     * @var RouteCollections
+     * @var array
      */
-    protected $collections;
+    protected $routes;
 
     /**
-     * Full group name.
-     *
-     * @var string
+     * @var array
      */
-    protected $group = [];
+    protected $withPath = [];
 
     /**
-     * @var string
+     * @var RouteGroup[]
      */
-    protected $schema = 'http';
+    protected $withGroup = [];
 
     /**
-     * Route group domain.
-     *
-     * @var string
+     * @var RouteGroup
      */
-    protected $domain;
+    protected $group;
+
+    protected $hashTable = [];
 
     /**
-     * Router constructor.
-     * Initialize route collections and route Generator.
+     * @return array
      */
-    public function __construct()
+    public function getRoutes()
     {
-        $this->collections = new RouteCollections();
+        return $this->routes;
+    }
+
+    public function get($path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, ['GET'], $default, $requirements, $formats);
+    }
+
+    public function post($path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, ['POST'], $default, $requirements, $formats);
+    }
+
+    public function put($path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, ['PUT'], $default, $requirements, $formats);
+    }
+
+    public function delete($path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, ['DELETE'], $default, $requirements, $formats);
+    }
+
+    public function options($path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, ['OPTIONS'], $default, $requirements, $formats);
+    }
+
+    public function head($path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, ['HEAD'], $default, $requirements, $formats);
+    }
+
+    public function patch($path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, ['PATCH'], $default, $requirements, $formats);
+    }
+
+    public function trace($path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, ['TRACE'], $default, $requirements, $formats);
+    }
+
+    public function match(array $method = ['GET'], $path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, $method, $default, $requirements, $formats);
+    }
+
+    public function any($path, $name, $callback = null, array $default = [], array $requirements = [], array $formats = [])
+    {
+        return $this->createRoute($path, $name, $callback, ['ANY'], $default, $requirements, $formats);
+    }
+
+    public function with($path, $name, \Closure $callback = null)
+    {
+        $this->withPath[] = $path;
+
+        $this->withGroup[] = new RouteGroup($path, $name, $callback);
+
+        $this->group = end($this->withGroup);
+
+        $callback($this);
+
+        $this->hashTable = array_merge($this->hashTable, $this->group->getHashTable());
+
+        array_pop($this->withPath);
+        array_pop($this->withGroup);
+
+        $group = $this->group;
+
+        $this->group = null;
+
+        return $group;
     }
 
     /**
-     * @return RouteCollections
-     */
-    public function getCollections()
-    {
-        return $this->collections;
-    }
-
-    /**
-     * @param       $name
-     * @param array $parameters
-     * @param bool $suffix
-     * @return string
-     */
-    public function generateUrl($name, array $parameters = array(), $suffix = false)
-    {
-        return RouteGenerator::generateUrl($this->collections->getRoute($name), $parameters, $suffix);
-    }
-
-    /**
-     * @param RouteInterface $routeInterface
-     * @return $this
-     */
-    public function setRoute(RouteInterface $routeInterface = null)
-    {
-        return $this->collections->setRoute($routeInterface);
-    }
-
-    /**
-     * @param $name
-     * @return RouteInterface
-     * @throws RouteException
-     */
-    public function getRoute($name)
-    {
-        return $this->collections->getRoute($name);
-    }
-
-    /**
-     * @param $name
-     * @return bool
-     */
-    public function hasRoute($name)
-    {
-        return $this->collections->hasRoute($name);
-    }
-
-    /**
-     * @param $name
-     * @return bool
-     */
-    public function removeRoute($name)
-    {
-        return $this->collections->removeRoute($name);
-    }
-
-    /**
-     * @param $route
+     * @param $path
      * @param $callback
+     * @param $name
      * @param $methods
-     * @return Route
+     * @param $default
+     * @param $requirements
+     * @param $formats
+     * @return RouteInterface
      */
-    public function createRoute($route, $callback, array $methods = ['GET'])
+    public function createRoute($path, $name, $callback = null, array $methods = ['GET'], $default = [], $requirements = [], $formats = ['php'])
     {
-        $name = '';
+        $group = implode('', $this->withPath);
 
-        $group = implode('', $this->group);
+        $route = new Route($group . $path, $name, $callback, $methods, $default, $requirements, $formats);
 
-        $routeName = $route;
+        null !== $this->group ? $this->group->setRoute($route) : null;
 
-        if (is_array($route)) {
-            $name = isset($route['name']) ? $route['name'] : '';
-            $routeName = $route[0];
-            $route = $group . $route[0];
-        } else if (is_string($route)) {
-            $routeName = $route;
-            $route = str_replace('//', '/', $group . $route);
-            $name = $route;
-        }
-
-        $route = new Route($route, $name, array(), $methods, array(), array(), $callback);
-
-        $route
-            ->setPath(implode('', $this->domainGroup) . $routeName)
-            ->setGroup($group)
-            ->setSchema($this->protocol)
-            ->setDomain($this->domain)
-        ;
-
-        $this->setRoute($route);
-
-        unset($name, $routeName);
+        $this->appendHashTable($route);
 
         return $route;
     }
 
-    /**
-     * @param $group
-     * @param $closure
-     * @return void
-     */
-    public function group($group, $closure)
+    public function appendHashTable(RouteInterface $routeInterface)
     {
-        if (!is_callable($closure)) {
-            throw new \InvalidArgumentException(sprintf('Argument 2 must be a Closure.'));
-        }
+        $this->hashTable[$routeInterface->getPath()] = $routeInterface->getName();
 
-        $groupInfo = $group;
-
-        if (is_array($groupInfo)) {
-            foreach ($groupInfo as $name => $value) {
-                if (isset($this->$name)) {
-                    $this->$name = $value;
-                }
-            }
-
-            if (isset($groupInfo[0])) {
-                $group = $groupInfo[0];
-            }
-        }
-
-        $this->group[] = $group;
-
-        if (!isset($groupInfo['domain'])) {
-            $this->domainGroup[] = $group;
-        }
-
-        unset($group);
-
-        $closure();
-
-        array_pop($this->group);
-        array_pop($this->domainGroup);
-        $this->domain = '';
-    }
-
-    /**
-     * @param  string $path
-     * @return Route
-     */
-    public function match($path)
-    {
-        return RouteMatcher::match($path, $this->collections);
-    }
-
-    /**
-     * @param                $host
-     * @param RouteInterface $route
-     * @return bool
-     * @throws RouteException
-     */
-    public function matchHost($host, RouteInterface $route)
-    {
-        return RouteMatcher::matchRequestHost($host, $route);
-    }
-
-    /**
-     * @param string         $path
-     * @param RouteInterface $route
-     * @return RouteInterface
-     * @throws RouteException
-     */
-    public function matchRoute($path, RouteInterface $route)
-    {
-        return RouteMatcher::matchRequestRoute($path, $route);
-    }
-
-    /**
-     * @param                $method
-     * @param RouteInterface $route
-     * @return bool
-     * @throws RouteException
-     */
-    public function matchMethod($method, RouteInterface $route)
-    {
-        return RouteMatcher::matchRequestMethod($method, $route);
-    }
-
-    /**
-     * @param                $format
-     * @param RouteInterface $route
-     * @return bool
-     * @throws RouteException
-     */
-    public function matchFormat($format, RouteInterface $route)
-    {
-        return RouteMatcher::matchRequestFormat($format, $route);
-    }
-
-    /**
-     * @param                $ip
-     * @param RouteInterface $route
-     * @return RouteInterface
-     */
-    public function matchIp($ip, RouteInterface $route)
-    {
-        return RouteMatcher::matchRequesetIps($ip, $route);
-    }
-
-    /**
-     * @param RouteInterface $route
-     * @return $this
-     */
-    public function setCurrentRoute(RouteInterface $route)
-    {
-        $this->collections->setCurrentRoute($route);
+        $this->routes[$routeInterface->getName()] = $routeInterface;
 
         return $this;
-    }
-
-    /**
-     * @return RouteInterface
-     */
-    public function getCurrentRoute()
-    {
-        return $this->collections->getCurrentRoute();
     }
 
     public function dispatch($route)

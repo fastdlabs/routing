@@ -15,6 +15,7 @@
 namespace FastD\Routing\Tests;
 
 use FastD\Routing\Route;
+use FastD\Routing\RouteGroup;
 
 class RouteTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,28 +32,33 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($baseRoute->getName(), 'root');
         $this->assertEquals($baseRoute->getPath(), '/');
         $this->assertEquals($baseRoute->getRequirements(), []);
-        $this->assertEquals($baseRoute->getPathRegex(), '/^\/$/');
+        $this->assertEquals($baseRoute->getPathRegex(), '/^\/{0,1}$/');
         $this->assertEquals($baseRoute->getSchema(), 'http');
     }
 
     public function testRouteArgument()
     {
         $argRoute = new Route('/{id}', 'article');
-        $this->assertEquals($argRoute->getParameters(), ['id']);
         $this->assertEquals($argRoute->getDefaults(), []);
         $this->assertEquals($argRoute->getRequirements(), []);
         $this->assertEquals($argRoute->getPathRegex(), '/^\/{1}(?P<id>.+)$/');
-
-        $argRoute = new Route('/{id}', 'article', null, ['id' => 1]);
         $this->assertEquals($argRoute->getParameters(), ['id']);
+
+        $argRoute = new Route('/{id}', 'article', null, ['GET'], ['id' => 1]);
         $this->assertEquals($argRoute->getDefaults(), ['id' => 1]);
         $this->assertEquals($argRoute->getRequirements(), []);
         $this->assertEquals($argRoute->getPathRegex(), '/^\/{1}(?P<id>.+)$/');
-
-        $argRoute = new Route('/{id}', 'article', null, ['id' => 1], ['ANY'], ['id' => '\d+']);
         $this->assertEquals($argRoute->getParameters(), ['id']);
+
+        $argRoute = new Route('/{id}', 'article', null, ['ANY'], ['id' => 1], ['id' => '\d+']);
         $this->assertEquals($argRoute->getDefaults(), ['id' => 1]);
         $this->assertEquals($argRoute->getRequirements(), ['id' => '\d+']);
         $this->assertEquals($argRoute->getPathRegex(), '/^\/{1}(?P<id>\d+)$/');
+        $this->assertEquals($argRoute->getParameters(), ['id']);
+    }
+
+    public function testRouteGroup()
+    {
+
     }
 }
