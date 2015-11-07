@@ -14,13 +14,34 @@
 
 namespace FastD\Routing;
 
-interface RouteCollectionInterface extends \Countable, \RecursiveIterator
+/**
+ * Interface RouteCollectionInterface
+ *
+ * @package FastD\Routing
+ */
+interface RouteCollectionInterface extends \Countable, \Iterator
 {
+    /**
+     * @param RouteInterface $routeInterface
+     * @return RouteCollectionInterface
+     */
     public function setRoute(RouteInterface $routeInterface);
 
+    /**
+     * @param $name
+     * @return RouteCollectionInterface
+     */
     public function hasRoute($name);
 
+    /**
+     * @param $name
+     * @return bool
+     */
     public function removeRoute($name);
 
+    /**
+     * @param $name
+     * @return RouteInterface
+     */
     public function getRoute($name);
 }

@@ -16,10 +16,21 @@ namespace FastD\Routing;
 
 use DateTimeZone;
 
+/**
+ * Class RouteExpire
+ *
+ * @package FastD\Routing
+ */
 class RouteExpire
 {
+    /**
+     * @var \DateTime
+     */
     protected $start;
 
+    /**
+     * @var \DateTime
+     */
     protected $end;
 
     /**
@@ -37,5 +48,9 @@ class RouteExpire
      * @return bool
      */
     public function isExpire()
-    {}
+    {
+        $date = new \DateTime();
+
+        return ($date->getTimestamp() > $this->start && $date->getTimestamp() < $this->end) ? true : false;
+    }
 }

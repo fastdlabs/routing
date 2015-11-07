@@ -51,16 +51,16 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testRouteWith()
     {
-        $group = $this->router->with('/root', 'root_with', function (Router $router) {
+        $this->router->with('/root', 'root_with', function (Router $router) {
             $router->get('/', 'root_with_get', function () {});
-            $router->with('/v1', 'root_v1', function () {
-
+            $router->with('/v1', 'root_v1', function (Router $router) {
+                $router->get('/test', 'root_with_test', function () {});
             });
         });
 
-        $route = $group->getRoute('root_with_get');
-
-        $this->assertEquals('root_with_get', $route->getName());
-        $this->assertEquals('/root/', $route->getPath());
+        $this->assertEquals('root_with_get', $this->router->getRoute('root_with_get')->getName());
+        $this->assertEquals('/root/', $this->router->getRoute('root_with_get')->getPath());
+        $this->assertEquals('/root/v1/test', $this->router->getRoute('root_with_test')->getPath());
+        $this->assertEquals('/root', $this->router->getWithRoute('root_with')->getPath());
     }
 }

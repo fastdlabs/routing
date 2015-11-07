@@ -33,6 +33,19 @@ class RouteGroup extends Route implements RouteCollectionInterface
      */
     protected $hashTable = [];
 
+    public function __construct($path, $name, \Closure $callback = null, \Closure $init = null)
+    {
+        parent::__construct(null, null, null);
+
+        $this->path = $path;
+
+        $this->name = $name;
+
+        if (is_callable($init)) {
+            $init($this);
+        }
+    }
+
     /**
      * @return array
      */
@@ -41,6 +54,9 @@ class RouteGroup extends Route implements RouteCollectionInterface
         return $this->hashTable;
     }
 
+    /**
+     * @return Route[]
+     */
     public function getRoutes()
     {
         return $this->routes;
@@ -69,15 +85,6 @@ class RouteGroup extends Route implements RouteCollectionInterface
     public function setRoute(RouteInterface $routeInterface)
     {
         $routeInterface->setGroup($this);
-
-//        $routeInterface->setSchema($this->getSchema());
-//        $routeInterface->setPath($this->getPath() . $routeInterface->getPath());
-//        $routeInterface->setDomain($this->getDomain());
-//        $routeInterface->setExpire($this->getExpire());
-//        $routeInterface->setMethods($this->getMethods());
-//        $routeInterface->setIps(array_merge($this->getIps(), $routeInterface->getIps()));
-//        $routeInterface->parsePathRegex($routeInterface->getPath(), $routeInterface->getRequirements());
-
         $this->hashTable[$routeInterface->getPath()] = $routeInterface->getName();
         $this->routes[$routeInterface->getName()] = $routeInterface;
 
@@ -180,29 +187,5 @@ class RouteGroup extends Route implements RouteCollectionInterface
     public function count()
     {
         return count($this->routes);
-    }
-
-    /**
-     * Returns if an iterator can be created for the current entry.
-     *
-     * @link  http://php.net/manual/en/recursiveiterator.haschildren.php
-     * @return bool true if the current entry can be iterated over, otherwise returns false.
-     * @since 5.1.0
-     */
-    public function hasChildren()
-    {
-        // TODO: Implement hasChildren() method.
-    }
-
-    /**
-     * Returns an iterator for the current entry.
-     *
-     * @link  http://php.net/manual/en/recursiveiterator.getchildren.php
-     * @return RecursiveIterator An iterator for the current entry.
-     * @since 5.1.0
-     */
-    public function getChildren()
-    {
-        // TODO: Implement getChildren() method.
     }
 }

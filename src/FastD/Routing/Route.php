@@ -127,7 +127,9 @@ class Route implements RouteInterface
 
         $this->callback     = $callback;
 
-        $this->parsePathRegex($this->path, $this->requirements);
+        if (null !== $path) {
+            $this->parsePathRegex($this->path, $this->requirements);
+        }
     }
 
     /**
