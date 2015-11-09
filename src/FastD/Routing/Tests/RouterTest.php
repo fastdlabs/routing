@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: janhuang
- * Date: 15/10/25
- * Time: 下午11:24
+ * Date: 15/11/10
+ * Time: 上午12:51
  * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
@@ -28,39 +28,10 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->router = new Router();
     }
 
-    public function testRoute()
+    public function testRouterCreate()
     {
-        $getRoute = $this->router->get('/', 'root_get', function () {});
-        $this->assertEquals($getRoute->getMethods(), ['GET']);
-        $this->assertEquals('root_get', $getRoute->getName());
-        $this->assertEquals('/', $getRoute->getPath());
-        $this->assertEquals('/^\/{0,1}$/', $getRoute->getPathRegex());
-        $this->assertRegExp($getRoute->getPathRegex(), '/');
-        $this->assertRegExp($getRoute->getPathRegex(), '');
+        $this->router->name('root')->get('/', null);
 
-        $postRoute = $this->router->post('/post', 'root_post', function () {});
-        $this->assertEquals(['POST'], $postRoute->getMethods());
-        $this->assertEquals('/^\/post$/', $postRoute->getPathRegex());
-    }
-
-    public function testRouteMatchMethods()
-    {
-        $route1 = $this->router->match(['POST', 'GET'], '/', 'root_path', function () {});
-        $this->assertEquals(['POST', 'GET'], $route1->getMethods());
-    }
-
-    public function testRouteWith()
-    {
-        $this->router->with('/root', 'root_with', function (Router $router) {
-            $router->get('/', 'root_with_get', function () {});
-            $router->with('/v1', 'root_v1', function (Router $router) {
-                $router->get('/test', 'root_with_test', function () {});
-            });
-        });
-
-        $this->assertEquals('root_with_get', $this->router->getRoute('root_with_get')->getName());
-        $this->assertEquals('/root/', $this->router->getRoute('root_with_get')->getPath());
-        $this->assertEquals('/root/v1/test', $this->router->getRoute('root_with_test')->getPath());
-        $this->assertEquals('/root', $this->router->getWithRoute('root_with')->getPath());
+        print_r($this->router);
     }
 }

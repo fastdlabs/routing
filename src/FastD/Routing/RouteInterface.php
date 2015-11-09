@@ -25,28 +25,30 @@ interface RouteInterface
      * {@inheritdoc}
      * @return string
      */
-    public function getSchema();
+    public function getSchemas();
 
     /**
      * {@inheritdoc}
-     * @param $schema
+     * @param $schemas
      * @return RouteInterface
      */
-    public function setSchema($schema);
+    public function setSchemas($schemas);
 
     /**
+     * Bind route host.
+     *
      * {@inheritdoc}
      * @param $domain
      * @return RouteInterface
      */
-    public function setDomain($domain);
+    public function setHost($domain);
 
     /**
      * Return route setting domain. Examples, "www.google.com". Default NULL.
      * {@inheritdoc}
      * @return string
      */
-    public function getDomain();
+    public function getHost();
 
     /**
      * Setting this route access ips.
@@ -159,13 +161,13 @@ interface RouteInterface
     public function getCallback();
 
     /**
-     * @param RouteGroup $routeGroup
+     * @param string $with
      * @return RouteInterface
      */
-    public function setGroup(RouteGroup $routeGroup);
+    public function setWith($with);
 
     /**
      * @return RouteGroup
      */
-    public function getGroup();
+    public function getWith();
 }

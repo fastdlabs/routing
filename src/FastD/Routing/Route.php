@@ -17,7 +17,7 @@ namespace FastD\Routing;
  *
  * @package FastD\Routing
  */
-class Route implements RouteInterface
+class Route
 {
     /**
      * @var string
@@ -32,7 +32,7 @@ class Route implements RouteInterface
     /**
      * @var string
      */
-    protected $group;
+    protected $with;
 
     /**
      * @var string|array
@@ -72,7 +72,7 @@ class Route implements RouteInterface
     /**
      * @var string
      */
-    private $pathRegex;
+    protected $pathRegex;
 
     /**
      * @var array
@@ -82,74 +82,28 @@ class Route implements RouteInterface
     /**
      * @var string
      */
-    protected $domain;
+    protected $schema = [];
 
     /**
      * @var string
      */
-    protected $schema = 'http';
+    protected $host;
 
     /**
      * @var RouteExpire
      */
     protected $expire;
 
-    /**
-     * @param string $path
-     * @param string $name
-     * @param array  $callback
-     * @param array  $methods
-     * @param array  $defaults
-     * @param array  $requirements
-     * @param array  $formats
-     */
-    public function __construct(
-        $path,
-        $name,
-        $callback           = null,
-        array $methods      = ['ANY'],
-        array $defaults     = [],
-        array $requirements = [],
-        array $formats      = ['php']
-    )
+    public function __construct($path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
     {
-        $this->path         = $path;
-
-        $this->name         = $name;
-
-        $this->defaults     = $defaults;
-
-        $this->method       = $methods;
-
-        $this->requirements = $requirements;
-
-        $this->format       = $formats;
-
-        $this->callback     = $callback;
-
-        if (null !== $path) {
-            $this->parsePathRegex($this->path, $this->requirements);
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getGroup()
-    {
-        return $this->group;
-    }
-
-    /**
-     * @param RouteGroup $routeGroup
-     * @return $this
-     */
-    public function setGroup(RouteGroup $routeGroup)
-    {
-        $this->group = $routeGroup;
-
-
-        return $this;
+        $this->setDefaults($defaults);
+        $this->setRequirements($requirements);
+        $this->setMethods($methods);
+        $this->setPath($path);
+        $this->setName($path);
+        $this->setCallback($callback);
+        $this->setSchema($schemas);
+        $this->setHost($host);
     }
 
     /**
@@ -159,6 +113,8 @@ class Route implements RouteInterface
     public function setPath($path)
     {
         $this->path = $path;
+
+        $this->pathRegex = $this->parsePathRegex();
 
         return $this;
     }
@@ -265,30 +221,23 @@ class Route implements RouteInterface
         return $this->format;
     }
 
-    /**
-     * @param string $route
-     * @param array  $requirements
-     * @return $this
-     */
-    public function parsePathRegex($route, $requirements = array())
+    public function parsePathRegex()
     {
+        $route = $this->path;
+
         if (preg_match_all('/\{(\w+)\}/i', $route, $match)) {
-
             foreach ($match[1] as $val) {
-                $pattern = '?P<' . $val . '>' . (isset($requirements[$val]) ? $requirements[$val] : '.+');
+                $pattern = '?P<' . $val . '>' . (isset($this->requirements[$val]) ? $this->requirements[$val] : '.+');
                 $route = str_replace('{' . $val . '}', '{1}(' . $pattern . ')', $route);
+                $this->parameters[$val] = isset($this->defaults[$val]) ? $this->defaults[$val] : null;
             }
-
-            $this->parameters = $match[1];
         }
 
         if ('/' === substr($route, -1, 1)) {
             $route .= '{0,1}';
         }
 
-        $this->pathRegex = '/^' . str_replace('/', '\/', $route) . '$/';
-
-        return $this->pathRegex;
+        return '/^' . str_replace('/', '\/', $route) . '$/';
     }
 
 
@@ -341,18 +290,18 @@ class Route implements RouteInterface
     /**
      * @return string
      */
-    public function getDomain()
+    public function getHost()
     {
-        return $this->domain;
+        return $this->host;
     }
 
     /**
-     * @param string $domain
+     * @param string $host
      * @return $this
      */
-    public function setDomain($domain)
+    public function setHost($host)
     {
-        $this->domain = $domain;
+        $this->host = $host;
 
         return $this;
     }
@@ -428,6 +377,23 @@ class Route implements RouteInterface
     {
         $this->setParameters(array_merge($this->parameters, $parameters));
 
+        return $this;
+    }
+
+    public function setRouteWith(RouteWith $routeWith)
+    {
+        $this->with = $routeWith;
+
+        return $this;
+    }
+
+    public function getRouteWith()
+    {
+        return $this->with;
+    }
+
+    public function __clone()
+    {
         return $this;
     }
 }
