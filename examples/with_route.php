@@ -12,11 +12,20 @@
  * WebSite: http://www.janhuang.me
  */
 
+include __DIR__ . '/../vendor/autoload.php';
 
-//$response = $router->dispatch('demo_get');
-//
-//echo $response();
+$router = new \FastD\Routing\Router();
 
+$router->with('/root', function (\FastD\Routing\Router $router) {
+    $router->name('root_index')->get('/index', function () {});
+    $router->with('/demo', function (\FastD\Routing\Router $router) {
+        $router->name('root_demo_index')->get('/index', function () {});
+    });
+});
+
+echo '<pre>';
+
+print_r($router);
 
 
 

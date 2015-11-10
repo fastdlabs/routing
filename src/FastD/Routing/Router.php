@@ -58,8 +58,48 @@ class Router
         return $this->createRoute($path, $callback, $defaults, $requirements, ['POST'], $schemas, $host);
     }
 
-    public function with($path, \Closure $callback = null)
+    public function put($path, $callback, array $defaults = [], array $requirements = [], array $schemas = ['http'], $host = null)
     {
+        return $this->createRoute($path, $callback, $defaults, $requirements, ['PUT'], $schemas, $host);
+    }
+
+    public function delete($path, $callback, array $defaults = [], array $requirements = [], array $schemas = ['http'], $host = null)
+    {
+        return $this->createRoute($path, $callback, $defaults, $requirements, ['DELETE'], $schemas, $host);
+    }
+
+    public function head($path, $callback, array $defaults = [], array $requirements = [], array $schemas = ['http'], $host = null)
+    {
+        return $this->createRoute($path, $callback, $defaults, $requirements, ['HEAD'], $schemas, $host);
+    }
+
+    public function options($path, $callback, array $defaults = [], array $requirements = [], array $schemas = ['http'], $host = null)
+    {
+        return $this->createRoute($path, $callback, $defaults, $requirements, ['OPTIONS'], $schemas, $host);
+    }
+
+    public function trace($path, $callback, array $defaults = [], array $requirements = [], array $schemas = ['http'], $host = null)
+    {
+        return $this->createRoute($path, $callback, $defaults, $requirements, ['TRACE'], $schemas, $host);
+    }
+
+    public function any($path, $callback, array $defaults = [], array $requirements = [], array $schemas = ['http'], $host = null)
+    {
+        return $this->createRoute($path, $callback, $defaults, $requirements, ['ANY'], $schemas, $host);
+    }
+
+    public function match($methods, $path, $callback, array $defaults = [], array $requirements = [], array $schemas = ['http'], $host = null)
+    {
+        return $this->createRoute($path, $callback, $defaults, $requirements, explode('|', $methods), $schemas, $host);
+    }
+
+    public function with($path, \Closure $callback, \Closure $init = null)
+    {
+        array_push($this->with, $path);
+
+        $callback($this);
+
+        array_pop($this->with);
     }
 
     public function name($name)
@@ -72,6 +112,7 @@ class Router
     public function createRoute($path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
     {
         $route = clone $this->routeProperty;
+        $path = implode('', $this->with) . $path;
         $route->setDefaults($defaults);
         $route->setRequirements($requirements);
         $route->setMethods($methods);
