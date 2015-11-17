@@ -30,8 +30,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testRouterCreate()
     {
-        $this->router->name('root')->get('/', null);
-
-        print_r($this->router);
+        $route = $this->router->get('/', null);
+        $route->setName('root');
+        $this->assertEquals('root', $route->getName());
     }
+
 }

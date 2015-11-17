@@ -73,6 +73,11 @@ class Router
         return $this->createRoute($path, $callback, $defaults, $requirements, ['HEAD'], $schemas, $host);
     }
 
+    public function patch($path, $callback, array $defaults = [], array $requirements = [], array $schemas = ['http'], $host = null)
+    {
+        return $this->createRoute($path, $callback, $defaults, $requirements, ['PATCH'], $schemas, $host);
+    }
+
     public function options($path, $callback, array $defaults = [], array $requirements = [], array $schemas = ['http'], $host = null)
     {
         return $this->createRoute($path, $callback, $defaults, $requirements, ['OPTIONS'], $schemas, $host);
@@ -102,13 +107,6 @@ class Router
         array_pop($this->with);
     }
 
-    public function name($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
     public function createRoute($path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
     {
         $route = clone $this->routeProperty;
@@ -117,7 +115,7 @@ class Router
         $route->setRequirements($requirements);
         $route->setMethods($methods);
         $route->setPath($path);
-        null !== $this->name ? $route->setName($this->name) : $route->setName($path);
+        $route->setName($path);
         $route->setCallback($callback);
         $route->setSchema($schemas);
         $route->setHost($host);

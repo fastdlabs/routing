@@ -13,16 +13,6 @@
 
 class Routes
 {
-    const METHOD_GET = 'GET';
-    const METHOD_POST = 'POST';
-    const METHOD_PUT = 'PUT';
-    const METHOD_DELETE = 'DELETE';
-    const METHOD_HEAD = 'HEAD';
-    const METHOD_OPTIONS = 'OPTIONS';
-    const METHOD_TRACE = 'TRACE';
-    const METHOD_PATCH = 'PATCH';
-    const METHOD_ANY = 'ANY';
-
     /**
      * @var \FastD\Routing\Router
      */
@@ -31,7 +21,7 @@ class Routes
     /**
      * Single mode.
      */
-    protected function __construct(){}
+    private function __construct(){}
 
     /**
      * @return \FastD\Routing\Router
@@ -45,114 +35,74 @@ class Routes
         return self::$router;
     }
 
-    /**
-     * @param $route
-     * @param $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function get($route, $callback)
+    public static function get($path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, [Routes::METHOD_GET]);
+        return self::getRouter()->get($path, $callback);
     }
 
-    /**
-     * @param $route
-     * @param $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function post($route, $callback)
+    public static function post($path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, [Routes::METHOD_POST]);
+        return self::getRouter()->post($path, $callback);
     }
 
-    /**
-     * @param $route
-     * @param $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function put($route, $callback)
+    public static function put($path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, [Routes::METHOD_PUT]);
+        return self::getRouter()->put($path, $callback);
     }
 
-    /**
-     * @param $route
-     * @param $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function delete($route, $callback)
+    public static function delete($path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, [Routes::METHOD_DELETE]);
+        return self::getRouter()->delete($path, $callback);
     }
 
-    /**
-     * @param $route
-     * @param $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function head($route, $callback)
+    public static function head($path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, [Routes::METHOD_HEAD]);
+        return self::getRouter()->head($path, $callback);
     }
 
-    /**
-     * @param $route
-     * @param $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function options($route, $callback)
+    public static function options($path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, [Routes::METHOD_OPTIONS]);
+        return self::getRouter()->createRoute($path, $callback);
     }
 
-    /**
-     * @param $route
-     * @param $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function trace($route, $callback)
+    public static function trace($path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, [Routes::METHOD_TRACE]);
+        return self::getRouter()->trace($path, $callback);
     }
 
-    /**
-     * @param $route
-     * @param $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function patch($route, $callback)
+    public static function patch($path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, [Routes::METHOD_PATCH]);
+        return self::getRouter()->patch($path, $callback);
     }
 
-    /**
-     * @param $route
-     * @param $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function any($route, $callback)
+    public static function any($path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, [Routes::METHOD_ANY]);
+        return self::getRouter()->any($path, $callback);
     }
 
-    /**
-     * @param array $methods
-     * @param       $route
-     * @param       $callback
-     * @return \FastD\Routing\Route
-     */
-    public static function match(array $methods = [], $route, $callback)
+    public static function match(array $methods = [], $path, $callback)
     {
-        return self::getRouter()->createRoute($route, $callback, $methods);
+        return self::getRouter()->match($methods, $path, $callback);
     }
 
-    /**
-     * @param $group
-     * @param $closure
-     * @return void
-     */
-    public static function group($group, $closure)
+    public static function createRoute($path, $callback)
     {
-        self::getRouter()->group($group, $closure);
+        $route = self::getRouter()->createRoute($path, $callback);
+
+        if (is_array($path) && isset($path['name'])) {
+            $route->setName($path['name']);
+        }
+
+        return $route;
+    }
+
+    public static function group($group, \Closure $closure)
+    {
+        self::with($group, $closure);
+    }
+
+    public static function with($group, \Closure $closure)
+    {
+        self::getRouter()->with($group, $closure);
     }
 }
