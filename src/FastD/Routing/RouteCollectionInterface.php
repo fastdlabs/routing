@@ -22,10 +22,10 @@ namespace FastD\Routing;
 interface RouteCollectionInterface extends \Countable, \Iterator
 {
     /**
-     * @param RouteInterface $routeInterface
+     * @param Route $route
      * @return RouteCollectionInterface
      */
-    public function setRoute(RouteInterface $routeInterface);
+    public function setRoute(Route $route);
 
     /**
      * @param $name

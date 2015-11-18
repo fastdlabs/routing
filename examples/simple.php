@@ -15,6 +15,22 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
+$router = new \FastD\Routing\Router();
+
+$router->with('/demo', function () use ($router) {
+    $router->addRoute('root', '/', null);
+    $router->addRoute('root2', '/2', null);
+
+    $router->with('/demo2', function () use ($router) {
+        $router->addRoute('demoroot2', '/demo3', null);
+    });
+});
+
+$router->addRoute('demo', '/', null);
+
+echo '<pre>';
+print_r($router);
+
 /**
  * $router = new Router();
  * $router->addRoute(new Route());

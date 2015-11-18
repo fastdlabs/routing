@@ -15,6 +15,7 @@ namespace FastD\Routing\Matcher;
 use FastD\Routing\RouteCollections;
 use FastD\Routing\RouteInterface;
 use FastD\Routing\Exception\RouteException;
+use FastD\Routing\Router;
 
 /**
  * Class RouteMatcher
@@ -37,9 +38,9 @@ class RouteMatcher implements RouteMatcherInterface
 
     protected $collection;
 
-    public function __construct(RouteCollections $routeCollections = null)
+    public function __construct(Router $router)
     {
-        $this->collection = $routeCollections;
+        $this->collection = $router->getCollection();
     }
 
     /**

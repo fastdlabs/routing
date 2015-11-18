@@ -94,13 +94,13 @@ class Route
      */
     protected $expire;
 
-    public function __construct($path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
+    public function __construct($name, $path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
     {
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setMethods($methods);
         $this->setPath($path);
-        $this->setName($path);
+        $this->setName($name);
         $this->setCallback($callback);
         $this->setSchema($schemas);
         $this->setHost($host);
@@ -380,7 +380,7 @@ class Route
         return $this;
     }
 
-    public function setRouteWith(RouteWith $routeWith)
+    public function setRouteWith($routeWith)
     {
         $this->with = $routeWith;
 
