@@ -22,6 +22,9 @@ use FastD\Routing\Matcher\RouteMatcher;
  */
 class Router extends RouteCollection
 {
+    /**
+     * @var Route
+     */
     protected $routeProperty;
 
     /**
@@ -29,12 +32,24 @@ class Router extends RouteCollection
      */
     protected $with = [];
 
+    /**
+     * @var array
+     */
     protected $group = [];
 
+    /**
+     * @var RouteMatcher
+     */
     protected $match;
 
+    /**
+     * @var RouteGenerator
+     */
     protected $generator;
 
+    /**
+     * Router constructor.
+     */
     public function __construct()
     {
         $this->routeProperty = new Route(null, null, null);
@@ -45,13 +60,19 @@ class Router extends RouteCollection
     }
 
     /**
-     * @return array
+     * Get route collections.
+     *
+     * @return RouteCollection
      */
     public function getCollection()
     {
-        return $this->routes;
+        return $this;
     }
 
+    /**
+     * @param          $path
+     * @param \Closure $callback
+     */
     public function with($path, \Closure $callback)
     {
         array_push($this->with, $path);
@@ -61,6 +82,17 @@ class Router extends RouteCollection
         array_pop($this->with);
     }
 
+    /**
+     * @param null  $name
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
+     * @param array $methods
+     * @param array $schemas
+     * @param null  $host
+     * @return Route
+     */
     public function addRoute($name = null, $path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
     {
         $route = clone $this->routeProperty;

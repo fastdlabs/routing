@@ -20,6 +20,32 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 {
     public function testRoute()
     {
+        $route = new Route('root', '/', function () {
+            return 'hello world';
+        });
 
+        $this->assertEquals('/', $route->getPath());
+        $this->assertEquals('/^\/{0,1}$/', $route->getPathRegex());
+
+        $route = new Route('name', '/name', function () {}, [], [], [], ['http', 'https'], 'www.baidu.com');
+
+        $this->assertEquals('/name', $route->getPath());
+        $this->assertEquals(['http', 'https'], $route->getSchema());
+        $this->assertEquals('www.baidu.com', $route->getHost());
+    }
+
+    public function testParametersRoute()
+    {
+        $route = new Route('arg', '/{name}', function ($name) {});
+
+        $this->assertEquals(['name' => null], $route->getParameters());
+
+        $route = new Route('name', '/{name}', function () {}, ['name' => 'janhuang']);
+        $this->assertEquals(['name' => 'janhuang'], $route->getParameters());
+
+        $route = new Route('name', '/{name}/{age}', function () {}, ['age' => 18]);
+        $this->assertEquals(['name' => null, 'age' => 18], $route->getParameters());
+        $this->assertEquals('/^\/{1}(?P<name>.+)\/{1}(?P<age>.+)$/', $route->getPathRegex());
+        $this->assertRegExp($route->getPathRegex(), '/janhuang/18');
     }
 }
