@@ -37,63 +37,63 @@ class Routes
 
     public static function get($path, $callback)
     {
-        return self::getRouter()->get($path, $callback);
+        return self::createRoute($path, $callback, ['GET']);
     }
 
     public static function post($path, $callback)
     {
-        return self::getRouter()->post($path, $callback);
+        return self::createRoute($path, $callback, ['POST']);
     }
 
     public static function put($path, $callback)
     {
-        return self::getRouter()->put($path, $callback);
+        return self::createRoute($path, $callback, ['PUT']);
     }
 
     public static function delete($path, $callback)
     {
-        return self::getRouter()->delete($path, $callback);
+        return self::createRoute($path, $callback, ['DELETE']);
     }
 
     public static function head($path, $callback)
     {
-        return self::getRouter()->head($path, $callback);
+        return self::createRoute($path, $callback, ['HEAD']);
     }
 
     public static function options($path, $callback)
     {
-        return self::getRouter()->createRoute($path, $callback);
+        return self::createRoute($path, $callback, ['OPTIONS']);
     }
 
     public static function trace($path, $callback)
     {
-        return self::getRouter()->trace($path, $callback);
+        return self::createRoute($path, $callback, ['TRACE']);
     }
 
     public static function patch($path, $callback)
     {
-        return self::getRouter()->patch($path, $callback);
+        return self::createRoute($path, $callback, ['PATCH']);
     }
 
     public static function any($path, $callback)
     {
-        return self::getRouter()->any($path, $callback);
+        return self::createRoute($path, $callback);
     }
 
     public static function match(array $methods = [], $path, $callback)
     {
-        return self::getRouter()->match($methods, $path, $callback);
+        return self::createRoute($path, $callback, $methods);
     }
 
-    public static function createRoute($path, $callback)
+    public static function createRoute($path, $callback, $methods = ['ANY'])
     {
-        $route = self::getRouter()->createRoute($path, $callback);
+        $name = $path;
 
         if (is_array($path) && isset($path['name'])) {
-            $route->setName($path['name']);
+            $name = $path['name'];
         }
 
-        return $route;
+        return self::getRouter()->addRoute($name, $path, $callback, [], [], $methods);
     }
 
     public static function group($group, \Closure $closure)

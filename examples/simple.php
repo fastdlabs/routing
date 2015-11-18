@@ -14,6 +14,7 @@
 
 
 include __DIR__ . '/../vendor/autoload.php';
+include __DIR__ . '/../src/FastD/Routing/Routes.php';
 
 $router = new \FastD\Routing\Router();
 
