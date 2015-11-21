@@ -43,9 +43,14 @@ class RouteCollection implements RouteCollectionInterface
         return isset($this->routes[$name]) ? true : false;
     }
 
+    /**
+     * @param Route $route
+     * @return $this
+     */
     public function setRoute(Route $route)
     {
-        $this->routes[$route->getName()] = $route;
+        $this->routes[$route->getName()] = $route->getPath();
+        $this->routes[$route->getPath()] = $route;
 
         return $this;
     }

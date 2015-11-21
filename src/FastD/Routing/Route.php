@@ -92,17 +92,23 @@ class Route
     protected $host;
 
     /**
-     * @var RouteExpire
+     * Route constructor.
+     *
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
+     * @param array $methods
+     * @param array $schemas
+     * @param null  $host
      */
-    protected $expire;
-
-    public function __construct($name, $path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
+    public function __construct($path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
     {
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setMethods($methods);
         $this->setPath($path);
-        $this->setName($name);
+        $this->setName($path);
         $this->setCallback($callback);
         $this->setSchema($schemas);
         $this->setHost($host);
@@ -223,6 +229,9 @@ class Route
         return $this->format;
     }
 
+    /**
+     * @return string
+     */
     public function parsePathRegex()
     {
         $route = $this->path;
@@ -347,6 +356,25 @@ class Route
     }
 
     /**
+     * @param $routeWith
+     * @return $this
+     */
+    public function setRouteWith($routeWith)
+    {
+        $this->with = $routeWith;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRouteWith()
+    {
+        return $this->with;
+    }
+
+    /**
      * Merge route parameters. Default merge route initialize's default values.
      *
      * {@inheritdoc}
@@ -360,23 +388,21 @@ class Route
         return $this;
     }
 
-    public function setRouteWith($routeWith)
-    {
-        $this->with = $routeWith;
-
-        return $this;
-    }
-
-    public function getRouteWith()
-    {
-        return $this->with;
-    }
-
+    /**
+     * @param $path
+     * @return int
+     */
     public function match($path)
     {
         return preg_match($this->getPathRegex(), $path);
     }
 
+    /**
+     * @param array $parameters
+     * @param null  $format
+     * @return string
+     * @throws RouteException
+     */
     public function generateUrl(array $parameters = [], $format = null)
     {
         $parameters = array_merge($this->getDefaults(), $parameters);
@@ -414,8 +440,23 @@ class Route
         return $host . $routeUrl . $format . $query;
     }
 
+    /**
+     * @return Route
+     */
     public function __clone()
     {
+        $this->arguments = [];
+        $this->callback = null;
+        $this->defaults = [];
+        $this->format = [];
+        $this->host = null;
+        $this->with = '';
+        $this->schema = '';
+        $this->ips = [];
+        $this->name = '';
+        $this->parameters = [];
+        $this->path = '';
+        $this->pathRegex = '';
         return $this;
     }
 }

@@ -12,7 +12,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Routing\Generator\RouteGenerator;
 use FastD\Routing\Matcher\RouteMatcher;
 
 /**
@@ -47,32 +46,9 @@ class Router extends RouteCollection
      */
     public function __construct()
     {
-        $this->routeProperty = new Route(null, null, null);
+        $this->routeProperty = new Route(null, null);
 
         $this->matcher = new RouteMatcher($this);
-    }
-
-    /**
-     * Get route collections.
-     *
-     * @return RouteCollection
-     */
-    public function getCollection()
-    {
-        return $this;
-    }
-
-    /**
-     * @param          $path
-     * @param \Closure $callback
-     */
-    public function with($path, \Closure $callback)
-    {
-        array_push($this->with, $path);
-
-        $callback($this);
-
-        array_pop($this->with);
     }
 
     /**
@@ -106,6 +82,29 @@ class Router extends RouteCollection
     }
 
     /**
+     * Get route collections.
+     *
+     * @return RouteCollection
+     */
+    public function getCollection()
+    {
+        return $this;
+    }
+
+    /**
+     * @param          $path
+     * @param \Closure $callback
+     */
+    public function with($path, \Closure $callback)
+    {
+        array_push($this->with, $path);
+
+        $callback($this);
+
+        array_pop($this->with);
+    }
+
+    /**
      * @param $name
      * @return bool|\Closure
      */
@@ -114,11 +113,23 @@ class Router extends RouteCollection
         return $this->getRoute($name)->getCallback();
     }
 
+    /**
+     * @param $path
+     * @return Route
+     * @throws Exception\RouteException
+     */
     public function match($path)
     {
         return $this->matcher->match($path);
     }
 
+    /**
+     * @param       $name
+     * @param array $parameters
+     * @param null  $format
+     * @return string
+     * @throws Exception\RouteException
+     */
     public function generateUrl($name, array $parameters = [], $format = null)
     {
         return $this->getRoute($name)->generateUrl($parameters, $format);
