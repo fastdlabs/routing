@@ -40,12 +40,7 @@ class Router extends RouteCollection
     /**
      * @var RouteMatcher
      */
-    protected $match;
-
-    /**
-     * @var RouteGenerator
-     */
-    protected $generator;
+    protected $matcher;
 
     /**
      * Router constructor.
@@ -54,9 +49,7 @@ class Router extends RouteCollection
     {
         $this->routeProperty = new Route(null, null, null);
 
-        $this->match = new RouteMatcher($this);
-
-        $this->generator = new RouteGenerator($this);
+        $this->matcher = new RouteMatcher($this);
     }
 
     /**
@@ -119,5 +112,15 @@ class Router extends RouteCollection
     public function dispatch($name)
     {
         return $this->getRoute($name)->getCallback();
+    }
+
+    public function match($path)
+    {
+        return $this->matcher->match($path);
+    }
+
+    public function generateUrl($name, array $parameters = [], $format = null)
+    {
+        return $this->getRoute($name)->generateUrl($parameters, $format);
     }
 }

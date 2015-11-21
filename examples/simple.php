@@ -29,8 +29,13 @@ $router->with('/demo', function () use ($router) {
 
 $router->addRoute('demo', '/', null);
 
+$route = $router->match('/');
+
 echo '<pre>';
-print_r($router);
+echo $router->generateUrl('demoroot2');
+print_r($route);
+
+
 
 /**
  * $router = new Router();

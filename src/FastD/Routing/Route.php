@@ -12,6 +12,8 @@
 
 namespace FastD\Routing;
 
+use FastD\Routing\Exception\RouteException;
+
 /**
  * Class Route
  *
@@ -345,28 +347,6 @@ class Route
     }
 
     /**
-     * Setting route access date expire.
-     *
-     * {@inheritdoc}
-     * @param RouteExpire $routeExpire
-     * @return RouteInterface
-     */
-    public function setExpire(RouteExpire $routeExpire = null)
-    {
-        $this->expire = $routeExpire;
-
-        return $this;
-    }
-
-    /**
-     * @return RouteExpire
-     */
-    public function getExpire()
-    {
-        return $this->expire;
-    }
-
-    /**
      * Merge route parameters. Default merge route initialize's default values.
      *
      * {@inheritdoc}
@@ -390,6 +370,48 @@ class Route
     public function getRouteWith()
     {
         return $this->with;
+    }
+
+    public function match($path)
+    {
+        return preg_match($this->getPathRegex(), $path);
+    }
+
+    public function generateUrl(array $parameters = [], $format = null)
+    {
+        $parameters = array_merge($this->getDefaults(), $parameters);
+        $query = '';
+        if ($format) {
+            if (!in_array($format, $this->getFormats())) {
+                $format = array_shift($this->getFormats());
+            }
+            $format = '.' . $format;
+        }
+        $host = '';
+        if ('' != $this->getHost()) {
+            $host = $this->getSchema() . '://' . $this->getHost();
+        }
+        if (0 === count($this->getParameters())) {
+            if (!empty($parameters)) {
+                $query = '?' . http_build_query($parameters);
+            }
+            return $host . $this->getPath() . $format . $query;
+        }
+        $replacer = $parameters;
+        $search = array_map(function ($value) use (&$parameters) {
+            unset($parameters[$value]);
+            return '{' . $value . '}';
+        }, $this->getParameters());
+        $routeUrl = str_replace($search, $replacer, $this->getPath());
+        if (!preg_match_all($this->getPathRegex(), $routeUrl, $match)) {
+            if (!preg_match_all($this->getPathRegex(), $this->getRouteWith() . $routeUrl, $match)) {
+                throw new RouteException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $this->getName(), implode('", "', $this->getArguments())), 500);
+            }
+        }
+        if (!empty($parameters)) {
+            $query = '?' . http_build_query($parameters);
+        }
+        return $host . $routeUrl . $format . $query;
     }
 
     public function __clone()

@@ -24,46 +24,34 @@ use FastD\Routing\Router;
  */
 class RouteMatcher implements RouteMatcherInterface
 {
-    const MATCH_ALL = 0;
-
-    const MATCH_PATH = 1;
-
-    const MATCH_METHOD = 2;
-
-    const MATCH_HOST = 3;
-
-    const MATCH_FORMAT = 4;
-
-    const MATCH_IP = 5;
-
-    protected $collection;
+    protected $router;
 
     public function __construct(Router $router)
     {
-        $this->collection = $router->getCollection();
+        $this->router = $router;
     }
 
-    /**
-     * @param                  $path
-     * @param RouteCollections $collections
-     * @return RouteInterface|mixed
-     * @throws RouteException
-     * @throws \Exception
-     */
-    public function match($path, RouteCollections $collections = null)
+    protected function getRealPath($path)
     {
-        if (false !== strpos('.', $path)) {
-            $path = pathinfo($path, PATHINFO_BASENAME);
+        if (false === strpos('.', $path)) {
+            return $path;
         }
-        try {
-            return $collections->setCurrentRoute($collections->getRoute($path))->getCurrentRoute();
-        } catch (RouteException $e) {
-            foreach ($collections as $route) {
-                try {
-                    return $collections->setCurrentRoute(self::matchRequestRoute($path, $route))->getCurrentRoute();
-                } catch (RouteException $e){}
-            }
 
+        return pathinfo($path, PATHINFO_BASENAME);
+    }
+
+    public function match($path)
+    {
+        $path = $this->getRealPath($path);
+
+        try {
+            return $this->router->getRoute($path);
+        } catch (RouteException $e) {
+            foreach ($this->router as $route) {
+                if (!$route->match($path)) {
+                    return $route;
+                }
+            }
             throw $e;
         }
     }
