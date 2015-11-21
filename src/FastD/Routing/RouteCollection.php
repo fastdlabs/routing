@@ -20,6 +20,10 @@ class RouteCollection implements RouteCollectionInterface
 {
     protected $routes = [];
 
+    protected $map = [];
+
+    protected $current;
+
     /**
      * @param $name
      * @return Route
@@ -31,7 +35,7 @@ class RouteCollection implements RouteCollectionInterface
             throw new RouteException(sprintf('Route "%s" is not exists.', $name));
         }
 
-        return $this->routes[$name];
+        return $this->routes[$this->current];
     }
 
     /**
@@ -40,7 +44,17 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function hasRoute($name)
     {
-        return isset($this->routes[$name]) ? true : false;
+        if (isset($this->map[$name])) {
+            $this->current = $this->map[$name];
+            return true;
+        }
+
+        if (isset($this->routes[$name])) {
+            $this->current = $name;
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -49,7 +63,7 @@ class RouteCollection implements RouteCollectionInterface
      */
     public function setRoute(Route $route)
     {
-        $this->routes[$route->getName()] = $route->getPath();
+        $this->map[$route->getName()] = $route->getPath();
         $this->routes[$route->getPath()] = $route;
 
         return $this;
