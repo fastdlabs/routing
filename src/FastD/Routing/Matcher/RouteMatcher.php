@@ -12,7 +12,6 @@
 
 namespace FastD\Routing\Matcher;
 
-use FastD\Routing\RouteCollections;
 use FastD\Routing\RouteInterface;
 use FastD\Routing\Exception\RouteException;
 use FastD\Routing\Router;
@@ -48,7 +47,7 @@ class RouteMatcher implements RouteMatcherInterface
             return $this->router->getRoute($path);
         } catch (RouteException $e) {
             foreach ($this->router as $route) {
-                if (!$route->match($path)) {
+                if ($route->match($path)) {
                     return $route;
                 }
             }
