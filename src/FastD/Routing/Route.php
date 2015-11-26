@@ -394,7 +394,9 @@ class Route
      */
     public function match($path)
     {
-        return preg_match($this->getPathRegex(), $path);
+        $status = preg_match($this->getPathRegex(), $path, $match);
+
+        return false === $status ? false : $match;
     }
 
     /**
