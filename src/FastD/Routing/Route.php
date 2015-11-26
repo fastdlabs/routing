@@ -4,7 +4,7 @@
  * User: janhuang
  * Date: 15/1/29
  * Time: 上午11:46
- * Github: https://www.github.com/janhuang 
+ * Github: https://www.github.com/janhuang
  * Coding: https://www.coding.net/janhuang
  * SegmentFault: http://segmentfault.com/u/janhuang
  * Blog: http://segmentfault.com/blog/janhuang
@@ -102,8 +102,15 @@ class Route
      * @param array $schemas
      * @param null  $host
      */
-    public function __construct($path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
-    {
+    public function __construct(
+        $path,
+        $callback,
+        array $defaults = [],
+        array $requirements = [],
+        array $methods = [],
+        array $schemas = ['http'],
+        $host = null
+    ) {
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
         $this->setMethods($methods);
@@ -145,6 +152,7 @@ class Route
 
         return $this;
     }
+
     /**
      * @return string
      */
@@ -248,7 +256,7 @@ class Route
             $route .= '{0,1}';
         }
 
-        return '/^' . str_replace('/', '\/', $route) . '$/';
+        return '/^'.str_replace('/', '\/', $route).'$/';
     }
 
 
@@ -394,9 +402,30 @@ class Route
      */
     public function match($path)
     {
-        $status = preg_match($this->getPathRegex(), $path, $match);
+        if (!preg_match($this->getPathRegex(), $path, $match)) {
+            if (array() === $this->getParameters() || array() === $this->getDefaults()) {
+                return false;
+            }
 
-        return false === $status ? false : $match;
+            $parameters = array_slice(
+                $this->getDefaults(),
+                (substr_count($path, '/') - substr_count($this->getPath(), '/'))
+            );
+
+            $path = str_replace('//', '/', $path.'/'.implode('/', array_values($parameters)));
+
+            if (!preg_match($this->getPathRegex(), $path, $match)) {
+                return false;
+            }
+        }
+
+        foreach ($this->parameters as $key => $value) {
+            $this->parameters[$key] = $match[$key];
+        }
+
+        unset($match);
+
+        return true;
     }
 
     /**
@@ -408,38 +437,45 @@ class Route
     public function generateUrl(array $parameters = [], $format = null)
     {
         $parameters = array_merge($this->getDefaults(), $parameters);
-        $query = '';
-        if ($format) {
-            if (!in_array($format, $this->getFormats())) {
-                $format = array_shift($this->getFormats());
-            }
+
+        if ($format && in_array($format, $this->getFormats())) {
             $format = '.' . $format;
+        } else {
+            $format = '';
         }
-        $host = '';
-        if ('' != $this->getHost()) {
-            $host = $this->getSchema() . '://' . $this->getHost();
+
+        $host = '' == $this->getHost() ? '' : $this->getSchema() . '://' . $this->getHost();
+
+        if (array() === $this->getParameters()) {
+            return $host . $this->getPath() . $format . (array() === $parameters ? '' : '?' . http_build_query($parameters));
         }
-        if (0 === count($this->getParameters())) {
-            if (!empty($parameters)) {
-                $query = '?' . http_build_query($parameters);
-            }
-            return $host . $this->getPath() . $format . $query;
-        }
+
         $replacer = $parameters;
-        $search = array_map(function ($value) use (&$parameters) {
-            unset($parameters[$value]);
-            return '{' . $value . '}';
-        }, $this->getParameters());
+        $keys = array_keys($parameters);
+        $search = array_map(
+            function ($name) use (&$parameters) {
+                unset($parameters[$name]);
+
+                return '{' . $name . '}';
+            },
+            $keys
+        );
+
+        unset($keys);
+
         $routeUrl = str_replace($search, $replacer, $this->getPath());
-        if (!preg_match_all($this->getPathRegex(), $routeUrl, $match)) {
-            if (!preg_match_all($this->getPathRegex(), $this->getRouteWith() . $routeUrl, $match)) {
-                throw new RouteException(sprintf('Route "%s" generator fail. Your should set route parameters ["%s"] value.', $this->getName(), implode('", "', $this->getArguments())), 500);
-            }
+
+        if (!preg_match($this->getPathRegex(), $routeUrl, $match)) {
+            throw new RouteException(
+                sprintf(
+                    'Route "%s" generator fail. Your should set route parameters ["%s"] value.',
+                    $this->getName(),
+                    implode('", "', array_keys($this->getParameters()))
+                ), 500
+            );
         }
-        if (!empty($parameters)) {
-            $query = '?' . http_build_query($parameters);
-        }
-        return $host . $routeUrl . $format . $query;
+
+        return $host . $routeUrl . $format . (array() === $parameters ? '' : '?' . http_build_query($parameters));
     }
 
     /**
@@ -459,6 +495,7 @@ class Route
         $this->parameters = [];
         $this->path = '';
         $this->pathRegex = '';
+
         return $this;
     }
 }
