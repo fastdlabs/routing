@@ -110,7 +110,7 @@ class RouteCollection implements RouteCollectionInterface
      * Return the key of the current element
      *
      * @link  http://php.net/manual/en/iterator.key.php
-     * @return mixed scalar on success, or null on failure.
+     * @return string
      * @since 5.0.0
      */
     public function key()

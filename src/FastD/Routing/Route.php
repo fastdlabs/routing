@@ -13,6 +13,7 @@
 namespace FastD\Routing;
 
 use FastD\Routing\Exception\RouteException;
+use FastD\Routing\Matcher\RouteMatcher;
 
 /**
  * Class Route
@@ -402,30 +403,7 @@ class Route
      */
     public function match($path)
     {
-        if (!preg_match($this->getPathRegex(), $path, $match)) {
-            if (array() === $this->getParameters() || array() === $this->getDefaults()) {
-                return false;
-            }
-
-            $parameters = array_slice(
-                $this->getDefaults(),
-                (substr_count($path, '/') - substr_count($this->getPath(), '/'))
-            );
-
-            $path = str_replace('//', '/', $path.'/'.implode('/', array_values($parameters)));
-
-            if (!preg_match($this->getPathRegex(), $path, $match)) {
-                return false;
-            }
-        }
-
-        foreach ($this->parameters as $key => $value) {
-            $this->parameters[$key] = $match[$key];
-        }
-
-        unset($match);
-
-        return true;
+        return RouteMatcher::matchRoute($path, $this);
     }
 
     /**
@@ -436,46 +414,7 @@ class Route
      */
     public function generateUrl(array $parameters = [], $format = null)
     {
-        $parameters = array_merge($this->getDefaults(), $parameters);
-
-        if ($format && in_array($format, $this->getFormats())) {
-            $format = '.' . $format;
-        } else {
-            $format = '';
-        }
-
-        $host = '' == $this->getHost() ? '' : $this->getSchema() . '://' . $this->getHost();
-
-        if (array() === $this->getParameters()) {
-            return $host . $this->getPath() . $format . (array() === $parameters ? '' : '?' . http_build_query($parameters));
-        }
-
-        $replacer = $parameters;
-        $keys = array_keys($parameters);
-        $search = array_map(
-            function ($name) use (&$parameters) {
-                unset($parameters[$name]);
-
-                return '{' . $name . '}';
-            },
-            $keys
-        );
-
-        unset($keys);
-
-        $routeUrl = str_replace($search, $replacer, $this->getPath());
-
-        if (!preg_match($this->getPathRegex(), $routeUrl, $match)) {
-            throw new RouteException(
-                sprintf(
-                    'Route "%s" generator fail. Your should set route parameters ["%s"] value.',
-                    $this->getName(),
-                    implode('", "', array_keys($this->getParameters()))
-                ), 500
-            );
-        }
-
-        return $host . $routeUrl . $format . (array() === $parameters ? '' : '?' . http_build_query($parameters));
+        return RouteGenerator::generateUrl($this, $parameters, $format);
     }
 
     /**

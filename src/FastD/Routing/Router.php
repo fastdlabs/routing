@@ -13,6 +13,7 @@
 namespace FastD\Routing;
 
 use FastD\Routing\Matcher\RouteMatcher;
+use FastD\Routing\Exception\RouteException;
 
 /**
  * Class Router
@@ -120,7 +121,7 @@ class Router extends RouteCollection
      */
     public function match($path)
     {
-        return $this->matcher->match($path);
+        return RouteMatcher::match($path, $this);
     }
 
     /**
@@ -129,9 +130,10 @@ class Router extends RouteCollection
      * @param null  $format
      * @return string
      * @throws Exception\RouteException
+     * @throws RouteException
      */
     public function generateUrl($name, array $parameters = [], $format = null)
     {
-        return $this->getRoute($name)->generateUrl($parameters, $format);
+        return RouteGenerator::generateUrl($this->getRoute($name), $parameters, $format);
     }
 }
