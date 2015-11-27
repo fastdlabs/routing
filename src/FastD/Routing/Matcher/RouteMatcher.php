@@ -21,7 +21,7 @@ use FastD\Routing\Router;
  *
  * @package FastD\Routing\Matcher
  */
-class RouteMatcher implements RouteMatcherInterface
+class RouteMatcher
 {
     protected $router;
 

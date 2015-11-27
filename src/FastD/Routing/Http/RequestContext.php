@@ -14,7 +14,9 @@
 
 namespace FastD\Routing\Http;
 
-class RequestContext
+use FastD\Http\Request;
+
+class RequestContext extends Request
 {
 
 }
