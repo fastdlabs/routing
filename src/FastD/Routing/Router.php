@@ -67,7 +67,7 @@ class Router extends RouteCollection
     {
         $route = clone $this->routeProperty;
         $with = implode('', $this->with);
-        $path = $with . $path;
+        $path = str_replace('//', '/', $with . $path);
         $route->setDefaults($defaults);
         $route->setRequirements($requirements);
         $route->setMethods($methods);

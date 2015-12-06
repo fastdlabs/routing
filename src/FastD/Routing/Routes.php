@@ -91,6 +91,7 @@ class Routes
 
         if (is_array($path) && isset($path['name'])) {
             $name = $path['name'];
+            $path = $path[0];
         }
 
         return self::getRouter()->addRoute($name, $path, $callback, [], [], $methods);
