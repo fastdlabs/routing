@@ -79,7 +79,7 @@ class Router extends RouteCollection
         $route->setHost($host);
         $this->setRoute($route);
         $this->group[$with][] = $name;
-        return $route;
+        return $this->getCurrentRoute();
     }
 
     /**

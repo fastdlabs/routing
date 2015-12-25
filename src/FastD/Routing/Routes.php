@@ -35,56 +35,113 @@ class Routes
         return self::$router;
     }
 
+    /**
+     * @param $path
+     * @param $callback
+     * @return \FastD\Routing\Route
+     */
     public static function get($path, $callback)
     {
         return self::createRoute($path, $callback, ['GET']);
     }
 
+    /**
+     * @param $path
+     * @param $callback
+     * @return \FastD\Routing\Route
+     */
     public static function post($path, $callback)
     {
         return self::createRoute($path, $callback, ['POST']);
     }
 
+    /**
+     * @param $path
+     * @param $callback
+     * @return \FastD\Routing\Route
+     */
     public static function put($path, $callback)
     {
         return self::createRoute($path, $callback, ['PUT']);
     }
 
+    /**
+     * @param $path
+     * @param $callback
+     * @return \FastD\Routing\Route
+     */
     public static function delete($path, $callback)
     {
         return self::createRoute($path, $callback, ['DELETE']);
     }
 
+    /**
+     * @param $path
+     * @param $callback
+     * @return \FastD\Routing\Route
+     */
     public static function head($path, $callback)
     {
         return self::createRoute($path, $callback, ['HEAD']);
     }
 
+    /**
+     * @param $path
+     * @param $callback
+     * @return \FastD\Routing\Route
+     */
     public static function options($path, $callback)
     {
         return self::createRoute($path, $callback, ['OPTIONS']);
     }
 
+    /**
+     * @param $path
+     * @param $callback
+     * @return \FastD\Routing\Route
+     */
     public static function trace($path, $callback)
     {
         return self::createRoute($path, $callback, ['TRACE']);
     }
 
+    /**
+     * @param $path
+     * @param $callback
+     * @return \FastD\Routing\Route
+     */
     public static function patch($path, $callback)
     {
         return self::createRoute($path, $callback, ['PATCH']);
     }
 
+    /**
+     * @param $path
+     * @param $callback
+     * @return \FastD\Routing\Route
+     */
     public static function any($path, $callback)
     {
         return self::createRoute($path, $callback);
     }
 
+    /**
+     * @param array $methods
+     * @param       $path
+     * @param       $callback
+     * @return \FastD\Routing\Route
+     */
     public static function match(array $methods = [], $path, $callback)
     {
         return self::createRoute($path, $callback, $methods);
     }
 
+    /**
+     * @param       $path
+     * @param       $callback
+     * @param array $methods
+     * @return \FastD\Routing\Route
+     */
     public static function createRoute($path, $callback, $methods = ['ANY'])
     {
         $name = $path;
@@ -97,11 +154,19 @@ class Routes
         return self::getRouter()->addRoute($name, $path, $callback, [], [], $methods);
     }
 
+    /**
+     * @param         $group
+     * @param Closure $closure
+     */
     public static function group($group, \Closure $closure)
     {
         self::with($group, $closure);
     }
 
+    /**
+     * @param         $group
+     * @param Closure $closure
+     */
     public static function with($group, \Closure $closure)
     {
         self::getRouter()->with($group, $closure);

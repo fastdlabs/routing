@@ -19,7 +19,7 @@ namespace FastD\Routing;
  *
  * @package FastD\Routing
  */
-interface RouteCollectionInterface extends \Countable, \Iterator
+interface RouteCollectionInterface
 {
     /**
      * @param Route $route

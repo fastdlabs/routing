@@ -16,12 +16,26 @@ namespace FastD\Routing;
 
 use FastD\Routing\Exception\RouteException;
 
-class RouteCollection implements RouteCollectionInterface
+/**
+ * Class RouteCollection
+ *
+ * @package FastD\Routing
+ */
+class RouteCollection implements RouteCollectionInterface, \Countable, \Iterator
 {
+    /**
+     * @var array
+     */
     protected $routes = [];
 
+    /**
+     * @var array
+     */
     protected $map = [];
 
+    /**
+     * @var
+     */
     protected $current;
 
     /**
@@ -65,6 +79,7 @@ class RouteCollection implements RouteCollectionInterface
     {
         $this->map[$route->getName()] = $route->getPath();
         $this->routes[$route->getPath()] = $route;
+        $this->current = $route;
 
         return $this;
     }
@@ -80,6 +95,14 @@ class RouteCollection implements RouteCollectionInterface
         }
 
         return true;
+    }
+
+    /**
+     * @return Route
+     */
+    public function getCurrentRoute()
+    {
+        return $this->current;
     }
 
     /**
