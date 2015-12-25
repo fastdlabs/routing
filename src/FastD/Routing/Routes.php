@@ -36,113 +36,135 @@ class Routes
     }
 
     /**
-     * @param $path
-     * @param $callback
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function get($path, $callback)
+    public static function get($path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback, ['GET']);
+        return self::createRoute($path, $callback, ['GET'], $defaults, $requirements);
     }
 
     /**
-     * @param $path
-     * @param $callback
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function post($path, $callback)
+    public static function post($path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback, ['POST']);
+        return self::createRoute($path, $callback, ['POST'], $defaults, $requirements);
     }
 
     /**
-     * @param $path
-     * @param $callback
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function put($path, $callback)
+    public static function put($path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback, ['PUT']);
+        return self::createRoute($path, $callback, ['PUT'], $defaults, $requirements);
     }
 
     /**
-     * @param $path
-     * @param $callback
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function delete($path, $callback)
+    public static function delete($path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback, ['DELETE']);
+        return self::createRoute($path, $callback, ['DELETE'], $defaults, $requirements);
     }
 
     /**
-     * @param $path
-     * @param $callback
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function head($path, $callback)
+    public static function head($path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback, ['HEAD']);
+        return self::createRoute($path, $callback, ['HEAD'], $defaults, $requirements);
     }
 
     /**
-     * @param $path
-     * @param $callback
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function options($path, $callback)
+    public static function options($path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback, ['OPTIONS']);
+        return self::createRoute($path, $callback, ['OPTIONS'], $defaults, $requirements);
     }
 
     /**
-     * @param $path
-     * @param $callback
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function trace($path, $callback)
+    public static function trace($path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback, ['TRACE']);
+        return self::createRoute($path, $callback, ['TRACE'], $defaults, $requirements);
     }
 
     /**
-     * @param $path
-     * @param $callback
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function patch($path, $callback)
+    public static function patch($path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback, ['PATCH']);
+        return self::createRoute($path, $callback, ['PATCH'], $defaults, $requirements);
     }
 
     /**
-     * @param $path
-     * @param $callback
+     * @param       $path
+     * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function any($path, $callback)
+    public static function any($path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback);
+        return self::createRoute($path, $callback, $defaults, $requirements);
     }
 
     /**
      * @param array $methods
      * @param       $path
      * @param       $callback
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function match(array $methods = [], $path, $callback)
+    public static function match(array $methods = [], $path, $callback, $defaults = [], $requirements = [])
     {
-        return self::createRoute($path, $callback, $methods);
+        return self::createRoute($path, $callback, $methods, $defaults, $requirements);
     }
 
     /**
      * @param       $path
      * @param       $callback
      * @param array $methods
+     * @param array $defaults
+     * @param array $requirements
      * @return \FastD\Routing\Route
      */
-    public static function createRoute($path, $callback, $methods = ['ANY'])
+    public static function createRoute($path, $callback, $methods = ['ANY'], $defaults = [], $requirements = [])
     {
         $name = $path;
 
@@ -151,7 +173,7 @@ class Routes
             $path = $path[0];
         }
 
-        return self::getRouter()->addRoute($name, $path, $callback, [], [], $methods);
+        return self::getRouter()->addRoute($name, $path, $callback, $defaults, $requirements, $methods);
     }
 
     /**
