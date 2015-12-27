@@ -30,6 +30,5 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
         $route3 = new Route('/name', '3');
         $route3->setFormats(['json']);
         $this->assertEquals('/name', $route3->generateUrl());
-
     }
 }

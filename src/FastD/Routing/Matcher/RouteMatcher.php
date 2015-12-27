@@ -137,11 +137,11 @@ class RouteMatcher implements RouteMatcherInterface
      */
     public static function match(
         $path,
-        $method,
-        $format,
-        $host,
-        $scheme,
-        $ip,
+        $method = null,
+        $format = null,
+        $host = null,
+        $scheme = null,
+        $ip = null,
         RouteCollectionInterface $routeCollectionInterface
     ) {
         $path = self::getRealPath($path);
