@@ -13,7 +13,9 @@
 
 namespace FastD\Routing\Exception;
 
-class RouteException extends \Exception
-{
-
-}
+/**
+ * Class RouteException
+ *
+ * @package FastD\Routing\Exception
+ */
+class RouteException extends \Exception {}

@@ -12,6 +12,7 @@
 
 namespace FastD\Routing;
 
+use FastD\Http\Request;
 use FastD\Routing\Matcher\RouteMatcher;
 use FastD\Routing\Exception\RouteException;
 
@@ -115,13 +116,34 @@ class Router extends RouteCollection
     }
 
     /**
-     * @param $path
+     * @param      $path
+     * @param null $method
+     * @param null $format
+     * @param null $host
+     * @param null $scheme
+     * @param null $ip
      * @return Route
-     * @throws Exception\RouteException
+     * @throws \Exception
      */
-    public function match($path)
+    public function match($path, $method = null, $format = null, $host = null, $scheme =null, $ip = null)
     {
-        return RouteMatcher::match($path, $this);
+        return RouteMatcher::match($path, $method, $format, $host, $scheme, $ip, $this);
+    }
+
+    /**
+     * @param Request $request
+     * @return Route
+     */
+    public function handleRequest(Request $request)
+    {
+        return $this->match(
+            $request->getPathInfo(),
+            $request->getMethod(),
+            $request->getFormat(),
+            $request->getHost(),
+            $request->getScheme(),
+            $request->getClientIp()
+        );
     }
 
     /**

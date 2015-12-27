@@ -1,16 +1,16 @@
 #FastD Routing
 
-##Requirement
+##要求
 
-* PHP 5.4+
+* PHP 7+
 
 ##Composer
 
 ```
-composer require fastd/routing "1.0.x-dev"
+composer require "fastd/routing:2.0-dev"
 ```
 
-##Usage
+##使用
 
 ```php
 $router = new FastD\Routing\Router();

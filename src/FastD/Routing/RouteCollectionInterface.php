@@ -41,7 +41,7 @@ interface RouteCollectionInterface
 
     /**
      * @param $name
-     * @return RouteInterface
+     * @return Route
      */
     public function getRoute($name);
 }

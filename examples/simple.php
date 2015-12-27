@@ -14,7 +14,6 @@
 
 
 include __DIR__ . '/../vendor/autoload.php';
-include __DIR__ . '/../src/FastD/Routing/Routes.php';
 
 $router = new \FastD\Routing\Router();
 
@@ -32,7 +31,6 @@ $router->addRoute('demo', '/', null);
 $route = $router->match('/');
 
 echo '<pre>';
-echo $router->generateUrl('demoroot2');
 print_r($route);
 
 

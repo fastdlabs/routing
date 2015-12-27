@@ -13,7 +13,6 @@
 namespace FastD\Routing;
 
 use FastD\Routing\Exception\RouteException;
-use FastD\Routing\Matcher\RouteMatcher;
 
 /**
  * Class Route
@@ -90,7 +89,7 @@ class Route
     /**
      * @var string
      */
-    protected $host;
+    protected $host = [];
 
     /**
      * Route constructor.
@@ -355,7 +354,7 @@ class Route
 
     /**
      * @param $schema
-     * @return RouteInterface
+     * @return Route
      */
     public function setSchema($schema)
     {
@@ -388,22 +387,13 @@ class Route
      *
      * {@inheritdoc}
      * @param array $parameters
-     * @return RouteInterface
+     * @return Route
      */
     public function mergeParameters(array $parameters)
     {
         $this->setParameters(array_merge($this->parameters, $parameters));
 
         return $this;
-    }
-
-    /**
-     * @param $path
-     * @return int
-     */
-    public function match($path)
-    {
-        return RouteMatcher::matchRoute($path, $this);
     }
 
     /**
@@ -424,6 +414,7 @@ class Route
     {
         $this->arguments = [];
         $this->callback = null;
+        $this->method = ['ANY'];
         $this->defaults = [];
         $this->format = [];
         $this->host = null;
