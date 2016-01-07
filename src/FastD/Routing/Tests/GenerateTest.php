@@ -38,8 +38,12 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
         $route = new Route('/{name}', function () {}, ['name' => 'janhuang']);
         $this->assertEquals('/janhuang', RouteGenerator::generateUrl($route));
         $route = new Route('/{name}', function () {}, ['name' => '']);
-        $this->assertEquals('/', RouteGenerator::generateUrl($route));
+        $route->setFormats(['html', 'json']);
+        $this->assertEquals('/', RouteGenerator::generateUrl($route, [], 'html'));
         $route = new Route('/name/{name}', function () {}, ['name' => '']);
         $this->assertEquals('/name/', RouteGenerator::generateUrl($route));
+        $route = new Route('/', function () {});
+        $route->setFormats(['html', 'json']);
+        $this->assertEquals('/', RouteGenerator::generateUrl($route, [], 'html'));
     }
 }

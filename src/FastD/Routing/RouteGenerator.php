@@ -37,6 +37,11 @@ class RouteGenerator
         $host = '' == $route->getHost() ? '' : $route->getSchema() . '://' . $route->getHost();
 
         if (array() === $route->getParameters()) {
+            if (substr($route->getPath(), -1) != '/' && in_array($format, $route->getFormats())) {
+                $format = '.' . $format;
+            } else {
+                $format = '';
+            }
             return $host . $route->getPath() . $format . (array() === $parameters ? '' : '?' . http_build_query($parameters));
         }
 
@@ -65,7 +70,7 @@ class RouteGenerator
             );
         }
 
-        if ($format && in_array($format, $route->getFormats()) && substr($routeUrl, -1) != '/') {
+        if (substr($routeUrl, -1) !== '/' && in_array($format, $route->getFormats())) {
             $format = '.' . $format;
         } else {
             $format = '';

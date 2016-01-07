@@ -15,23 +15,18 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-$router = new \FastD\Routing\Router();
+use FastD\Routing\Route;
+use FastD\Routing\RouteGenerator;
 
-$router->with('/demo', function () use ($router) {
-    $router->addRoute('root', '/', null);
-    $router->addRoute('root2', '/2', null);
+$route4 = new Route('/name/{name}', '3', ['name' => 'jan']);
+$route4->setFormats(['json']);
+echo RouteGenerator::generateUrl($route4, ['name' => 'janhuang'], 'json') . '<br />';
+echo RouteGenerator::generateUrl($route4, ['name' => 'janhuang'], 'jsp');
+//$this->assertEquals('/name/jan', RouteGenerator::generateUrl($route4));
+//$this->assertEquals('/name/janhuang', RouteGenerator::generateUrl($route4, ['name' => 'janhuang']));
+//$this->assertEquals('/name/janhuang.json', RouteGenerator::generateUrl($route4, ['name' => 'janhuang'], 'json'));
+//$this->assertEquals('/name/janhuang.json', RouteGenerator::generateUrl($route4, ['name' => 'janhuang'], 'jsp'));
 
-    $router->with('/demo2', function () use ($router) {
-        $router->addRoute('demoroot2', '/demo3', null);
-    });
-});
-
-$router->addRoute('demo', '/', null);
-
-$route = $router->match('/');
-
-echo '<pre>';
-print_r($route);
 
 
 
