@@ -26,18 +26,10 @@ class MatchTest extends \PHPUnit_Framework_TestCase
 
         $route3 = new Route('/name/{name}', '3', ['name' => 'jan']);
         $this->assertRegExp($route3->getPathRegex(), '/name/jan');
-        $this->assertTrue($route3->match('/name'));
         $this->assertEquals(['name' => 'jan'], $route3->getParameters());
-        $this->assertTrue($route3->match('/name/janhuang'));
-        $this->assertEquals(['name' => 'janhuang'], $route3->getParameters());
 
 
         $route4 = new Route('/name/{name}/{age}', '3', ['age' => 12]);
         $this->assertRegExp($route4->getPathRegex(), '/name/jan/13');
-        $this->assertFalse($route4->match('/name'));
-        $this->assertTrue($route4->match('/name/janhuang/13'));
-        $this->assertEquals(['name' => 'janhuang', 'age' => 13], $route4->getParameters());
-        $this->assertTrue($route4->match('/name/janhuang'));
-        $this->assertEquals(['name' => 'janhuang', 'age' => 12], $route4->getParameters());
     }
 }

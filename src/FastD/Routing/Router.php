@@ -44,6 +44,11 @@ class Router extends RouteCollection
     protected $matcher;
 
     /**
+     * @var string
+     */
+    protected $host;
+
+    /**
      * Router constructor.
      */
     public function __construct()
@@ -128,6 +133,25 @@ class Router extends RouteCollection
     public function match($path, $method = null, $format = null, $host = null, $scheme =null, $ip = null)
     {
         return RouteMatcher::match($path, $method, $format, $host, $scheme, $ip, $this);
+    }
+
+    /**
+     * @param $host
+     * @return $this
+     */
+    public function bindHost($host)
+    {
+        $this->host = $host;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
     }
 
     /**

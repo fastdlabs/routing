@@ -247,8 +247,14 @@ class Route
         if (preg_match_all('/\{(\w+)\}/i', $route, $match)) {
             foreach ($match[1] as $val) {
                 $pattern = '?P<' . $val . '>' . (isset($this->requirements[$val]) ? $this->requirements[$val] : '.+');
-                $route = str_replace('{' . $val . '}', '{1}(' . $pattern . ')', $route);
-                $this->parameters[$val] = isset($this->defaults[$val]) ? $this->defaults[$val] : null;
+                $default = null;
+                $limited = '{1}';
+                if (array_key_exists($val, $this->getDefaults())) {
+                    $default = $this->defaults[$val];
+                    $limited = '{0,1}';
+                }
+                $this->parameters[$val] = $default;
+                $route = str_replace('{' . $val . '}', $limited . '(' . $pattern . ')', $route);
             }
         }
 

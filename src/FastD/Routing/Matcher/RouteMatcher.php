@@ -165,7 +165,6 @@ class RouteMatcher implements RouteMatcherInterface
             self::matchMethod($method, $route) &&
             self::matchFormat($format, $route) &&
             self::matchScheme($scheme, $route) &&
-            self::matchHost($host, $route) &&
             self::matchIp($ip, $route)
         ) {
             return $route;

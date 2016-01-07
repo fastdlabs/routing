@@ -45,7 +45,15 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
         $route = new Route('/{name}/{age}', function () {}, ['age' => 18]);
         $this->assertEquals(['name' => null, 'age' => 18], $route->getParameters());
-        $this->assertEquals('/^\/{1}(?P<name>.+)\/{1}(?P<age>.+)$/', $route->getPathRegex());
+        $this->assertEquals('/^\/{1}(?P<name>.+)\/{0,1}(?P<age>.+)$/', $route->getPathRegex());
         $this->assertRegExp($route->getPathRegex(), '/janhuang/18');
+    }
+
+    public function testRouteDefault()
+    {
+        $route = new Route('/{name}', function () {}, ['name' => 'janhuang']);
+        $this->assertRegExp($route->getPathRegex(), '/123');
+        $this->assertRegExp($route->getPathRegex(), '/');
+        $this->assertRegExp($route->getPathRegex(), ' ');
     }
 }
