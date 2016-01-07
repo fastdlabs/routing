@@ -15,6 +15,7 @@
 namespace FastD\Routing\Tests;
 
 use FastD\Routing\Route;
+use FastD\Routing\RouteGenerator;
 
 class GenerateTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,13 +23,23 @@ class GenerateTest extends \PHPUnit_Framework_TestCase
     {
         $route4 = new Route('/name/{name}', '3', ['name' => 'jan']);
         $route4->setFormats(['json']);
-        $this->assertEquals('/name/jan', $route4->generateUrl());
-        $this->assertEquals('/name/janhuang', $route4->generateUrl(['name' => 'janhuang']));
-        $this->assertEquals('/name/janhuang.json', $route4->generateUrl(['name' => 'janhuang'], 'json'));
-        $this->assertEquals('/name/janhuang', $route4->generateUrl(['name' => 'janhuang'], 'jsp'));
+        $this->assertEquals('/name/jan', RouteGenerator::generateUrl($route4));
+        $this->assertEquals('/name/janhuang', RouteGenerator::generateUrl($route4, ['name' => 'janhuang']));
+        $this->assertEquals('/name/janhuang.json', RouteGenerator::generateUrl($route4, ['name' => 'janhuang'], 'json'));
+        $this->assertEquals('/name/janhuang', RouteGenerator::generateUrl($route4, ['name' => 'janhuang'], 'jsp'));
 
         $route3 = new Route('/name', '3');
         $route3->setFormats(['json']);
-        $this->assertEquals('/name', $route3->generateUrl());
+        $this->assertEquals('/name', RouteGenerator::generateUrl($route3));
+    }
+
+    public function testGenerateDefaultArgs()
+    {
+        $route = new Route('/{name}', function () {}, ['name' => 'janhuang']);
+        $this->assertEquals('/janhuang', RouteGenerator::generateUrl($route));
+        $route = new Route('/{name}', function () {}, ['name' => '']);
+        $this->assertEquals('/', RouteGenerator::generateUrl($route));
+        $route = new Route('/name/{name}', function () {}, ['name' => '']);
+        $this->assertEquals('/name/', RouteGenerator::generateUrl($route));
     }
 }

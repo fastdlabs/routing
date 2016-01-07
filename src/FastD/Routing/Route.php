@@ -403,17 +403,6 @@ class Route
     }
 
     /**
-     * @param array $parameters
-     * @param null  $format
-     * @return string
-     * @throws RouteException
-     */
-    public function generateUrl(array $parameters = [], $format = null)
-    {
-        return RouteGenerator::generateUrl($this, $parameters, $format);
-    }
-
-    /**
      * @return Route
      */
     public function __clone()
