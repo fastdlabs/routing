@@ -14,22 +14,23 @@
 
 namespace FastD\Routing\Tests;
 
+use FastD\Routing\Matcher\RouteMatcher;
 use FastD\Routing\Route;
 
 class MatchTest extends \PHPUnit_Framework_TestCase
 {
     public function testMatch()
     {
-        $route1 = new Route('/', '1');
-        $route2 = new Route('/name', '2');
+        $route = new Route('/name/{name}', '3', ['name' => 'jan']);
+        $this->assertRegExp($route->getPathRegex(), '/name/jan');
+        $this->assertEquals(['name' => 'jan'], $route->getParameters());
 
 
-        $route3 = new Route('/name/{name}', '3', ['name' => 'jan']);
-        $this->assertRegExp($route3->getPathRegex(), '/name/jan');
-        $this->assertEquals(['name' => 'jan'], $route3->getParameters());
-
-
-        $route4 = new Route('/name/{name}/{age}', '3', ['age' => 12]);
-        $this->assertRegExp($route4->getPathRegex(), '/name/jan/13');
+        $route = new Route('/name/{name}/{age}', '3', ['age' => 12]);
+        $this->assertRegExp($route->getPathRegex(), '/name/jan/13');
+        RouteMatcher::matchRoute('/name/jan', $route);
+        $this->assertEquals($route->getParameters(), ['name' => 'jan', 'age' => 12]);
+        RouteMatcher::matchRoute('/name/jan/13', $route);
+        $this->assertEquals($route->getParameters(), ['name' => 'jan', 'age' => 13]);
     }
 }

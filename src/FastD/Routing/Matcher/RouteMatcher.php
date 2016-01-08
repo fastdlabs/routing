@@ -65,8 +65,11 @@ class RouteMatcher implements RouteMatcherInterface
 
         $data = [];
         foreach ($route->getParameters() as $key => $value) {
-            $data[$key] = $match[$key];
+            if (!empty($match[$key])) {
+                $data[$key] = $match[$key];
+            }
         }
+
         $route->mergeParameters($data);
 
         unset($match);
