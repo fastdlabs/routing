@@ -28,6 +28,9 @@ echo RouteGenerator::generateUrl($route4, ['name' => 'janhuang'], 'jsp');
 //$this->assertEquals('/name/janhuang.json', RouteGenerator::generateUrl($route4, ['name' => 'janhuang'], 'jsp'));
 
 
+$router = new \FastD\Routing\Router();
+
+$router->setRoute(new Route('/', 'root'));
 
 
 /**
