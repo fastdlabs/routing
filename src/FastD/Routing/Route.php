@@ -82,7 +82,7 @@ class Route
     /**
      * @var string
      */
-    protected $schemes = [];
+    protected $scheme = 'http';
 
     /**
      * @var string
@@ -116,8 +116,6 @@ class Route
 
         $this->pathRegex = $this->parsePathRegex();
 
-        $this->name = trim(str_replace('/', '_', $path), '_') . ':' . strtolower($this->method);
-
         return $this;
     }
 
@@ -130,7 +128,6 @@ class Route
     }
 
     /**
-     * @deprecated
      * @param $name
      * @return $this
      */
@@ -341,18 +338,18 @@ class Route
     /**
      * @return string
      */
-    public function getSchemes()
+    public function getScheme()
     {
-        return $this->schemes;
+        return $this->scheme;
     }
 
     /**
      * @param $scheme
      * @return Route
      */
-    public function setSchemes($scheme)
+    public function setScheme($scheme)
     {
-        $this->schemes = $scheme;
+        $this->scheme = $scheme;
 
         return $this;
     }
@@ -402,7 +399,7 @@ class Route
         $this->formats = [];
         $this->host = null;
         $this->group = '';
-        $this->schemes = '';
+        $this->scheme = '';
         $this->ips = [];
         $this->name = '';
         $this->parameters = [];

@@ -64,14 +64,15 @@ class Router extends RouteCollection
     }
 
     /**
-     * @param array|string $method
+     * @param $name
+     * @param $method
      * @param $path
      * @param null $callback
      * @param array $defaults
      * @param array $requirements
      * @return Route
      */
-    public function addRoute($method, $path, $callback = null, array $defaults = [], array $requirements = [])
+    public function addRoute($name, $method, $path, $callback = null, array $defaults = [], array $requirements = [])
     {
         $with = implode('', $this->with);
 
@@ -86,6 +87,7 @@ class Router extends RouteCollection
         $route->setRequirements($requirements);
         $route->setMethod($method);
         $route->setPath($path);
+        $route->setName($name);
         $route->setGroup($with);
         $route->setCallback($callback);
 
@@ -150,18 +152,19 @@ class Router extends RouteCollection
     }
 
     /**
-     * @param       $name
+     * @param $name
      * @param array $parameters
-     * @param null  $format
+     * @param null $format
      * @return string
-     * @throws Exception\RouteException
-     * @throws RouteException
+     * @throws \Exception
      */
     public function generateUrl($name, array $parameters = [], $format = null)
     {
+        $route = $this->getRoute($name);
+
         $parameters = array_merge($route->getDefaults(), $parameters);
 
-        $host = '' == $route->getHost() ? '' : $route->getSchema() . '://' . $route->getHost();
+        $host = '' == $route->getHost() ? '' : ($route->getScheme() . '://' . $route->getHost());
 
         if (array() === $route->getParameters()) {
             if (substr($route->getPath(), -1) != '/' && in_array($format, $route->getFormats())) {
@@ -188,7 +191,7 @@ class Router extends RouteCollection
         $routeUrl = str_replace($search, $replacer, $route->getPath());
 
         if (!preg_match($route->getPathRegex(), $routeUrl, $match)) {
-            throw new RouteException(
+            throw new \Exception(
                 sprintf(
                     'Route "%s" generator fail. Your should set route parameters ["%s"] value.',
                     $route->getName(),

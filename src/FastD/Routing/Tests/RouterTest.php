@@ -30,7 +30,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testAddRoute()
     {
-        $this->router->addRoute('GET', '/test');
+        $this->router->addRoute('test:get', 'GET', '/test');
 
         $this->assertEquals([
             '/' => [
@@ -38,7 +38,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             ]
         ], $this->router->getGroup());
 
-        $this->router->addRoute('GET', '/name');
+        $this->router->addRoute('name:get', 'GET', '/name');
 
         $this->assertEquals([
             '/' => [
@@ -48,7 +48,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         ], $this->router->getGroup());
 
         $this->router->group('/base', function () {
-            $this->router->addRoute('GET', '/name');
+            $this->router->addRoute('base_name:get', 'GET', '/name');
         });
 
         $this->assertEquals([
@@ -63,7 +63,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $this->router->group('/base', function () {
             $this->router->group('/second', function () {
-                $this->router->addRoute('GET', '/name');
+                $this->router->addRoute('base_second_name:get', 'GET', '/name');
             });
         });
 
@@ -89,13 +89,13 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testRouteDiffMethod()
     {
-        $this->router->addRoute('GET', '/test');
+        $this->router->addRoute('test:get', 'GET', '/test');
 
         $this->assertEquals($this->router->getRoute('test:get'), $this->router->getCurrentRoute());
 
         $this->assertEquals($this->router->getRoute('test:get')->getName(), 'test:get');
 
-        $this->router->addRoute('POST', '/test');
+        $this->router->addRoute('test:post', 'POST', '/test');
 
         $this->assertEquals([
             '/' => [
@@ -107,14 +107,14 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->router->getRoute('test:get')->getMethod(), 'GET');
         $this->assertEquals($this->router->getRoute('test:post')->getMethod(), 'POST');
 
-        $this->router->addRoute('PUT', '/test');
+        $this->router->addRoute('test:put', 'PUT', '/test');
 
         $this->assertEquals($this->router->getRoute('test:put')->getMethod(), 'PUT');
     }
 
     public function testRouterDispatch()
     {
-        $this->router->addRoute('GET', '/test', function () {
+        $this->router->addRoute('test:get', 'GET', '/test', function () {
             return 'hello world';
         });
 
@@ -122,12 +122,28 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($callback(), 'hello world');
 
-        $this->router->addRoute('GET', '/{name}', function () {
+        $this->router->addRoute('name:get', 'GET', '/{name}', function () {
             return 'hello jan';
         });
 
         $callback = $this->router->dispatch('GET', '/janhuang');
 
         $this->assertEquals($callback(), 'hello jan');
+    }
+
+    public function testGenerate()
+    {
+        $this->router->addRoute('test:get', 'GET', '/test', function () {
+            return 'hello world';
+        });
+
+        $this->assertEquals($this->router->generateUrl('test:get'), '/test');
+
+        $this->router->addRoute('name:get', 'GET', '/{name}')->setFormats(['json', 'php']);
+
+        $this->assertEquals('/test', $this->router->generateUrl('name:get', ['name' => 'test']));
+
+        $this->assertEquals('/janhuang', $this->router->generateUrl('name:get', ['name' => 'janhuang']));
+        $this->assertEquals('/janhuang.json', $this->router->generateUrl('name:get', ['name' => 'janhuang'], 'json'));
     }
 }
