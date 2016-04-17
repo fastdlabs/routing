@@ -23,6 +23,8 @@ class Routes
      */
     private function __construct(){}
 
+    private function __clone(){}
+
     /**
      * @return \FastD\Routing\Router
      */

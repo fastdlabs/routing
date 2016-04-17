@@ -12,10 +12,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Http\Request;
-use FastD\Routing\Matcher\RouteMatcher;
-use FastD\Routing\Exception\RouteException;
-
 /**
  * Class Router
  *
@@ -26,7 +22,7 @@ class Router extends RouteCollection
     /**
      * @var Route
      */
-    protected $routeProperty;
+    protected $route;
 
     /**
      * @var array
@@ -39,70 +35,26 @@ class Router extends RouteCollection
     protected $group = [];
 
     /**
-     * @var RouteMatcher
-     */
-    protected $matcher;
-
-    /**
-     * @var string
-     */
-    protected $host;
-
-    /**
      * Router constructor.
      */
     public function __construct()
     {
-        $this->routeProperty = new Route(null, null);
-
-        $this->matcher = new RouteMatcher($this);
+        $this->route = new Route(null, null, null);
     }
 
     /**
-     * @param null  $name
-     * @param       $path
-     * @param       $callback
-     * @param array $defaults
-     * @param array $requirements
-     * @param array $methods
-     * @param array $schemas
-     * @param null  $host
-     * @return Route
+     * @return array
      */
-    public function addRoute($name = null, $path, $callback, array $defaults = [], array $requirements = [], array $methods = [], array $schemas = ['http'], $host = null)
+    public function getGroup()
     {
-        $route = clone $this->routeProperty;
-        $with = implode('', $this->with);
-        $path = str_replace('//', '/', $with . $path);
-        $route->setDefaults($defaults);
-        $route->setRequirements($requirements);
-        $route->setMethods($methods);
-        $route->setPath($path);
-        $route->setName($name);
-        $route->setRouteWith($with);
-        $route->setCallback($callback);
-        $route->setSchema($schemas);
-        $route->setHost($host);
-        $this->setRoute($route);
-        $this->group[$with][] = $name;
-        return $this->getCurrentRoute();
-    }
-
-    /**
-     * Get route collections.
-     *
-     * @return RouteCollection
-     */
-    public function getCollection()
-    {
-        return $this;
+        return $this->group;
     }
 
     /**
      * @param          $path
      * @param \Closure $callback
      */
-    public function with($path, \Closure $callback)
+    public function group($path, \Closure $callback)
     {
         array_push($this->with, $path);
 
@@ -112,62 +64,89 @@ class Router extends RouteCollection
     }
 
     /**
-     * @param $name
-     * @return bool|\Closure
+     * @param array|string $method
+     * @param $path
+     * @param null $callback
+     * @param array $defaults
+     * @param array $requirements
+     * @return Route
      */
-    public function dispatch($name)
+    public function addRoute($method, $path, $callback = null, array $defaults = [], array $requirements = [])
     {
-        return $this->getRoute($name)->getCallback();
+        $with = implode('', $this->with);
+
+        if (empty($with)) {
+            $with = '/';
+        }
+
+        $path = str_replace('//', '/', $with . $path);
+
+        $route = clone $this->route;
+        $route->setDefaults($defaults);
+        $route->setRequirements($requirements);
+        $route->setMethod($method);
+        $route->setPath($path);
+        $route->setGroup($with);
+        $route->setCallback($callback);
+
+        $this->setRoute($route);
+        $this->group[$with][] = $route->getName();
+
+        return $this->getCurrentRoute();
     }
 
     /**
-     * @param      $path
      * @param null $method
-     * @param null $format
-     * @param null $host
-     * @param null $scheme
-     * @param null $ip
-     * @return Route
+     * @param $path
+     * @return \Closure
      * @throws \Exception
      */
-    public function match($path, $method = null, $format = null, $host = null, $scheme =null, $ip = null)
+    public function dispatch($method = null, $path)
     {
-        return RouteMatcher::match($path, $method, $format, $host, $scheme, $ip, $this);
-    }
+        try {
+            $alias = $path . ':' . strtolower($method);
+            return $this->getRoute($alias)->getCallback();
+        } catch (\Exception $e) {
+            $match = function ($path, Route $route) {
+                if (!preg_match($route->getPathRegex(), $path, $match)) {
+                    if (array() === $route->getParameters() || array() === $route->getDefaults()) {
+                        return false;
+                    }
 
-    /**
-     * @param $host
-     * @return $this
-     */
-    public function bindHost($host)
-    {
-        $this->host = $host;
+                    $parameters = array_slice(
+                        $route->getDefaults(),
+                        (substr_count($path, '/') - substr_count($route->getPath(), '/'))
+                    );
 
-        return $this;
-    }
+                    $path = str_replace('//', '/', $path . '/' . implode('/', array_values($parameters)));
 
-    /**
-     * @return string
-     */
-    public function getHost()
-    {
-        return $this->host;
-    }
+                    unset($parameters);
 
-    /**
-     * @param Request $request
-     * @return Route
-     */
-    public function handleRequest(Request $request)
-    {
-        return $this->match(
-            $request->getPathInfo(),
-            $request->getMethod(),
-            $request->getFormat(),
-            $request->getHost(),
-            $request->getScheme(),
-            $request->getClientIp()
-        );
+                    if (!preg_match($route->getPathRegex(), $path, $match)) {
+                        return false;
+                    }
+                }
+
+                $data = [];
+                foreach ($route->getParameters() as $key => $value) {
+                    if (!empty($match[$key])) {
+                        $data[$key] = $match[$key];
+                    }
+                }
+                $route->mergeParameters($data);
+
+                return true;
+            };
+
+            foreach ($this as $route) {
+                if (true === $match($path, $route)) {
+                    unset($match);
+                    return $route->getCallback();
+                }
+            }
+        }
+
+        throw new \Exception(sprintf('Not found "%s"', $path));
     }
 
     /**
@@ -180,6 +159,52 @@ class Router extends RouteCollection
      */
     public function generateUrl($name, array $parameters = [], $format = null)
     {
-        return RouteGenerator::generateUrl($this->getRoute($name), $parameters, $format);
+        $parameters = array_merge($route->getDefaults(), $parameters);
+
+        $host = '' == $route->getHost() ? '' : $route->getSchema() . '://' . $route->getHost();
+
+        if (array() === $route->getParameters()) {
+            if (substr($route->getPath(), -1) != '/' && in_array($format, $route->getFormats())) {
+                $format = '.' . $format;
+            } else {
+                $format = '';
+            }
+            return $host . $route->getPath() . $format . (array() === $parameters ? '' : '?' . http_build_query($parameters));
+        }
+
+        $replacer = $parameters;
+        $keys = array_keys($parameters);
+        $search = array_map(
+            function ($name) use (&$parameters) {
+                unset($parameters[$name]);
+
+                return '{' . $name . '}';
+            },
+            $keys
+        );
+
+        unset($keys);
+
+        $routeUrl = str_replace($search, $replacer, $route->getPath());
+
+        if (!preg_match($route->getPathRegex(), $routeUrl, $match)) {
+            throw new RouteException(
+                sprintf(
+                    'Route "%s" generator fail. Your should set route parameters ["%s"] value.',
+                    $route->getName(),
+                    implode('", "', array_keys($route->getParameters()))
+                ), 500
+            );
+        }
+
+        if (substr($routeUrl, -1) !== '/' && in_array($format, $route->getFormats())) {
+            $format = '.' . $format;
+        } else {
+            $format = '';
+        }
+
+        unset($route);
+
+        return $host . $routeUrl . $format . (array() === $parameters ? '' : '?' . http_build_query($parameters));
     }
 }

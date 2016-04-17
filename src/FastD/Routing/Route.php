@@ -12,8 +12,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Routing\Exception\RouteException;
-
 /**
  * Class Route
  *
@@ -34,12 +32,12 @@ class Route
     /**
      * @var string
      */
-    protected $with;
+    protected $group;
 
     /**
-     * @var string|array
+     * @var array
      */
-    protected $format = ['php'];
+    protected $formats = ['php'];
 
     /**
      * @var array
@@ -64,7 +62,7 @@ class Route
     /**
      * @var string|array
      */
-    protected $method = ['ANY'];
+    protected $method = 'ANY';
 
     /**
      * @var \Closure
@@ -84,7 +82,7 @@ class Route
     /**
      * @var string
      */
-    protected $schema = [];
+    protected $schemes = [];
 
     /**
      * @var string
@@ -93,32 +91,19 @@ class Route
 
     /**
      * Route constructor.
-     *
-     * @param       $path
-     * @param       $callback
+     * @param $method
+     * @param $path
+     * @param $callback
      * @param array $defaults
      * @param array $requirements
-     * @param array $methods
-     * @param array $schemas
-     * @param null  $host
      */
-    public function __construct(
-        $path,
-        $callback,
-        array $defaults = [],
-        array $requirements = [],
-        array $methods = [],
-        array $schemas = ['http'],
-        $host = null
-    ) {
+    public function __construct($method, $path, $callback, array $defaults = [], array $requirements = [])
+    {
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
-        $this->setMethods($methods);
+        $this->setMethod($method);
         $this->setPath($path);
-        $this->setName($path);
         $this->setCallback($callback);
-        $this->setSchema($schemas);
-        $this->setHost($host);
     }
 
     /**
@@ -130,6 +115,8 @@ class Route
         $this->path = $path;
 
         $this->pathRegex = $this->parsePathRegex();
+
+        $this->name = trim(str_replace('/', '_', $path), '_') . ':' . strtolower($this->method);
 
         return $this;
     }
@@ -143,6 +130,7 @@ class Route
     }
 
     /**
+     * @deprecated
      * @param $name
      * @return $this
      */
@@ -165,7 +153,7 @@ class Route
      * @param array|string $method
      * @return $this
      */
-    public function setMethods(array $method)
+    public function setMethod($method)
     {
         $this->method = $method;
 
@@ -175,7 +163,7 @@ class Route
     /**
      * @return array
      */
-    public function getMethods()
+    public function getMethod()
     {
         return $this->method;
     }
@@ -219,12 +207,12 @@ class Route
     }
 
     /**
-     * @param array $format
+     * @param array $formats
      * @return $this
      */
-    public function setFormats(array $format)
+    public function setFormats(array $formats)
     {
-        $this->format = $format;
+        $this->formats = $formats;
 
         return $this;
     }
@@ -234,7 +222,7 @@ class Route
      */
     public function getFormats()
     {
-        return $this->format;
+        return $this->formats;
     }
 
     /**
@@ -353,29 +341,29 @@ class Route
     /**
      * @return string
      */
-    public function getSchema()
+    public function getSchemes()
     {
-        return $this->schema;
+        return $this->schemes;
     }
 
     /**
-     * @param $schema
+     * @param $scheme
      * @return Route
      */
-    public function setSchema($schema)
+    public function setSchemes($scheme)
     {
-        $this->schema = $schema;
+        $this->schemes = $scheme;
 
         return $this;
     }
 
     /**
-     * @param $routeWith
+     * @param $group
      * @return $this
      */
-    public function setRouteWith($routeWith)
+    public function setGroup($group)
     {
-        $this->with = $routeWith;
+        $this->group = $group;
 
         return $this;
     }
@@ -383,9 +371,9 @@ class Route
     /**
      * @return string
      */
-    public function getRouteWith()
+    public function getGroup()
     {
-        return $this->with;
+        return $this->group;
     }
 
     /**
@@ -409,12 +397,12 @@ class Route
     {
         $this->arguments = [];
         $this->callback = null;
-        $this->method = ['ANY'];
+        $this->method = 'ANY';
         $this->defaults = [];
-        $this->format = [];
+        $this->formats = [];
         $this->host = null;
-        $this->with = '';
-        $this->schema = '';
+        $this->group = '';
+        $this->schemes = '';
         $this->ips = [];
         $this->name = '';
         $this->parameters = [];
@@ -422,5 +410,10 @@ class Route
         $this->pathRegex = '';
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return "Route: {$this->group}{$this->path}\n";
     }
 }

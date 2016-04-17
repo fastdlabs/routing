@@ -14,17 +14,15 @@
 
 namespace FastD\Routing;
 
-use FastD\Routing\Exception\RouteException;
-
 /**
  * Class RouteCollection
  *
  * @package FastD\Routing
  */
-class RouteCollection implements RouteCollectionInterface, \Countable, \Iterator
+class RouteCollection implements \Iterator, \Countable
 {
     /**
-     * @var array
+     * @var Route[]
      */
     protected $routes = [];
 
@@ -34,37 +32,42 @@ class RouteCollection implements RouteCollectionInterface, \Countable, \Iterator
     protected $map = [];
 
     /**
-     * @var
+     * @var Route
      */
     protected $current;
 
     /**
+     * @var string
+     */
+    protected $index;
+
+    /**
      * @param $name
      * @return Route
-     * @throws RouteException
+     * @throws \Exception
      */
-    public function getRoute($name)
+    public function getRoute($name): Route
     {
         if (!$this->hasRoute($name)) {
-            throw new RouteException(sprintf('Route "%s" is not exists.', $name));
+            throw new \Exception(sprintf('Route "%s" is not exists.', $name));
         }
 
-        return $this->routes[$this->current];
+        return $this->routes[$this->index];
     }
 
     /**
      * @param $name
      * @return bool
      */
-    public function hasRoute($name)
+    public function hasRoute($name): bool
     {
         if (isset($this->map[$name])) {
-            $this->current = $this->map[$name];
+            $this->index = $this->map[$name];
             return true;
         }
 
         if (isset($this->routes[$name])) {
-            $this->current = $name;
+            $this->index = $name;
             return true;
         }
 
@@ -73,13 +76,16 @@ class RouteCollection implements RouteCollectionInterface, \Countable, \Iterator
 
     /**
      * @param Route $route
-     * @return $this
+     * @return RouteCollection
      */
-    public function setRoute(Route $route)
+    public function setRoute(Route $route): RouteCollection
     {
-        $this->map[$route->getName()] = $route->getPath();
-        $this->routes[$route->getPath()] = $route;
+        $alias = $route->getPath() . ':' . strtolower($route->getMethod());
+        $this->map[$route->getName()] = $alias;
+        $this->routes[$alias] = $route;
         $this->current = $route;
+
+        unset($alias, $route);
 
         return $this;
     }
@@ -88,7 +94,7 @@ class RouteCollection implements RouteCollectionInterface, \Countable, \Iterator
      * @param $name
      * @return bool
      */
-    public function removeRoute($name)
+    public function removeRoute($name): bool
     {
         if ($this->hasRoute($name)) {
             unset($this->routes[$name]);
@@ -100,9 +106,14 @@ class RouteCollection implements RouteCollectionInterface, \Countable, \Iterator
     /**
      * @return Route
      */
-    public function getCurrentRoute()
+    public function getCurrentRoute(): Route
     {
         return $this->current;
+    }
+
+    public function getMap(): array
+    {
+        return $this->map;
     }
 
     /**
@@ -112,7 +123,7 @@ class RouteCollection implements RouteCollectionInterface, \Countable, \Iterator
      * @return Route
      * @since 5.0.0
      */
-    public function current()
+    public function current(): Route
     {
         return current($this->routes);
     }
