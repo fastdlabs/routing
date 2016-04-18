@@ -16,7 +16,7 @@ composer require "fastd/routing:2.0-dev"
 
 可以通过 `Router` 对象设置路由，也可以通过路由列表创建路由.
 
-### Router
+### 路由器
 
 ```php
 $router = new FastD\Routing\Router();
@@ -26,7 +26,7 @@ $router->addRoute('name', 'GET', '/', function () {
 $callback = $router->dispatch('GET', '/');
 ```
 
-### Routes
+### 路由列表
 
 ```php
 Routes::get('name', '/', function () {
