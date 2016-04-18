@@ -1,7 +1,6 @@
-* 1.0.0 (2015-XX-XX)
- * Remove get/setArgument for RouteInterface
- * Compatible PHP7 and requirement >= php7
- * New routing request is valid
- * Add route group object
- * Fixed root path regex bug
- * Support php7
+* 2.0.0 (2015-XX-XX)
+ * 移除不必要的接口，减少加载的对象，简洁为主
+ * 修复结尾 '/' 路由的匹配
+ * PHP7 支持
+ * 移除 match 匹配方法，路由多方法支持需要配置多个路由
+
