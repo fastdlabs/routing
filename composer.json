@@ -3,14 +3,7 @@
     "description": "FastD routing component",
     "type": "library",
     "license": "MIT",
-    "keywords": [
-        "routing",
-        "router",
-        "route",
-        "FastD framework",
-        "php7",
-        "fd"
-    ],
+    "keywords": ["routing"],
     "authors": [
         {
             "name": "janhuang",
