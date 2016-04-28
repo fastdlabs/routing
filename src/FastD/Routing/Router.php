@@ -107,7 +107,7 @@ class Router extends RouteCollection
     {
         try {
             $alias = $path . ':' . strtolower($method);
-            return $this->getRoute($alias)->getCallback();
+            return $this->getRoute($alias);
         } catch (\Exception $e) {
             $match = function ($path, Route $route) {
                 if (!preg_match($route->getPathRegex(), $path, $match)) {
@@ -143,7 +143,7 @@ class Router extends RouteCollection
             foreach ($this as $route) {
                 if (true === $match($path, $route)) {
                     unset($match);
-                    return $route->getCallback();
+                    return $route;
                 }
             }
         }
