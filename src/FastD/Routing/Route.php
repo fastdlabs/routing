@@ -396,10 +396,10 @@ class Route
         $this->callback = null;
         $this->method = 'ANY';
         $this->defaults = [];
-        $this->formats = [];
+        $this->formats = ['php'];
         $this->host = null;
         $this->group = '';
-        $this->scheme = '';
+        $this->scheme = 'http';
         $this->ips = [];
         $this->name = '';
         $this->parameters = [];
