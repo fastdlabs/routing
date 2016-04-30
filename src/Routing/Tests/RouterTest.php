@@ -118,17 +118,17 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             return 'hello world';
         });
 
-        $callback = $this->router->dispatch('GET', '/test');
+        $route = $this->router->dispatch('GET', '/test');
 
-        $this->assertEquals($callback(), 'hello world');
+        $this->assertEquals($route->getCallback()(), 'hello world');
 
         $this->router->addRoute('name:get', 'GET', '/{name}', function () {
             return 'hello jan';
         });
 
-        $callback = $this->router->dispatch('GET', '/janhuang');
+        $route = $this->router->dispatch('GET', '/janhuang');
 
-        $this->assertEquals($callback(), 'hello jan');
+        $this->assertEquals($route->getCallback()(), 'hello jan');
     }
 
     public function testGenerate()

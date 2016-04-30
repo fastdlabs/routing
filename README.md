@@ -2,6 +2,9 @@
 
 简单的 PHP 路由器，支持路由嵌套，动态路由等。
 
+![Building](https://api.travis-ci.org/JanHuang/routing.svg?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/fastd/routing/v/stable)](https://packagist.org/packages/fastd/routing) [![Total Downloads](https://poser.pugx.org/fastd/routing/downloads)](https://packagist.org/packages/fastd/routing) [![Latest Unstable Version](https://poser.pugx.org/fastd/routing/v/unstable)](https://packagist.org/packages/fastd/routing) [![License](https://poser.pugx.org/fastd/routing/license)](https://packagist.org/packages/fastd/routing)
+
 ## 要求
 
 * PHP 7+

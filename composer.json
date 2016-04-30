@@ -27,7 +27,7 @@
     },
     "autoload": {
         "psr-4": {
-            "FastD\\": "src/FastD"
+            "FastD\\": "src"
         },
         "files": [
             "src/FastD/Routing/Routes.php"
