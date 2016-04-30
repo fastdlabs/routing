@@ -30,7 +30,7 @@
             "FastD\\": "src"
         },
         "files": [
-            "src/FastD/Routing/Routes.php"
+            "src/Routing/Routes.php"
         ]
     }
 }
