@@ -148,7 +148,7 @@ class Router extends RouteCollection
             }
         }
 
-        throw new \Exception(sprintf('Not found "%s"', $path));
+        throw new \Exception(sprintf('Not found "%s"', $path), 404);
     }
 
     /**
