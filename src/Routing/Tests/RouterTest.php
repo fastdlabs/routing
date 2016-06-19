@@ -112,13 +112,13 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->router->getRoute('test:put')->getMethod(), 'PUT');
     }
 
-    public function testRouterDispatch()
+    public function testRouterMatch()
     {
         $this->router->addRoute('test:get', 'GET', '/test', function () {
             return 'hello world';
         });
 
-        $route = $this->router->dispatch('GET', '/test');
+        $route = $this->router->match('GET', '/test');
 
         $this->assertEquals($route->getCallback()(), 'hello world');
 
@@ -126,9 +126,20 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             return 'hello jan';
         });
 
-        $route = $this->router->dispatch('GET', '/janhuang');
+        $route = $this->router->match('GET', '/janhuang');
 
         $this->assertEquals($route->getCallback()(), 'hello jan');
+    }
+
+    public function testRouterDispatch()
+    {
+        $this->router->addRoute('test:get', 'GET', '/test', function () {
+            echo 'hello world';
+        });
+
+        $this->router->dispatch('get', '/test');
+
+        $this->expectOutputString('hello world');
     }
 
     public function testGenerate()

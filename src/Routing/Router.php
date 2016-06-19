@@ -52,9 +52,9 @@ class Router extends RouteCollection
 
     /**
      * @param          $path
-     * @param \Closure $callback
+     * @param callable $callback
      */
-    public function group($path, \Closure $callback)
+    public function group($path, callable $callback)
     {
         array_push($this->with, $path);
 
@@ -98,12 +98,12 @@ class Router extends RouteCollection
     }
 
     /**
-     * @param null $method
+     * @param $method
      * @param $path
-     * @return \Closure
+     * @return Route
      * @throws \Exception
      */
-    public function dispatch($method = null, $path)
+    public function match($method, $path)
     {
         try {
             $alias = $path . ':' . strtolower($method);
@@ -152,6 +152,18 @@ class Router extends RouteCollection
     }
 
     /**
+     * @param string $method
+     * @param $path
+     * @return mixed
+     */
+    public function dispatch($method, $path)
+    {
+        $callable = $this->match($method, $path)->getCallback();
+        
+        return $callable();
+    }
+
+    /**
      * @param $name
      * @param array $parameters
      * @param null $format
@@ -196,7 +208,7 @@ class Router extends RouteCollection
                     'Route "%s" generator fail. Your should set route parameters ["%s"] value.',
                     $route->getName(),
                     implode('", "', array_keys($route->getParameters()))
-                ), 500
+                ), 400
             );
         }
 
