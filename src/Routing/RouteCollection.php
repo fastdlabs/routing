@@ -37,8 +37,6 @@ abstract class RouteCollection
     protected $dynamicRoutes = [];
 
     /**
-     * 用户快速匹配路由, 用于 has, get 方法
-     *
      * @var array
      */
     protected $map = [];
@@ -62,36 +60,36 @@ abstract class RouteCollection
     }
 
     /**
-     * @param $name
+     * @param $path
      * @return Route
      * @throws \Exception
      */
-    public function getRoute($name): Route
+    public function getRoute($path): Route
     {
-        if (!$this->hasRoute($name)) {
-            throw new \Exception(sprintf('Route "%s" is not exists.', $name));
-        }
-
-        return $this->routes[$this->index];
     }
 
     /**
-     * @param $name
+     * @param $path
      * @return bool
      */
-    public function hasRoute($name): bool
+    public function hasRoute($path): bool
     {
-        if (isset($this->map[$name])) {
-            $this->index = $this->map[$name];
-            return true;
-        }
+    }
 
-        if (isset($this->routes[$name])) {
-            $this->index = $name;
-            return true;
-        }
+    /**
+     * @return array
+     */
+    public function getDynamics()
+    {
+        return $this->dynamicRoutes;
+    }
 
-        return false;
+    /**
+     * @return array
+     */
+    public function getStatics()
+    {
+        return $this->staticRoutes;
     }
 
     /**
@@ -104,15 +102,24 @@ abstract class RouteCollection
             $this->staticRoutes[$route->getMethod()][$route->getPath()] = $route;
         } else {
             $routeInfo = $this->parseRoute($route->getPath());
-            // /test/123
-            /*
-             * [
-             *  '/test' => [
-             *      '/123' => $route
-             *  ]
-             * ]
-             * */
-            $this->dynamicRoutes[$route->getMethod()][] = $route;
+
+            $quoteMap = $this->dynamicRoutes[$route->getMethod()] ?? [];
+
+            (function ($routeInfo) use (&$quoteMap, $route) {
+                foreach ($routeInfo as $key) {
+                    if (isset($quoteMap[$key])) {
+                        $quoteMap = & $quoteMap[$key];
+                    } else {
+                        $quoteMap[$key] = [];
+                        $quoteMap = & $quoteMap[$key];
+                    }
+                }
+                $quoteMap = $route;
+            }) ($routeInfo);
+
+            $this->dynamicRoutes[$route->getMethod()] = $quoteMap;
+
+            unset($quoteMap, $routeInfo, $route);
         }
 
         return $this;

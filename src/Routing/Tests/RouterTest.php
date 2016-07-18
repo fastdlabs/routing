@@ -24,8 +24,10 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $router->addRoute('GET', '/test', []);
 
+        $router->addRoute('POST', '/test/b', []);
+
         $router->addRoute('GET', '/test/{id}', []);
 
-        print_r($router);
+        $router->addRoute('GET', '/test/{b}', []);
     }
 }
