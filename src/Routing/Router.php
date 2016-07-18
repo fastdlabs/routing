@@ -67,50 +67,69 @@ class Router extends RouteCollection
      */
     public function match($method, $path)
     {
-        try {
-            $alias = $path . ':' . strtolower($method);
-            return $this->getRoute($alias);
-        } catch (\Exception $e) {
-            $match = function ($path, Route $route) {
-                if (!preg_match($route->getPathRegex(), $path, $match)) {
-                    if (array() === $route->getParameters() || array() === $route->getDefaults()) {
-                        return false;
-                    }
+        if (isset($this->staticRoutes[$method][$path])) {
+            return $this->staticRoutes[$method][$path];
+        }
 
-                    $parameters = array_slice(
-                        $route->getDefaults(),
-                        (substr_count($path, '/') - substr_count($route->getPath(), '/'))
-                    );
+        if (!isset($this->dynamicRoutes[$method])) {
+            throw new RouteNotFoundException($path);
+        }
 
-                    $path = str_replace('//', '/', $path . '/' . implode('/', array_values($parameters)));
+        $quoteMap = $this->dynamicRoutes[$method];
 
-                    unset($parameters);
+        $routeInfo = $this->parseRoute($path);
 
-                    if (!preg_match($route->getPathRegex(), $path, $match)) {
-                        return false;
-                    }
-                }
-
-                $data = [];
-                foreach ($route->getParameters() as $key => $value) {
-                    if (!empty($match[$key])) {
-                        $data[$key] = $match[$key];
-                    }
-                }
-                $route->mergeParameters($data);
-
-                return true;
-            };
-
-            foreach ($this as $route) {
-                if (true === $match($path, $route)) {
-                    unset($match);
-                    return $route;
-                }
+        foreach ($routeInfo as $key) {
+            if (isset($quoteMap[$key])) {
+                $quoteMap = & $quoteMap[$key];
             }
         }
 
-        throw new \Exception(sprintf('Not found "%s"', $path), 404);
+        foreach ($quoteMap as $route) {
+            if (preg_match($route->getPathRegex(), $path)) {
+                return $route;
+            }
+        }
+
+        throw new RouteNotFoundException($path);
+
+        $match = function ($path, Route $route) {
+            if (!preg_match($route->getPathRegex(), $path, $match)) {
+                if (array() === $route->getParameters() || array() === $route->getDefaults()) {
+                    return false;
+                }
+
+                $parameters = array_slice(
+                    $route->getDefaults(),
+                    (substr_count($path, '/') - substr_count($route->getPath(), '/'))
+                );
+
+                $path = str_replace('//', '/', $path . '/' . implode('/', array_values($parameters)));
+
+                unset($parameters);
+
+                if (!preg_match($route->getPathRegex(), $path, $match)) {
+                    return false;
+                }
+            }
+
+            $data = [];
+            foreach ($route->getParameters() as $key => $value) {
+                if (!empty($match[$key])) {
+                    $data[$key] = $match[$key];
+                }
+            }
+            $route->mergeParameters($data);
+
+            return true;
+        };
+
+        foreach ($this as $route) {
+            if (true === $match($path, $route)) {
+                unset($match);
+                return $route;
+            }
+        }
     }
 
     /**

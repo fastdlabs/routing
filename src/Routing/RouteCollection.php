@@ -60,23 +60,6 @@ abstract class RouteCollection
     }
 
     /**
-     * @param $path
-     * @return Route
-     * @throws \Exception
-     */
-    public function getRoute($path): Route
-    {
-    }
-
-    /**
-     * @param $path
-     * @return bool
-     */
-    public function hasRoute($path): bool
-    {
-    }
-
-    /**
      * @return array
      */
     public function getDynamics()
