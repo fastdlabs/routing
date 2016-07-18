@@ -20,11 +20,6 @@ namespace FastD\Routing;
 class Router extends RouteCollection
 {
     /**
-     * @var Route
-     */
-    protected $route;
-
-    /**
      * @var array
      */
     protected $with = [];
@@ -33,22 +28,6 @@ class Router extends RouteCollection
      * @var array
      */
     protected $group = [];
-
-    /**
-     * Router constructor.
-     */
-    public function __construct()
-    {
-        $this->route = new Route(null, null, null);
-    }
-
-    /**
-     * @return array
-     */
-    public function getGroup()
-    {
-        return $this->group;
-    }
 
     /**
      * @param          $path
@@ -64,7 +43,6 @@ class Router extends RouteCollection
     }
 
     /**
-     * @param $name
      * @param $method
      * @param $path
      * @param null $callback
@@ -72,29 +50,13 @@ class Router extends RouteCollection
      * @param array $requirements
      * @return Route
      */
-    public function addRoute($name, $method, $path, $callback = null, array $defaults = [], array $requirements = [])
+    public function addRoute($method, $path, $callback, array $defaults = [], array $requirements = [])
     {
-        $with = implode('', $this->with);
-
-        if (empty($with)) {
-            $with = '/';
-        }
-
-        $path = str_replace('//', '/', $with . $path);
-
-        $route = clone $this->route;
-        $route->setDefaults($defaults);
-        $route->setRequirements($requirements);
-        $route->setMethod($method);
-        $route->setPath($path);
-        $route->setName($name);
-        $route->setGroup($with);
-        $route->setCallback($callback);
+        $route = new Route($method, $path, $callback, $defaults, $requirements);
 
         $this->setRoute($route);
-        $this->group[$with][] = $route->getName();
 
-        return $this->getCurrentRoute();
+        return $route;
     }
 
     /**
@@ -153,14 +115,13 @@ class Router extends RouteCollection
 
     /**
      * @param string $method
-     * @param $path
+     * @param string $path
+     * @param array $parameters
      * @return mixed
      */
-    public function dispatch($method, $path)
+    public function dispatch($method, $path, array $parameters = [])
     {
-        $callable = $this->match($method, $path)->getCallback();
-        
-        return $callable();
+        return call_user_func_array($this->match($method, $path)->getCallback(), $parameters);
     }
 
     /**

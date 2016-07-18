@@ -7,12 +7,12 @@
 
 ## 要求
 
-* PHP 7+
+* PHP 7.0+
 
 ## Composer
 
 ```
-composer require "fastd/routing:2.0-dev"
+composer require "fastd/routing:3.0.x-dev"
 ```
 
 ## 使用

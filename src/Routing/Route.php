@@ -30,16 +30,6 @@ class Route
     protected $name;
 
     /**
-     * @var string
-     */
-    protected $group;
-
-    /**
-     * @var array
-     */
-    protected $formats = ['php'];
-
-    /**
      * @var array
      */
     protected $defaults = [];
@@ -73,21 +63,6 @@ class Route
      * @var string
      */
     protected $pathRegex;
-
-    /**
-     * @var array
-     */
-    protected $ips = [];
-
-    /**
-     * @var string
-     */
-    protected $scheme = 'http';
-
-    /**
-     * @var string
-     */
-    protected $host = [];
 
     /**
      * Route constructor.
@@ -158,7 +133,7 @@ class Route
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getMethod()
     {
@@ -201,25 +176,6 @@ class Route
     public function getRequirements()
     {
         return $this->requirements;
-    }
-
-    /**
-     * @param array $formats
-     * @return $this
-     */
-    public function setFormats(array $formats)
-    {
-        $this->formats = $formats;
-
-        return $this;
-    }
-
-    /**
-     * @return array|string
-     */
-    public function getFormats()
-    {
-        return $this->formats;
     }
 
     /**
@@ -295,122 +251,5 @@ class Route
         $this->parameters = $parameters;
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHost()
-    {
-        return $this->host;
-    }
-
-    /**
-     * @param string $host
-     * @return $this
-     */
-    public function setHost($host)
-    {
-        $this->host = $host;
-
-        return $this;
-    }
-
-    /**
-     * @param array $ips
-     * @return $this
-     */
-    public function setIps(array $ips)
-    {
-        $this->ips = $ips;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getIps()
-    {
-        return $this->ips;
-    }
-
-    /**
-     * @return string
-     */
-    public function getScheme()
-    {
-        return $this->scheme;
-    }
-
-    /**
-     * @param $scheme
-     * @return Route
-     */
-    public function setScheme($scheme)
-    {
-        $this->scheme = $scheme;
-
-        return $this;
-    }
-
-    /**
-     * @param $group
-     * @return $this
-     */
-    public function setGroup($group)
-    {
-        $this->group = $group;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGroup()
-    {
-        return $this->group;
-    }
-
-    /**
-     * Merge route parameters. Default merge route initialize's default values.
-     *
-     * {@inheritdoc}
-     * @param array $parameters
-     * @return Route
-     */
-    public function mergeParameters(array $parameters)
-    {
-        $this->setParameters(array_merge($this->parameters, $parameters));
-
-        return $this;
-    }
-
-    /**
-     * @return Route
-     */
-    public function __clone()
-    {
-        $this->arguments = [];
-        $this->callback = null;
-        $this->method = 'ANY';
-        $this->defaults = [];
-        $this->formats = ['php'];
-        $this->host = null;
-        $this->group = '';
-        $this->scheme = 'http';
-        $this->ips = [];
-        $this->name = '';
-        $this->parameters = [];
-        $this->path = '';
-        $this->pathRegex = '';
-
-        return $this;
-    }
-
-    public function __toString()
-    {
-        return "Route: {$this->group}{$this->path}\n";
     }
 }

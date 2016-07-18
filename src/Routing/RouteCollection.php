@@ -19,27 +19,47 @@ namespace FastD\Routing;
  *
  * @package FastD\Routing
  */
-class RouteCollection implements \Iterator, \Countable
+abstract class RouteCollection
 {
     /**
-     * @var Route[]
+     * @var Route
      */
-    protected $routes = [];
+    protected $activeRoute;
 
     /**
+     * @var array
+     */
+    protected $staticRoutes = [];
+
+    /**
+     * @var array
+     */
+    protected $dynamicRoutes = [];
+
+    /**
+     * 用户快速匹配路由, 用于 has, get 方法
+     *
      * @var array
      */
     protected $map = [];
 
     /**
-     * @var Route
+     * @param $path
+     * @return bool
      */
-    protected $current;
+    protected function isStaticRoute($path)
+    {
+        return false === strpos($path, '{');
+    }
 
     /**
-     * @var string
+     * @param $path
+     * @return array
      */
-    protected $index;
+    protected function parseRoute($path)
+    {
+        return preg_split('/(\/[^\/]+)/', $path, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+    }
 
     /**
      * @param $name
@@ -80,115 +100,29 @@ class RouteCollection implements \Iterator, \Countable
      */
     public function setRoute(Route $route): RouteCollection
     {
-        $alias = $route->getPath() . ':' . strtolower($route->getMethod());
-        $this->map[$route->getName()] = $alias;
-        $this->routes[$alias] = $route;
-        $this->current = $route;
-
-        unset($alias, $route);
+        if ($this->isStaticRoute($route->getPath())) {
+            $this->staticRoutes[$route->getMethod()][$route->getPath()] = $route;
+        } else {
+            $routeInfo = $this->parseRoute($route->getPath());
+            // /test/123
+            /*
+             * [
+             *  '/test' => [
+             *      '/123' => $route
+             *  ]
+             * ]
+             * */
+            $this->dynamicRoutes[$route->getMethod()][] = $route;
+        }
 
         return $this;
     }
 
     /**
-     * @param $name
-     * @return bool
+     * @return array
      */
-    public function removeRoute($name): bool
-    {
-        if ($this->hasRoute($name)) {
-            unset($this->routes[$name]);
-        }
-
-        return true;
-    }
-
-    /**
-     * @return Route
-     */
-    public function getCurrentRoute(): Route
-    {
-        return $this->current;
-    }
-
     public function getMap(): array
     {
         return $this->map;
-    }
-
-    /**
-     * Return the current element
-     *
-     * @link  http://php.net/manual/en/iterator.current.php
-     * @return Route
-     * @since 5.0.0
-     */
-    public function current(): Route
-    {
-        return current($this->routes);
-    }
-
-    /**
-     * Move forward to next element
-     *
-     * @link  http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
-     */
-    public function next()
-    {
-        next($this->routes);
-    }
-
-    /**
-     * Return the key of the current element
-     *
-     * @link  http://php.net/manual/en/iterator.key.php
-     * @return string
-     * @since 5.0.0
-     */
-    public function key()
-    {
-        return key($this->routes);
-    }
-
-    /**
-     * Checks if current position is valid
-     *
-     * @link  http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     *        Returns true on success or false on failure.
-     * @since 5.0.0
-     */
-    public function valid()
-    {
-        return isset($this->routes[$this->key()]);
-    }
-
-    /**
-     * Rewind the Iterator to the first element
-     *
-     * @link  http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
-     * @since 5.0.0
-     */
-    public function rewind()
-    {
-        reset($this->routes);
-    }
-
-    /**
-     * Count elements of an object
-     *
-     * @link  http://php.net/manual/en/countable.count.php
-     * @return int The custom count as an integer.
-     *        </p>
-     *        <p>
-     *        The return value is cast to an integer.
-     * @since 5.1.0
-     */
-    public function count()
-    {
-        return count($this->routes);
     }
 }
