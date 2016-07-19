@@ -21,6 +21,8 @@ namespace FastD\Routing;
  */
 class RouteCollection extends RouteRegex
 {
+    const ROUTES_CHUNK = 10;
+
     /**
      * @var Route
      */
@@ -40,6 +42,10 @@ class RouteCollection extends RouteRegex
      * @var array
      */
     protected $map = [];
+
+    protected $num = 0;
+
+    protected $regexes = [];
 
     /**
      * @param $path
@@ -66,24 +72,30 @@ class RouteCollection extends RouteRegex
         return $this->staticRoutes;
     }
 
-    public function getRoute($name)
-    {
-
-    }
-
     /**
-     * @param Route $route
-     * @return RouteCollection
+     * @param $method
+     * @param $path
+     * @param null $callback
+     * @return $this
      */
-    public function setRoute(Route $route): RouteCollection
+    public function addRoute($method, $path, $callback)
     {
-        if ($this->isStaticRoute($route->getPath())) {
-            $this->staticRoutes[$route->getMethod()][$route->getPath()] = $route;
+        if ($this->isStaticRoute($path)) {
+            $this->staticRoutes[$method][$path] = $callback;
         } else {
-            $regex = $this->parseRoute($route->getPath());
-            // '~^(?|' . implode('|', $regexes) . ')$~';
-            $this->dynamicRoutes[$route->getMethod()]['regex'] = $regex;
-            $this->dynamicRoutes[$route->getMethod()]['routes'][] = $route;
+            $routeInfo = $this->parseRoute($path);
+            list($regex, $variables) = $this->buildRouteRegex($routeInfo);
+
+            $numVariables = count($variables);
+            $numGroups = max($this->num, $numVariables);
+            $regexes[] = $regex . str_repeat('()', $numGroups - $numVariables);
+            $routeMap[$numGroups + 1] = [];
+
+            ++$this->num;
+
+            $this->regexes[$method][] = $regex;
+            $this->dynamicRoutes[$method]['regex'] = '~^(?|' . implode('|', $this->regexes[$method]) . ')$~';
+            $this->dynamicRoutes[$method]['routes'][] = $callback;
         }
 
         return $this;
@@ -95,5 +107,32 @@ class RouteCollection extends RouteRegex
     public function getMap(): array
     {
         return $this->map;
+    }
+
+    /**
+     * @param $method
+     * @param $path
+     * @return Route
+     * @throws RouteNotFoundException
+     */
+    public function match($method, $path)
+    {
+        if (isset($this->staticRoutes[$method][$path])) {
+            return $this->staticRoutes[$method][$path];
+        }
+
+        if (!isset($this->dynamicRoutes[$method])) {
+            throw new RouteNotFoundException($path);
+        }
+
+        $quoteMap = $this->dynamicRoutes[$method];
+
+        preg_match($quoteMap['regex'], $path, $matches);
+
+        if (!empty($matches)) {
+            return $quoteMap['routes'][count($matches)-1];
+        }
+
+        throw new RouteNotFoundException($path);
     }
 }

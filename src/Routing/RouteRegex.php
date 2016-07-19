@@ -26,9 +26,10 @@ class RouteRegex
      * @return string
      * @throws \Exception
      */
-    private function buildRouteRegex(array $routeInfo)
+    public function buildRouteRegex(array $routeInfo)
     {
         $regex = '';
+        $variables = [];
         foreach ($routeInfo as $part) {
             if (is_string($part)) {
                 $regex .= preg_quote($part, '~');
@@ -37,6 +38,12 @@ class RouteRegex
 
             list($varName, $regexPart) = $part;
 
+            if (isset($variables[$varName])) {
+                throw new \Exception(sprintf(
+                    'Cannot use the same placeholder "%s" twice', $varName
+                ));
+            }
+
             if ($this->regexHasCapturingGroups($regexPart)) {
                 throw new \Exception(sprintf(
                     'Regex "%s" for parameter "%s" contains a capturing group',
@@ -44,10 +51,11 @@ class RouteRegex
                 ));
             }
 
-            $regex .= '(?P<' . $varName . '>' . $regexPart . ')';
+            $variables[$varName] = $varName;
+            $regex .= '(' . $regexPart . ')';
         }
 
-        return $regex;
+        return [$regex, $variables];
     }
 
     /**
@@ -100,7 +108,7 @@ class RouteRegex
 
         unset($currentRoute, $segments);
 
-        return $this->buildRouteRegex($routeInfo[0]);
+        return $routeInfo[0];
     }
 
     /**

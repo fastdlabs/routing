@@ -12,5 +12,9 @@ namespace FastD\Routing;
 
 class RouteCache extends RouteCollection
 {
+    public function toCache()
+    {}
 
+    public function toRoute()
+    {}
 }

@@ -30,9 +30,5 @@ $router->addRoute('GET', '/{user}/profile', function () {
 $router->addRoute('GET', '/{test}/test', function () {
     return 'hello POST';
 });
-
-print_r($router->dispatch('GET', '/test'));
-print_r($router->dispatch('POST', '/test'));
-
 echo '<pre>';
-print_r($router);
+print_r($router->getDynamicsMap());

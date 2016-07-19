@@ -43,96 +43,6 @@ class Router extends RouteCollection
     }
 
     /**
-     * @param $method
-     * @param $path
-     * @param null $callback
-     * @param array $defaults
-     * @param array $requirements
-     * @return Route
-     */
-    public function addRoute($method, $path, $callback, array $defaults = [], array $requirements = [])
-    {
-        $route = new Route($method, $path, $callback, $defaults, $requirements);
-
-        $this->setRoute($route);
-
-        return $route;
-    }
-
-    /**
-     * @param $method
-     * @param $path
-     * @return Route
-     * @throws RouteNotFoundException
-     */
-    public function match($method, $path)
-    {
-        if (isset($this->staticRoutes[$method][$path])) {
-            return $this->staticRoutes[$method][$path];
-        }
-
-        if (!isset($this->dynamicRoutes[$method])) {
-            throw new RouteNotFoundException($path);
-        }
-
-        $quoteMap = $this->dynamicRoutes[$method];
-
-        $routeInfo = $this->parseRoute($path);
-
-        foreach ($routeInfo as $key) {
-            if (isset($quoteMap[$key])) {
-                $quoteMap = & $quoteMap[$key];
-            }
-        }
-
-        foreach ($quoteMap as $routes) {
-            foreach ($routes as $route) {
-
-            }
-        }
-
-        throw new RouteNotFoundException($path);
-
-        $match = function ($path, Route $route) {
-            if (!preg_match($route->getPathRegex(), $path, $match)) {
-                if (array() === $route->getParameters() || array() === $route->getDefaults()) {
-                    return false;
-                }
-
-                $parameters = array_slice(
-                    $route->getDefaults(),
-                    (substr_count($path, '/') - substr_count($route->getPath(), '/'))
-                );
-
-                $path = str_replace('//', '/', $path . '/' . implode('/', array_values($parameters)));
-
-                unset($parameters);
-
-                if (!preg_match($route->getPathRegex(), $path, $match)) {
-                    return false;
-                }
-            }
-
-            $data = [];
-            foreach ($route->getParameters() as $key => $value) {
-                if (!empty($match[$key])) {
-                    $data[$key] = $match[$key];
-                }
-            }
-            $route->mergeParameters($data);
-
-            return true;
-        };
-
-        foreach ($this as $route) {
-            if (true === $match($path, $route)) {
-                unset($match);
-                return $route;
-            }
-        }
-    }
-
-    /**
      * @param string $method
      * @param string $path
      * @param array $parameters
@@ -140,7 +50,7 @@ class Router extends RouteCollection
      */
     public function dispatch($method, $path, array $parameters = [])
     {
-        return call_user_func_array($this->match($method, $path)->getCallback(), $parameters);
+        return call_user_func_array($this->match($method, $path), $parameters);
     }
 
     /**
