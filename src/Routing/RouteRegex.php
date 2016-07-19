@@ -63,7 +63,7 @@ REGEX;
     /**
      * @return bool
      */
-    protected function isStaticRoute()
+    public function isStaticRoute()
     {
         if (empty($this->path)) {
             return true;

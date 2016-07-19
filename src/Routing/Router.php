@@ -20,29 +20,6 @@ namespace FastD\Routing;
 class Router extends RouteCollection
 {
     /**
-     * @var array
-     */
-    protected $with = [];
-
-    /**
-     * @var array
-     */
-    protected $group = [];
-
-    /**
-     * @param          $path
-     * @param callable $callback
-     */
-    public function group($path, callable $callback)
-    {
-        array_push($this->with, $path);
-
-        $callback($this);
-
-        array_pop($this->with);
-    }
-
-    /**
      * @param string $method
      * @param string $path
      * @param array $parameters

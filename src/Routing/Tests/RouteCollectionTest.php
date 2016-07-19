@@ -36,6 +36,21 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('post profile', call_user_func_array($route->getCallback(), []));
     }
 
+    public function testAddRouteToCollectionGroup()
+    {
+        $collection = new RouteCollection();
+
+        $collection->group('/user', function (RouteCollection $collection) {
+            $collection->addRoute('GET', '/test', function () {
+                return 'hello collection group';
+            });
+        });
+
+        $route = $collection->match('GET', '/user/test');
+        
+        $this->assertEquals('hello collection group', call_user_func_array($route->getCallback(), []));
+    }
+
     public function testRouteMatch()
     {
         $collection = new RouteCollection();

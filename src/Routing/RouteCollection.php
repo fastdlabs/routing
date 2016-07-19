@@ -19,9 +19,14 @@ namespace FastD\Routing;
  *
  * @package FastD\Routing
  */
-class RouteCollection extends RouteRegex
+class RouteCollection
 {
     const ROUTES_CHUNK = 10;
+
+    /**
+     * @var array
+     */
+    protected $with = [];
 
     /**
      * @var Route
@@ -74,6 +79,19 @@ class RouteCollection extends RouteRegex
     }
 
     /**
+     * @param          $path
+     * @param callable $callback
+     */
+    public function group($path, callable $callback)
+    {
+        array_push($this->with, $path);
+
+        $callback($this);
+
+        array_pop($this->with);
+    }
+
+    /**
      * @param $method
      * @param $path
      * @param $callback
@@ -82,6 +100,8 @@ class RouteCollection extends RouteRegex
      */
     public function addRoute($method, $path, $callback, array $defaults = [])
     {
+        $path = implode('/', $this->with) . $path;
+
         $route = new Route($method, $path, $callback, $defaults);
 
         if ($route->isStaticRoute()) {
