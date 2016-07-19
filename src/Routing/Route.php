@@ -42,7 +42,7 @@ class Route
     /**
      * @var array
      */
-    protected $arguments = [];
+    protected $variables = [];
 
     /**
      * @var array
@@ -66,19 +66,43 @@ class Route
 
     /**
      * Route constructor.
+     *
+     * @param $name
      * @param $method
      * @param $path
+     * @param $regex
      * @param $callback
      * @param array $defaults
      * @param array $requirements
      */
-    public function __construct($method, $path, $callback, array $defaults = [], array $requirements = [])
+    public function __construct($name, $method, $path, $regex, $callback, array $defaults = [], array $requirements = [])
     {
+        $this->setName($name);
         $this->setDefaults($defaults);
         $this->setRequirements($requirements);
+        $this->setVariables(array_keys($this->requirements));
+        $this->setPathRegex($regex);
         $this->setMethod($method);
         $this->setPath($path);
         $this->setCallback($callback);
+    }
+
+    /**
+     * @return array
+     */
+    public function getVariables(): array
+    {
+        return $this->variables;
+    }
+
+    /**
+     * @param array $variables
+     * @return $this
+     */
+    public function setVariables($variables)
+    {
+        $this->variables = $variables;
+        return $this;
     }
 
     /**
@@ -88,8 +112,6 @@ class Route
     public function setPath($path)
     {
         $this->path = $path;
-
-        $this->pathRegex = $this->parsePathRegex();
 
         return $this;
     }
@@ -179,31 +201,14 @@ class Route
     }
 
     /**
-     * @return string
+     * @param  string $regex
+     * @return $this
      */
-    public function parsePathRegex()
+    public function setPathRegex($regex)
     {
-        $route = $this->path;
+        $this->pathRegex = $regex;
 
-        if (preg_match_all('/\{(\w+)\}/i', $route, $match)) {
-            foreach ($match[1] as $val) {
-                $pattern = '?P<' . $val . '>' . (isset($this->requirements[$val]) ? $this->requirements[$val] : '\w*');
-                $default = null;
-                $limited = '{1}';
-                if (array_key_exists($val, $this->getDefaults())) {
-                    $default = $this->defaults[$val];
-                    $limited = '{0,1}';
-                }
-                $this->parameters[$val] = $default;
-                $route = str_replace('{' . $val . '}', $limited . '(' . $pattern . ')', $route);
-            }
-        }
-
-        if ('/' === substr($route, -1, 1)) {
-            $route .= '{0,1}';
-        }
-
-        return '/^'.str_replace('/', '\/', $route).'$/';
+        return $this;
     }
 
 

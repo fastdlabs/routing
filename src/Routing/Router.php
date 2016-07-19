@@ -50,7 +50,7 @@ class Router extends RouteCollection
      */
     public function dispatch($method, $path, array $parameters = [])
     {
-        return call_user_func_array($this->match($method, $path), $parameters);
+        return call_user_func_array($this->match($method, $path)->getCallback(), $parameters);
     }
 
     /**

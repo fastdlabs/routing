@@ -10,6 +10,8 @@
 
 namespace FastD\Routing;
 
+use InvalidArgumentException;
+
 /**
  * Class RouteRegex
  *
@@ -17,7 +19,14 @@ namespace FastD\Routing;
  */
 class RouteRegex
 {
-    const VARIABLE_REGEX = '{\s*([a-zA-Z][a-zA-Z0-9_]*)\s*}';
+    const VARIABLE_REGEX = <<<'REGEX'
+\{
+    \s* ([a-zA-Z][a-zA-Z0-9_]*) \s*
+    (?:
+        : \s* ([^{}]*(?:\{(?-1)\}[^{}]*)*)
+    )?
+\}
+REGEX;
 
     const DEFAULT_DISPATCH_REGEX = '[^/]+';
 
@@ -39,13 +48,13 @@ class RouteRegex
             list($varName, $regexPart) = $part;
 
             if (isset($variables[$varName])) {
-                throw new \Exception(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'Cannot use the same placeholder "%s" twice', $varName
                 ));
             }
 
             if ($this->regexHasCapturingGroups($regexPart)) {
-                throw new \Exception(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'Regex "%s" for parameter "%s" contains a capturing group',
                     $regexPart, $varName
                 ));

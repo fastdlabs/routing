@@ -39,12 +39,22 @@ class RouteCollection extends RouteRegex
     protected $dynamicRoutes = [];
 
     /**
+     * 路由列表计数器
+     *
+     * @var int
+     */
+    protected $num = 1;
+
+    /**
+     * 路由分组计数器
+     *
+     * @var int
+     */
+    protected $index = 0;
+
+    /**
      * @var array
      */
-    protected $map = [];
-
-    protected $num = 0;
-
     protected $regexes = [];
 
     /**
@@ -75,38 +85,36 @@ class RouteCollection extends RouteRegex
     /**
      * @param $method
      * @param $path
-     * @param null $callback
+     * @param $callback
+     * @param null $name
      * @return $this
      */
-    public function addRoute($method, $path, $callback)
+    public function addRoute($method, $path, $callback, $name = null)
     {
         if ($this->isStaticRoute($path)) {
-            $this->staticRoutes[$method][$path] = $callback;
+            $this->staticRoutes[$method][$path] = new Route(null === $name ? $path : $name, $method, $path, null, $callback, [], []);
         } else {
             $routeInfo = $this->parseRoute($path);
             list($regex, $variables) = $this->buildRouteRegex($routeInfo);
 
             $numVariables = count($variables);
             $numGroups = max($this->num, $numVariables);
-            $regexes[] = $regex . str_repeat('()', $numGroups - $numVariables);
-            $routeMap[$numGroups + 1] = [];
+            $this->regexes[$method][] = $regex . str_repeat('()', $numGroups - $numVariables);
+
+            $this->dynamicRoutes[$method][$this->index]['regex'] = '~^(?|' . implode('|', $this->regexes[$method]) . ')$~';
+            $this->dynamicRoutes[$method][$this->index]['routes'][$numGroups + 1] = new Route(null === $name ? $path : $name, $method, $path, $regex, $callback, [], []);
 
             ++$this->num;
 
-            $this->regexes[$method][] = $regex;
-            $this->dynamicRoutes[$method]['regex'] = '~^(?|' . implode('|', $this->regexes[$method]) . ')$~';
-            $this->dynamicRoutes[$method]['routes'][] = $callback;
+            if (count($this->regexes[$method]) >= static::ROUTES_CHUNK) {
+                ++$this->index;
+                $this->num = 1;
+                $this->regexes[$method] = [];
+            }
+            unset($numGroups, $numVariables);
         }
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMap(): array
-    {
-        return $this->map;
     }
 
     /**
@@ -127,10 +135,13 @@ class RouteCollection extends RouteRegex
 
         $quoteMap = $this->dynamicRoutes[$method];
 
-        preg_match($quoteMap['regex'], $path, $matches);
+        foreach ($quoteMap as $data) {
 
-        if (!empty($matches)) {
-            return $quoteMap['routes'][count($matches)-1];
+            if (!preg_match($data['regex'], $path, $matches)) {
+                continue;
+            }
+
+            return $data['routes'][count($matches)];
         }
 
         throw new RouteNotFoundException($path);

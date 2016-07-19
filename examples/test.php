@@ -10,25 +10,14 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
+echo '<pre>';
+
 $router = new \FastD\Routing\Router();
 
-$router->addRoute('GET', '/test', function () {
-    return 'hello GET';
-});
+for ($i = 0; $i < 15; $i++) {
+    $router->addRoute('GET', '/{test}/test' . $i . '', function () use ($i) {
+        return 'hello POST ' . $i;
+    });
+}
 
-$router->addRoute('POST', '/test', function () {
-    return 'hello POST';
-});
-
-$router->addRoute('POST', '/{user}/profile', function () {
-    return 'hello POST';
-});
-
-$router->addRoute('GET', '/{user}/profile', function () {
-    return 'hello POST';
-});
-$router->addRoute('GET', '/{test}/test', function () {
-    return 'hello POST';
-});
-echo '<pre>';
-print_r($router->getDynamicsMap());
+print_r($router->dispatch('GET', '/janhuang/test0', []));
