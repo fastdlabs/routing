@@ -63,7 +63,7 @@ class Router extends RouteCollection
      * @param $method
      * @param $path
      * @return Route
-     * @throws \Exception
+     * @throws RouteNotFoundException
      */
     public function match($method, $path)
     {

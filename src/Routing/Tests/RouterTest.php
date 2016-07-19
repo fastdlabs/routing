@@ -48,5 +48,10 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('GET', $route->getMethod());
 
         $this->assertEquals('/{test}', $route->getPath());
+
+        $router->addRoute('GET', '/{user}/', []);
+        $router->addRoute('GET', '/{user}/profile', []);
+
+        print_r($router);
     }
 }

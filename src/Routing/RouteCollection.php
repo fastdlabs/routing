@@ -75,6 +75,11 @@ abstract class RouteCollection
         return $this->staticRoutes;
     }
 
+    public function getRoute($name)
+    {
+
+    }
+
     /**
      * @param Route $route
      * @return RouteCollection
@@ -85,7 +90,7 @@ abstract class RouteCollection
             $this->staticRoutes[$route->getMethod()][$route->getPath()] = $route;
         } else {
             $routeInfo = $this->parseRoute($route->getPath());
-
+            print_r($routeInfo);
             $quoteMap = $this->dynamicRoutes[$route->getMethod()] ?? [];
 
             (function ($routeInfo) use (&$quoteMap, $route) {
