@@ -20,24 +20,9 @@ namespace FastD\Routing;
 class Route extends RouteRegex
 {
     /**
-     * @var string
-     */
-    protected $path;
-
-    /**
      * @var array
      */
     protected $defaults = [];
-
-    /**
-     * @var array
-     */
-    protected $requirements = [];
-
-    /**
-     * @var array
-     */
-    protected $variables = [];
 
     /**
      * @var array
@@ -55,11 +40,6 @@ class Route extends RouteRegex
     protected $callback;
 
     /**
-     * @var string
-     */
-    protected $pathRegex;
-
-    /**
      * Route constructor.
      *
      * @param $method
@@ -69,44 +49,13 @@ class Route extends RouteRegex
      */
     public function __construct($method, $path, $callback, array $defaults = [])
     {
+        parent::__construct($path);
 
-    }
+        $this->setMethod($method);
 
-    /**
-     * @return array
-     */
-    public function getVariables(): array
-    {
-        return $this->variables;
-    }
+        $this->setCallback($callback);
 
-    /**
-     * @param array $variables
-     * @return $this
-     */
-    public function setVariables($variables)
-    {
-        $this->variables = $variables;
-        return $this;
-    }
-
-    /**
-     * @param $path
-     * @return $this
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->path;
+        $this->setDefaults($defaults);
     }
 
     /**
@@ -145,45 +94,6 @@ class Route extends RouteRegex
     public function getDefaults()
     {
         return $this->defaults;
-    }
-
-    /**
-     * @param array|string $requirements
-     * @return $this
-     */
-    public function setRequirements(array $requirements)
-    {
-        $this->requirements = $requirements;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRequirements()
-    {
-        return $this->requirements;
-    }
-
-    /**
-     * @param  string $regex
-     * @return $this
-     */
-    public function setPathRegex($regex)
-    {
-        $this->pathRegex = $regex;
-
-        return $this;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getPathRegex()
-    {
-        return $this->pathRegex;
     }
 
     /**

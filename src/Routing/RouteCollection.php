@@ -57,8 +57,6 @@ class RouteCollection extends RouteRegex
      */
     protected $regexes = [];
 
-
-
     /**
      * @return array
      */
@@ -79,23 +77,22 @@ class RouteCollection extends RouteRegex
      * @param $method
      * @param $path
      * @param $callback
-     * @param null $name
+     * @param array $defaults
      * @return $this
      */
-    public function addRoute($method, $path, $callback, $name = null)
+    public function addRoute($method, $path, $callback, array $defaults = [])
     {
-        if ($this->isStaticRoute($path)) {
-            $this->staticRoutes[$method][$path] = new Route(null === $name ? $path : $name, $method, $path, null, $callback, [], []);
-        } else {
-            $routeInfo = $this->parseRoute($path);
-            list($regex, $variables) = $this->buildRouteRegex($routeInfo);
+        $route = new Route($method, $path, $callback, $defaults);
 
-            $numVariables = count($variables);
+        if ($route->isStaticRoute()) {
+            $this->staticRoutes[$method][$path] = $route;
+        } else {
+            $numVariables = count($route->getVariable());
             $numGroups = max($this->num, $numVariables);
-            $this->regexes[$method][] = $regex . str_repeat('()', $numGroups - $numVariables);
+            $this->regexes[$method][] = $route->getRegex() . str_repeat('()', $numGroups - $numVariables);
 
             $this->dynamicRoutes[$method][$this->index]['regex'] = '~^(?|' . implode('|', $this->regexes[$method]) . ')$~';
-            $this->dynamicRoutes[$method][$this->index]['routes'][$numGroups + 1] = new Route(null === $name ? $path : $name, $method, $path, $regex, $callback, [], []);
+            $this->dynamicRoutes[$method][$this->index]['routes'][$numGroups + 1] = $route;
 
             ++$this->num;
 
@@ -129,7 +126,6 @@ class RouteCollection extends RouteRegex
         $quoteMap = $this->dynamicRoutes[$method];
 
         foreach ($quoteMap as $data) {
-
             if (!preg_match($data['regex'], $path, $matches)) {
                 continue;
             }

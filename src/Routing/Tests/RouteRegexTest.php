@@ -16,12 +16,15 @@ class RouteRegexTest extends \PHPUnit_Framework_TestCase
 {
     public function testRegex()
     {
-        $routeRegex = new RouteRegex();
+        $regex = new RouteRegex('/test/{name:\d+}/[{age}]');
 
-        $regex = $routeRegex->parseRoute('/test/{name:\d+}/[{age}]');
+        $this->assertRegExp('~^(' . $regex->getRegex() . ')$~', '/test/18');
 
-        $this->assertRegExp('~^(' . $regex . ')$~', '/test/18');
+        $this->assertEquals(['name', 'age'], $regex->getVariable());
 
-        print_r($routeRegex);
+        $this->assertEquals([
+            'name' => '\d+',
+            'age' => '[^/]+'
+        ], $regex->getRequirements());
     }
 }

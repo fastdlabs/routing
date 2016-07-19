@@ -57,20 +57,19 @@ REGEX;
     {
         $this->path = $path;
 
-        $this->parseRoute($path);
+        $this->parseRoute();
     }
 
     /**
-     * @param string $path
      * @return bool
      */
-    protected function isStaticRoute($path)
+    protected function isStaticRoute()
     {
-        if (empty($path)) {
+        if (empty($this->path)) {
             return true;
         }
 
-        return false === strpos($path, '{');
+        return false === strpos($this->path, '{');
     }
 
     /**
@@ -98,16 +97,25 @@ REGEX;
     }
 
     /**
-     * @param $path
+     * @return null
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
      * @return mixed|string
      */
-    public function parseRoute($path)
+    protected function parseRoute()
     {
-        if ($this->isStaticRoute($path)) {
-            return $path;
+        if ($this->isStaticRoute()) {
+            return $this->getPath();
         }
 
-        preg_match_all('~' . self::VARIABLE_REGEX . '~x', $path, $matches, PREG_SET_ORDER);
+        $path = $this->getPath();
+
+        preg_match_all('~' . self::VARIABLE_REGEX . '~x', $this->path, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $match) {
             $path = str_replace($match[0], '(' . ($match[2] ?? static::DEFAULT_DISPATCH_REGEX) . ')', $path);
