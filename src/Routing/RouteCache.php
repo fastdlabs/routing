@@ -14,7 +14,7 @@ class RouteCache extends RouteCollection
 {
     public function toCache()
     {
-        return var_export($this->getMap(), true);
+
     }
 
     public function toRoute()

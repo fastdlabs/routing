@@ -11,6 +11,7 @@
 namespace FastD\Routing\Tests;
 
 use FastD\Routing\RouteCollection;
+use FastD\Routing\Router;
 
 class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,7 +48,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         });
 
         $route = $collection->match('GET', '/user/test');
-        
+
         $this->assertEquals('hello collection group', call_user_func_array($route->getCallback(), []));
     }
 
@@ -72,5 +73,16 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $route = $collection->match('GET', '/test_13');
 
         $this->assertEquals(13, call_user_func_array($route->getCallback(), []));
+    }
+
+    public function testGenerateUrl()
+    {
+        $collection = new RouteCollection();
+
+        $collection->addRoute('GET', '/user/{name}/profile', function ($name) {
+            return $name;
+        });
+
+
     }
 }

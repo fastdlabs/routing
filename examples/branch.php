@@ -25,4 +25,3 @@ for ($i = 0; $i < $nMatches; $i++) {
     $res = $router->dispatch('GET', '/a/30000');
 }
 printf("FastD first route: %f\n", microtime(true) - $startTime);
-die;
