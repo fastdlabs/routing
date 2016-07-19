@@ -21,37 +21,5 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     public function testAddRoute()
     {
         $router = new Router();
-
-        $router->addRoute('GET', '/test', []);
-
-        $router->addRoute('POST', '/test/b', []);
-
-        $router->addRoute('GET', '/test/{id}', []);
-
-        $router->addRoute('GET', '/test/{b}', []);
-    }
-
-    public function testMatch()
-    {
-        $router = new Router();
-
-        $router->addRoute('GET', '/test', []);
-
-        $route = $router->match('GET', '/test');
-
-        $this->assertEquals('/test', $route->getPath());
-
-        $router->addRoute('GET', '/{test}', []);
-
-        $route = $router->match('GET', '/abc');
-
-        $this->assertEquals('GET', $route->getMethod());
-
-        $this->assertEquals('/{test}', $route->getPath());
-
-        $router->addRoute('GET', '/{user}/', []);
-        $router->addRoute('GET', '/{user}/profile', []);
-
-        print_r($router);
     }
 }

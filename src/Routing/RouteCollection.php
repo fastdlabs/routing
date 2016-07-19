@@ -19,7 +19,7 @@ namespace FastD\Routing;
  *
  * @package FastD\Routing
  */
-abstract class RouteCollection
+class RouteCollection extends RouteRegex
 {
     /**
      * @var Route
@@ -51,18 +51,9 @@ abstract class RouteCollection
     }
 
     /**
-     * @param $path
      * @return array
      */
-    protected function parseRoute($path)
-    {
-        return preg_split('/(\/[^\/]+)/', $path, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
-    }
-
-    /**
-     * @return array
-     */
-    public function getDynamics()
+    public function getDynamicsMap()
     {
         return $this->dynamicRoutes;
     }
@@ -70,7 +61,7 @@ abstract class RouteCollection
     /**
      * @return array
      */
-    public function getStatics()
+    public function getStaticsMap()
     {
         return $this->staticRoutes;
     }
@@ -89,25 +80,10 @@ abstract class RouteCollection
         if ($this->isStaticRoute($route->getPath())) {
             $this->staticRoutes[$route->getMethod()][$route->getPath()] = $route;
         } else {
-            $routeInfo = $this->parseRoute($route->getPath());
-            print_r($routeInfo);
-            $quoteMap = $this->dynamicRoutes[$route->getMethod()] ?? [];
-
-            (function ($routeInfo) use (&$quoteMap, $route) {
-                foreach ($routeInfo as $key) {
-                    if (isset($quoteMap[$key])) {
-                        $quoteMap = & $quoteMap[$key];
-                    } else {
-                        $quoteMap[$key] = [];
-                        $quoteMap = & $quoteMap[$key];
-                    }
-                }
-                $quoteMap = $route;
-            }) ($routeInfo);
-
-            $this->dynamicRoutes[$route->getMethod()] = $quoteMap;
-
-            unset($quoteMap, $routeInfo, $route);
+            $regex = $this->parseRoute($route->getPath());
+            // '~^(?|' . implode('|', $regexes) . ')$~';
+            $this->dynamicRoutes[$route->getMethod()]['regex'] = $regex;
+            $this->dynamicRoutes[$route->getMethod()]['routes'][] = $route;
         }
 
         return $this;

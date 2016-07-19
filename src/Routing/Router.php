@@ -85,9 +85,9 @@ class Router extends RouteCollection
             }
         }
 
-        foreach ($quoteMap as $route) {
-            if (preg_match($route->getPathRegex(), $path)) {
-                return $route;
+        foreach ($quoteMap as $routes) {
+            foreach ($routes as $route) {
+
             }
         }
 
