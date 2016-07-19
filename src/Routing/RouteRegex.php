@@ -55,17 +55,22 @@ REGEX;
      */
     public function __construct($path = null)
     {
-        if (null !== $path && !$this->isStaticRoute()) {
-            $this->parseRoute($path);
-        }
+        $this->path = $path;
+
+        $this->parseRoute($path);
     }
 
     /**
+     * @param string $path
      * @return bool
      */
-    protected function isStaticRoute()
+    protected function isStaticRoute($path)
     {
-        return false === strpos($this->path, '{');
+        if (empty($path)) {
+            return true;
+        }
+
+        return false === strpos($path, '{');
     }
 
     /**
@@ -98,7 +103,9 @@ REGEX;
      */
     public function parseRoute($path)
     {
-        $this->path = $path;
+        if ($this->isStaticRoute($path)) {
+            return $path;
+        }
 
         preg_match_all('~' . self::VARIABLE_REGEX . '~x', $path, $matches, PREG_SET_ORDER);
 

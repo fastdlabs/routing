@@ -18,10 +18,10 @@ class RouteRegexTest extends \PHPUnit_Framework_TestCase
     {
         $routeRegex = new RouteRegex();
 
-        $regex = $routeRegex->parse('/test/{name:\d+}/[{age}]');
-
-        echo $regex;
+        $regex = $routeRegex->parseRoute('/test/{name:\d+}/[{age}]');
 
         $this->assertRegExp('~^(' . $regex . ')$~', '/test/18');
+
+        print_r($routeRegex);
     }
 }
