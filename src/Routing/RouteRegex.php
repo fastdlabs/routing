@@ -10,8 +10,6 @@
 
 namespace FastD\Routing;
 
-use InvalidArgumentException;
-
 /**
  * Class RouteRegex
  *
@@ -31,125 +29,89 @@ REGEX;
     const DEFAULT_DISPATCH_REGEX = '[^/]+';
 
     /**
-     * @param array $routeInfo
-     * @return string
-     * @throws \Exception
+     * @var array
      */
-    public function buildRouteRegex(array $routeInfo)
+    protected $variables = [];
+
+    /**
+     * @var array
+     */
+    protected $requirements = [];
+
+    /**
+     * @var string
+     */
+    protected $regex;
+
+    /**
+     * @var null
+     */
+    protected $path;
+
+    /**
+     * RouteRegex constructor.
+     *
+     * @param null $path
+     */
+    public function __construct($path = null)
     {
-        $regex = '';
-        $variables = [];
-        foreach ($routeInfo as $part) {
-            if (is_string($part)) {
-                $regex .= preg_quote($part, '~');
-                continue;
-            }
-
-            list($varName, $regexPart) = $part;
-
-            if (isset($variables[$varName])) {
-                throw new InvalidArgumentException(sprintf(
-                    'Cannot use the same placeholder "%s" twice', $varName
-                ));
-            }
-
-            if ($this->regexHasCapturingGroups($regexPart)) {
-                throw new InvalidArgumentException(sprintf(
-                    'Regex "%s" for parameter "%s" contains a capturing group',
-                    $regexPart, $varName
-                ));
-            }
-
-            $variables[$varName] = $varName;
-            $regex .= '(' . $regexPart . ')';
+        if (null !== $path && !$this->isStaticRoute()) {
+            $this->parseRoute($path);
         }
-
-        return [$regex, $variables];
     }
 
     /**
-     * @param $regex
-     * @return bool|int
+     * @return bool
      */
-    private function regexHasCapturingGroups($regex) {
-        if (false === strpos($regex, '(')) {
-            // Needs to have at least a ( to contain a capturing group
-            return false;
-        }
+    protected function isStaticRoute()
+    {
+        return false === strpos($this->path, '{');
+    }
 
-        // Semi-accurate detection for capturing groups
-        return preg_match(
-            '~
-                (?:
-                    \(\?\(
-                  | \[ [^\]\\\\]* (?: \\\\ . [^\]\\\\]* )* \]
-                  | \\\\ .
-                ) (*SKIP)(*FAIL) |
-                \(
-                (?!
-                    \? (?! <(?![!=]) | P< | \' )
-                  | \*
-                )
-            ~x',
-            $regex
-        );
+    /**
+     * @return array
+     */
+    public function getRequirements()
+    {
+        return $this->requirements;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRegex()
+    {
+        return $this->regex;
+    }
+
+    /**
+     * @return array
+     */
+    public function getVariable()
+    {
+        return $this->variables;
     }
 
     /**
      * @param $path
-     * @return array
-     * @throws \Exception
+     * @return mixed|string
      */
     public function parseRoute($path)
     {
-        $segments = preg_split('~' . self::VARIABLE_REGEX . '(*SKIP)(*F) | \[~x', $path);
+        $this->path = $path;
 
-        $currentRoute = '';
-        $routeInfo = [];
-        foreach ($segments as $n => $segment) {
-            if ($segment === '' && $n !== 0) {
-                throw new \Exception("Empty optional part");
-            }
+        preg_match_all('~' . self::VARIABLE_REGEX . '~x', $path, $matches, PREG_SET_ORDER);
 
-            $currentRoute .= $segment;
-            $routeInfo[] = $this->parsePlaceholders($currentRoute);
+        foreach ($matches as $match) {
+            $path = str_replace($match[0], '(' . ($match[2] ?? static::DEFAULT_DISPATCH_REGEX) . ')', $path);
+
+            $this->variables[] = $match[1];
+
+            $this->requirements[$match[1]] = $match[2] ?? static::DEFAULT_DISPATCH_REGEX;
         }
 
-        unset($currentRoute, $segments);
+        $this->regex = str_replace(['[(', ')]'], ['?(', ')'], $path);
 
-        return $routeInfo[0];
-    }
-
-    /**
-     * @param $route
-     * @return array
-     */
-    private function parsePlaceholders($route) {
-        if (!preg_match_all(
-            '~' . self::VARIABLE_REGEX . '~x', $route, $matches,
-            PREG_OFFSET_CAPTURE | PREG_SET_ORDER
-        )
-        ) {
-            return [$route];
-        }
-
-        $offset = 0;
-        $routeInfo = [];
-        foreach ($matches as $set) {
-            if ($set[0][1] > $offset) {
-                $routeInfo[] = substr($route, $offset, $set[0][1] - $offset);
-            }
-            $routeInfo[] = [
-                $set[1][0],
-                isset($set[2]) ? trim($set[2][0]) : self::DEFAULT_DISPATCH_REGEX
-            ];
-            $offset = $set[0][1] + strlen($set[0][0]);
-        }
-
-        if ($offset != strlen($route)) {
-            $routeInfo[] = substr($route, $offset);
-        }
-
-        return $routeInfo;
+        return $this->regex;
     }
 }

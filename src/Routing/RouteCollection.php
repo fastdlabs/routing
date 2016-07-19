@@ -57,14 +57,7 @@ class RouteCollection extends RouteRegex
      */
     protected $regexes = [];
 
-    /**
-     * @param $path
-     * @return bool
-     */
-    protected function isStaticRoute($path)
-    {
-        return false === strpos($path, '{');
-    }
+
 
     /**
      * @return array

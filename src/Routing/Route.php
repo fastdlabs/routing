@@ -17,17 +17,12 @@ namespace FastD\Routing;
  *
  * @package FastD\Routing
  */
-class Route
+class Route extends RouteRegex
 {
     /**
      * @var string
      */
     protected $path;
-
-    /**
-     * @var string
-     */
-    protected $name;
 
     /**
      * @var array
@@ -67,24 +62,14 @@ class Route
     /**
      * Route constructor.
      *
-     * @param $name
      * @param $method
      * @param $path
-     * @param $regex
      * @param $callback
      * @param array $defaults
-     * @param array $requirements
      */
-    public function __construct($name, $method, $path, $regex, $callback, array $defaults = [], array $requirements = [])
+    public function __construct($method, $path, $callback, array $defaults = [])
     {
-        $this->setName($name);
-        $this->setDefaults($defaults);
-        $this->setRequirements($requirements);
-        $this->setVariables(array_keys($this->requirements));
-        $this->setPathRegex($regex);
-        $this->setMethod($method);
-        $this->setPath($path);
-        $this->setCallback($callback);
+
     }
 
     /**
@@ -122,25 +107,6 @@ class Route
     public function getPath()
     {
         return $this->path;
-    }
-
-    /**
-     * @param $name
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**

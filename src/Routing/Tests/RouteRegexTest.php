@@ -18,12 +18,10 @@ class RouteRegexTest extends \PHPUnit_Framework_TestCase
     {
         $routeRegex = new RouteRegex();
 
-        $regex = $routeRegex->buildRouteRegex($routeRegex->parseRoute('/{user}/profile/{name}'));
+        $regex = $routeRegex->parse('/test/{name:\d+}/[{age}]');
 
-        $regex = '~^(?|' . $regex . ')$~';
+        echo $regex;
 
-        $this->assertRegExp($regex, '/jan/profile/abc');
-//        preg_match('~^(?|/(?P<user>[^/]+)/profile|/(?P<test>[^/]+)/test)$~', '/janhuang/profile', $matches);
-//        print_r($matches);
+        $this->assertRegExp('~^(' . $regex . ')$~', '/test/18');
     }
 }
