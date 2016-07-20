@@ -20,7 +20,7 @@ class RouteRegexTest extends \PHPUnit_Framework_TestCase
 
         $this->assertRegExp('~^(' . $regex->getRegex() . ')$~', '/test/18');
 
-        $this->assertEquals(['name', 'age'], $regex->getVariable());
+        $this->assertEquals(['name', 'age'], $regex->getVariables());
 
         $this->assertEquals([
             'name' => '\d+',

@@ -97,22 +97,23 @@ class RouteCollection
     }
 
     /**
+     * @param $name
      * @param $method
      * @param $path
      * @param $callback
      * @param array $defaults
      * @return $this
      */
-    public function addRoute($method, $path, $callback, array $defaults = [])
+    public function addRoute($name, $method, $path, $callback, array $defaults = [])
     {
         $path = implode('/', $this->with) . $path;
 
-        $route = new Route($method, $path, $callback, $defaults);
+        $route = new Route($name, $method, $path, $callback, $defaults);
 
         if ($route->isStaticRoute()) {
             $this->staticRoutes[$method][$path] = $route;
         } else {
-            $numVariables = count($route->getVariable());
+            $numVariables = count($route->getVariables());
             $numGroups = max($this->num, $numVariables);
             $this->regexes[$method][] = $route->getRegex() . str_repeat('()', $numGroups - $numVariables);
 
@@ -128,6 +129,8 @@ class RouteCollection
             }
             unset($numGroups, $numVariables);
         }
+
+        $this->aliasMap[$name] = $route;
 
         return $this;
     }

@@ -19,12 +19,12 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new RouteCollection();
 
-        $collection->addRoute('GET', '/test', []);
-        $collection->addRoute('GET', '/test/{name}', []);
-        $collection->addRoute('GET', '/user/profile/{name}', function ( ) {
+        $collection->addRoute('test1', 'GET', '/test', []);
+        $collection->addRoute('test2', 'GET', '/test/{name}', []);
+        $collection->addRoute('test3', 'GET', '/user/profile/{name}', function ( ) {
             return 'get profile';
         });
-        $collection->addRoute('POST', '/user/profile/{name}', function () {
+        $collection->addRoute('user', 'POST', '/user/profile/{name}', function () {
             return 'post profile';
         });
 
@@ -42,7 +42,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
 
         $collection->group('/user', function (RouteCollection $collection) {
-            $collection->addRoute('GET', '/test', function () {
+            $collection->addRoute('test1', 'GET', '/test', function () {
                 return 'hello collection group';
             });
         });
@@ -57,7 +57,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
 
         for ($i = 0; $i < 15; $i++) {
-            $collection->addRoute('GET', '/test_' . $i, function () use ($i) {
+            $collection->addRoute('test' . $i, 'GET', '/test_' . $i, function () use ($i) {
                 return $i;
             });
         }
@@ -79,7 +79,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new RouteCollection();
 
-        $collection->addRoute('GET', '/user/{name}/profile', function ($name) {
+        $collection->addRoute('test1', 'GET', '/user/{name}/profile', function ($name) {
             return $name;
         });
 

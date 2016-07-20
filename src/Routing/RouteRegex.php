@@ -91,7 +91,7 @@ REGEX;
     /**
      * @return array
      */
-    public function getVariable()
+    public function getVariables()
     {
         return $this->variables;
     }

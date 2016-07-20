@@ -39,23 +39,46 @@ class Route extends RouteRegex
      */
     protected $callback;
 
+    protected $name;
+
     /**
      * Route constructor.
      *
+     * @param $name
      * @param $method
      * @param $path
      * @param $callback
      * @param array $defaults
      */
-    public function __construct($method, $path, $callback, array $defaults = [])
+    public function __construct($name, $method, $path, $callback, array $defaults = [])
     {
         parent::__construct($path);
+
+        $this->setName($name);
 
         $this->setMethod($method);
 
         $this->setCallback($callback);
 
         $this->setDefaults($defaults);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
     }
 
     /**

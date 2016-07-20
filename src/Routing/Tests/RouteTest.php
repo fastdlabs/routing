@@ -16,7 +16,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 {
     public function testRoute()
     {
-        $route = new Route('GET', '/test', []);
+        $route = new Route('test', 'GET', '/test', []);
 
         $this->assertEquals('GET', $route->getMethod());
 
