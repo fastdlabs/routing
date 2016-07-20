@@ -39,6 +39,9 @@ class Route extends RouteRegex
      */
     protected $callback;
 
+    /**
+     * @var string
+     */
     protected $name;
 
     /**
