@@ -27,6 +27,7 @@ class RouteRegex
 REGEX;
 
     const DEFAULT_DISPATCH_REGEX = '[^/]+';
+    const DEFAULT_OPTIONAL_REGEX = '[^/]*';
 
     /**
      * @var array
@@ -125,7 +126,7 @@ REGEX;
             $this->requirements[$match[1]] = $match[2] ?? static::DEFAULT_DISPATCH_REGEX;
         }
 
-        $this->regex = str_replace(['[(', ')]'], ['?(', ')'], $path);
+        $this->regex = str_replace(['[(', '+)]'], ['?(', '*)'], $path);
 
         return $this->regex;
     }

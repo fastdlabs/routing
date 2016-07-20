@@ -10,18 +10,21 @@
 
 include __DIR__ . '/../vendor/autoload.php';
 
-$nRoutes = 10000;
-$nMatches = 30000;
+for ($n = 0; $n < 10; $n++) {
+    $nRoutes = 100;
+    $nMatches = 30000;
 
-$router = new \FastD\Routing\Router();
+    $router = new \FastD\Routing\RouteCollection();
 
-$startTime = microtime(true);
-for ($i = 0, $str = 'a'; $i < $nRoutes; $i++, $str++) {
-    $router->addRoute('GET', '/' . $str . '/{arg}', function () {
-        return 'hello world';
-    });
+    $startTime = microtime(true);
+    for ($i = 0, $str = 'a'; $i < $nRoutes; $i++, $str++) {
+        $router->addRoute('branch' . $i, 'GET', '/' . $str . '/{arg}', function () {
+            return 'hello world';
+        });
+    }
+    for ($i = 0; $i < $nMatches; $i++) {
+        $res = $router->dispatch('GET', '/a/30000');
+    }
+    printf("FastD first route: %f\n", microtime(true) - $startTime);
 }
-for ($i = 0; $i < $nMatches; $i++) {
-    $res = $router->dispatch('GET', '/a/30000');
-}
-printf("FastD first route: %f\n", microtime(true) - $startTime);
+

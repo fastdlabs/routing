@@ -79,10 +79,35 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new RouteCollection();
 
+        $collection->addRoute('static1', 'GET', '/user/profile', function () {
+
+        });
+
+        $this->assertEquals('/user/profile', $collection->generateUrl('static1'));
+
         $collection->addRoute('test1', 'GET', '/user/{name}/profile', function ($name) {
             return $name;
         });
 
+        $path = $collection->generateUrl('test1', ['name' => 'janhuang']);
 
+        $this->assertEquals('/user/janhuang/profile', $path);
+
+        $collection->addRoute('test2', 'GET', '/articles/[{id}]', function ($name) {
+            return $name;
+        });
+
+        $path = $collection->generateUrl('test2');
+
+        $this->assertEquals('/articles', $path);
+
+        $path = $collection->generateUrl('test2', ['id' => '10']);
+
+        $this->assertEquals('/articles/10', $path);
+
+        $regex = '~^(' . $collection->getRoute('test2')->getRegex() . ')$~';
+
+        $this->assertRegExp($regex, '/articles/10');
+        $this->assertRegExp($regex, '/articles');
     }
 }

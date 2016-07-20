@@ -12,12 +12,12 @@ include __DIR__ . '/../vendor/autoload.php';
 
 echo '<pre>';
 
-$router = new \FastD\Routing\Router();
+$router = new \FastD\Routing\RouteCollection();
 
 for ($i = 0; $i < 15; $i++) {
-    $router->addRoute('GET', '/{test}/test' . $i . '', function () use ($i) {
+    $router->addRoute($i, 'GET', '/{test}/test' . $i . '', function () use ($i) {
         return 'hello POST ' . $i;
     });
 }
 
-print_r($router->dispatch('GET', '/janhuang/test0', []));
+print_r($router->dispatch('GET', '/janhuang/test1', []));

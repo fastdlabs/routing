@@ -24,4 +24,15 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($route->getRegex());
     }
+
+    public function testDynamicRoute()
+    {
+        $route = new Route('test', 'GET', '/users/[{name}]', []);
+
+        $regex = '~^(' . $route->getRegex() . ')$~';
+
+        $this->assertRegExp($regex, '/users/10');
+        $this->assertRegExp($regex, '/users');
+        $this->assertRegExp($regex, '/users/');
+    }
 }

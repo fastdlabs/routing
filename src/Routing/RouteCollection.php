@@ -98,6 +98,15 @@ class RouteCollection
 
     /**
      * @param $name
+     * @return bool|Route
+     */
+    public function getRoute($name)
+    {
+        return $this->aliasMap[$name] ?? false;
+    }
+
+    /**
+     * @param $name
      * @param $method
      * @param $path
      * @param $callback
@@ -184,54 +193,43 @@ class RouteCollection
      */
     public function generateUrl($name, array $parameters = [], $format = null)
     {
-        $route = $this->getRoute($name);
-
-        $parameters = array_merge($route->getDefaults(), $parameters);
-
-        $host = '' == $route->getHost() ? '' : ($route->getScheme() . '://' . $route->getHost());
-
-        if (array() === $route->getParameters()) {
-            if (substr($route->getPath(), -1) != '/' && in_array($format, $route->getFormats())) {
-                $format = '.' . $format;
-            } else {
-                $format = '';
-            }
-            return $host . $route->getPath() . $format . (array() === $parameters ? '' : '?' . http_build_query($parameters));
+        if (false === ($route = $this->getRoute($name))) {
+            throw new RouteNotFoundException($name);
         }
 
-        $replacer = $parameters;
-        $keys = array_keys($parameters);
-        $search = array_map(
-            function ($name) use (&$parameters) {
-                unset($parameters[$name]);
-
-                return '{' . $name . '}';
-            },
-            $keys
-        );
-
-        unset($keys);
-
-        $routeUrl = str_replace($search, $replacer, $route->getPath());
-
-        if (!preg_match($route->getPathRegex(), $routeUrl, $match)) {
-            throw new \Exception(
-                sprintf(
-                    'Route "%s" generator fail. Your should set route parameters ["%s"] value.',
-                    $route->getName(),
-                    implode('", "', array_keys($route->getParameters()))
-                ), 400
-            );
-        }
-
-        if (substr($routeUrl, -1) !== '/' && in_array($format, $route->getFormats())) {
+        if (null !== $format) {
             $format = '.' . $format;
         } else {
             $format = '';
         }
 
-        unset($route);
+        if ($route->isStaticRoute()) {
+            return $route->getPath() . $format;
+        }
 
-        return $host . $routeUrl . $format . (array() === $parameters ? '' : '?' . http_build_query($parameters));
+        $parameters = array_merge($route->getDefaults(), $parameters);
+        $queryString = [];
+
+        foreach ($parameters as $key => $parameter) {
+            if (!in_array($key, $route->getVariables())) {
+                $queryString[$key] = $parameter;
+                unset($parameters[$key]);
+            }
+        }
+
+        $search = array_map(function ($v) {
+            return '{' . $v . '}';
+        }, array_keys($parameters));
+
+        $replace = $parameters;
+
+        $path = str_replace($search, $replace, $route->getPath());
+
+        if (false !== strpos($path, '[')) {
+            $path = str_replace(['[', ']'], '', $path);
+            $path = rtrim(preg_replace('~(({.*?}))~', '', $path), '/');
+        }
+
+        return $path . $format . ([] === $queryString ? '' : '?' . http_build_query($queryString));
     }
 }
