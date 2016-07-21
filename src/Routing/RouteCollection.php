@@ -111,10 +111,14 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
-     * @return $this
+     * @return $this|bool
      */
     public function addRoute($name, $method, $path, $callback, array $defaults = [])
     {
+        if (isset($this->aliasMap[$name])) {
+            return false;
+        }
+
         $path = implode('/', $this->with) . $path;
 
         $route = new Route($name, $method, $path, $callback, $defaults);
@@ -167,7 +171,13 @@ class RouteCollection
                 continue;
             }
 
-            return $data['routes'][count($matches)];
+            $route = $data['routes'][count($matches)];
+
+            $matches = array_slice($matches, 1, count($route->getVariables()));
+
+            $route->setParameters(array_combine($route->getVariables(), $matches));
+
+            return $route;
         }
 
         throw new RouteNotFoundException($path);
@@ -176,12 +186,13 @@ class RouteCollection
     /**
      * @param string $method
      * @param string $path
-     * @param array $parameters
      * @return mixed
      */
-    public function dispatch($method, $path, array $parameters = [])
+    public function dispatch($method, $path)
     {
-        return call_user_func_array($this->match($method, $path)->getCallback(), $parameters);
+        $route = $this->match($method, $path);
+
+        return call_user_func_array($route->getCallback(), $route->getParameters());
     }
 
     /**
@@ -207,7 +218,7 @@ class RouteCollection
             return $route->getPath() . $format;
         }
 
-        $parameters = array_merge($route->getDefaults(), $parameters);
+        $parameters = array_merge($route->getParameters(), $parameters);
         $queryString = [];
 
         foreach ($parameters as $key => $parameter) {

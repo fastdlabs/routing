@@ -22,11 +22,6 @@ class Route extends RouteRegex
     /**
      * @var array
      */
-    protected $defaults = [];
-
-    /**
-     * @var array
-     */
     protected $parameters = [];
 
     /**
@@ -63,7 +58,7 @@ class Route extends RouteRegex
 
         $this->setCallback($callback);
 
-        $this->setDefaults($defaults);
+        $this->setParameters($defaults);
     }
 
     /**
@@ -81,6 +76,7 @@ class Route extends RouteRegex
     public function setName($name)
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -101,25 +97,6 @@ class Route extends RouteRegex
     public function getMethod()
     {
         return $this->method;
-    }
-
-    /**
-     * @param array $defaults
-     * @return $this
-     */
-    public function setDefaults(array $defaults)
-    {
-        $this->defaults = $defaults;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaults()
-    {
-        return $this->defaults;
     }
 
     /**
@@ -155,7 +132,7 @@ class Route extends RouteRegex
      */
     public function setParameters(array $parameters)
     {
-        $this->parameters = $parameters;
+        $this->parameters = array_merge($this->parameters, $parameters);
 
         return $this;
     }

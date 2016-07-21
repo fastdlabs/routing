@@ -11,6 +11,7 @@
 namespace FastD\Routing\Tests;
 
 use FastD\Routing\Route;
+use FastD\Routing\RouteCollection;
 
 class RouteTest extends \PHPUnit_Framework_TestCase
 {
@@ -43,5 +44,36 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $regex = '~^(' . $route->getRegex() . ')$~';
 
         $this->assertRegExp($regex, '/users/10');
+    }
+
+    public function testRouteCallbackParameters()
+    {
+        $collection = new RouteCollection();
+
+        $collection->addRoute('test', 'GET', '/user/{name}', function ($name) {
+            return $name;
+        }, ['name' => 'jan']);
+
+        $collection->addRoute('test2', 'GET', '/user/{name}/{age}', function ($name, $age) {
+            return $name . $age;
+        }, ['name' => 'janhuang']);
+
+        $route = $collection->match('GET', '/user/test2');
+
+        $this->assertEquals([
+            'name' => 'test2'
+        ], $route->getParameters());
+
+        $route = $collection->match('GET', '/user/test2/123');
+
+        $this->assertEquals([
+            'name' => 'test2',
+            'age' => 123
+        ], $route->getParameters());
+
+
+        $this->assertEquals('janhuang', $collection->dispatch('GET', '/user/janhuang'));
+
+        $this->assertEquals('janhuang11', $collection->dispatch('GET', '/user/janhuang/11'));
     }
 }
