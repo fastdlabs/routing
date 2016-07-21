@@ -17,9 +17,5 @@ class RouteCacheTest extends \PHPUnit_Framework_TestCase
     public function testToCache()
     {
         $cache = new RouteCache();
-
-        $cache->addRoute('test', 'GET', '/', function () {});
-
-        echo $cache->toCache();
     }
 }

@@ -15,28 +15,19 @@ namespace FastD\Routing;
  *
  * @package FastD\Routing
  */
-class RouteCache extends RouteCollection
+class RouteCache
 {
     /**
-     * @var array
-     */
-    protected $map;
-
-    /**
-     * RouteCache constructor.
-     *
-     * @param array|null $map
-     */
-    public function __construct(array $map = null)
-    {
-        $this->map = $map;
-    }
-
-    /**
+     * @param RouteCollection $collection
      * @return string
      */
-    public function toCache()
+    public static function toCache(RouteCollection $collection)
     {
-        return var_export($this, true);
+        return var_export($collection, true);
+    }
+
+    public static function __set_state($an_array)
+    {
+
     }
 }
