@@ -17,12 +17,12 @@ composer require "fastd/routing:3.0.x-dev"
 
 ## 使用
 
-可以通过 `Router` 对象设置路由，也可以通过路由列表创建路由.
+可以通过 `RouteCollection` 对象设置路由，也可以通过路由列表创建路由.
 
 ### 通过路由器配置
 
 ```php
-$router = new FastD\Routing\Router();
+$router = new FastD\Routing\RouteCollection();
 $router->addRoute('name', 'GET', '/', function () {
     return 'hello world';
 });
@@ -68,8 +68,6 @@ $callback = Routes::getRouter()->dispatch('GET', '/janhuang');
 ## Testing
 
 ```
-cd path/to/routing
-composer install
 phpunit
 ```
 
