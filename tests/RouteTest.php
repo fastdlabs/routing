@@ -12,6 +12,7 @@ namespace FastD\Routing\Tests;
 
 use FastD\Routing\Route;
 use FastD\Routing\RouteCollection;
+use FastD\Routing\RouteNotFoundException;
 
 class RouteTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,6 +47,9 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp($regex, '/users/10');
     }
 
+    /**
+     * @expectedException \FastD\Routing\RouteNotFoundException
+     */
     public function testRouteCallbackParameters()
     {
         $collection = new RouteCollection();
@@ -75,5 +79,11 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('janhuang', $collection->dispatch('GET', '/user/janhuang'));
 
         $this->assertEquals('janhuang11', $collection->dispatch('GET', '/user/janhuang/11'));
+
+        $collection->addRoute('test2', 'GET', '/profile/{name}/{age}', function ($name, $age) {
+            return $name . $age;
+        }, ['name' => 'janhuang']);
+
+        $this->assertEquals('janhuang', $collection->dispatch('GET', '/profile/janhuang'));
     }
 }
