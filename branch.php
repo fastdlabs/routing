@@ -8,7 +8,7 @@
  * @link      http://www.fast-d.cn/
  */
 
-include __DIR__ . '/../vendor/autoload.php';
+include __DIR__ . '/vendor/autoload.php';
 
 for ($n = 0; $n < 10; $n++) {
     $nRoutes = 100;
