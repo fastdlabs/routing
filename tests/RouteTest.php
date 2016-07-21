@@ -29,13 +29,27 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testDynamicRouteOptionalVariables()
     {
-        $route = new Route('test', 'GET', '/users/[{name}]', []);
+        $collection = new RouteCollection();
 
-        $regex = '~^(' . $route->getRegex() . ')$~';
+        $collection->addRoute('test', 'GET', '/users/[{name}]', function ($name) {
+            return $name;
+        });
+
+        $regex = '~^(' . $collection->getRoute('test')->getRegex() . ')$~';
 
         $this->assertRegExp($regex, '/users/10');
         $this->assertRegExp($regex, '/users');
         $this->assertRegExp($regex, '/users/');
+
+        $response = $collection->dispatch('GET', '/users');
+
+        $this->assertEquals('', $response);
+
+        $collection->addRoute('test2', 'GET', '/[{name}]', function ($name) {
+            return $name;
+        }, ['name' => 'janhuang']);
+
+        $this->assertEquals('janhuang', $collection->dispatch('GET', '/'));
     }
 
     public function testDynamicRouteRequireVariables()

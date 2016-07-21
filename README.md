@@ -19,51 +19,67 @@ composer require "fastd/routing:3.0.x-dev"
 
 可以通过 `RouteCollection` 对象设置路由，也可以通过路由列表创建路由.
 
-### 通过路由器配置
+### 静态路由
 
 ```php
-$router = new FastD\Routing\RouteCollection();
-$router->addRoute('name', 'GET', '/', function () {
+$collection = new FastD\Routing\RouteCollection();
+$collection->addRoute('name', 'GET', '/', function () {
     return 'hello world';
 });
-$callback = $router->dispatch('GET', '/');
-```
-
-### 路由列表配置
-
-```php
-Routes::get('name', '/', function () {
-    return 'hello world';
-});
-
-$callback = Routes::getRouter()->dispatch('GET', '/');
-```
-
-### 路由多个请求方法
-
-```php
-Routes::get('name_get', '/', function () {
-    return 'hello world';
-});
-
-Routes::post('name_post', '/', function () {
-    return 'hello world';
-});
-
-$callback = Routes::getRouter()->dispatch('POST', '/');
+$response = $collection->dispatch('GET', '/'); // hello world
 ```
 
 ### 动态路由
 
 ```php
-Routes::get('name', '/{name}', function () {
-    return 'hello world';
+$collection = new FastD\Routing\RouteCollection();
+$collection->addRoute('name', 'GET', '/{name}', function ($name) {
+    return 'hello ' . $name;
 });
-
-$callback = Routes::getRouter()->dispatch('GET', '/janhuang');
+$response = $collection->dispatch('GET', '/janhuang'); // hello janhuang
 ```
 
-**路由调度仅匹配并返回一个路由对象，具体回调操作需要通过 `Route::getCallback` 进行获取**
+动态路由会将变量数据注入到回调处理方法中。
+
+##### 动态路由可选参数
+
+可选参数通过 `[]` 中括号来表示。 配合路由第五个参数, 进行默认参数注入
+
+```php
+$collection = new FastD\Routing\RouteCollection();
+$collection->addRoute('name', 'GET', '/[{name}]', function ($name) {
+    return 'hello ' . $name;
+}, ['name' => 'jan']);
+$response = $collection->dispatch('GET', '/'); // hello jan
+```
+
+### 同个路由, 多个方法
+
+```php
+$collection = new FastD\Routing\RouteCollection();
+$collection->addRoute('name.get', 'GET', '/', function () {
+    return 'hello GET';
+});
+$collection->addRoute('name.post', 'POST', '/', function () {
+    return 'hello POST';
+});
+$response = $collection->dispatch('GET', '/'); // hello GET
+$response = $collection->dispatch('POST', '/'); // hello POST
+```
+
+### 路由组
+
+```php
+$collection = new RouteCollection();
+
+$collection->group('/user', function (RouteCollection $collection) {
+    $collection->addRoute('user.profile', 'GET', '/profile/{name}', function ($name) {
+        return 'hello ' . $name;
+    });
+});
+
+$response = $collection->dispatch('GET', '/user/profile/janhuang'); // hello janhuang
+```
 
 ## Testing
 
