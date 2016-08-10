@@ -142,8 +142,10 @@ class Router extends RouteCollection
 
             foreach ($this as $route) {
                 if (true === $match($path, $route)) {
-                    unset($match);
-                    return $route;
+                    if ($route->getMethod() === $method) {
+                        unset($match);
+                        return $route;
+                    }
                 }
             }
         }
