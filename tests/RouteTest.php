@@ -49,7 +49,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
             return $name;
         }, ['name' => 'janhuang']);
 
-        $this->assertEquals('janhuang', $collection->dispatch('GET', '/'));
+        $this->assertEquals('', $collection->dispatch('GET', '/'));
     }
 
     public function testDynamicRouteRequireVariables()

@@ -132,7 +132,18 @@ class Route extends RouteRegex
      */
     public function setParameters(array $parameters)
     {
-        $this->parameters = array_merge($this->parameters, $parameters);
+        $this->parameters = $parameters;
+
+        return $this;
+    }
+
+    /**
+     * @param array $parameters
+     * @return $this
+     */
+    public function mergeParameters(array $parameters)
+    {
+        $this->parameters = array_merge($this->parameters, ($parameters));
 
         return $this;
     }

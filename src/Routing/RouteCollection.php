@@ -111,12 +111,12 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
-     * @return $this|bool
+     * @return $this
      */
     public function addRoute($name, $method, $path, $callback, array $defaults = [])
     {
         if (isset($this->aliasMap[$name])) {
-            return false;
+            return $this;
         }
 
         $path = implode('/', $this->with) . $path;
@@ -174,8 +174,7 @@ class RouteCollection
             $route = $data['routes'][count($matches)];
 
             $matches = array_slice($matches, 1, count($route->getVariables()));
-
-            $route->setParameters(array_combine($route->getVariables(), $matches));
+            $route->mergeParameters(array_combine($route->getVariables(), $matches));
 
             return $route;
         }
