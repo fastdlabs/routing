@@ -111,12 +111,12 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
-     * @return $this|bool
+     * @return $this
      */
     public function addRoute($name, $method, $path, $callback, array $defaults = [])
     {
         if (isset($this->aliasMap[$name])) {
-            return false;
+            return $this;
         }
 
         $path = implode('/', $this->with) . $path;
