@@ -170,7 +170,6 @@ class RouteCollection
             if (!preg_match($data['regex'], $path, $matches)) {
                 continue;
             }
-
             $route = $data['routes'][count($matches)];
 
             $matches = array_slice($matches, 1, count($route->getVariables()));
