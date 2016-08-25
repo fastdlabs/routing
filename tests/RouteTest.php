@@ -27,31 +27,39 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($route->getRegex());
     }
 
-    public function testDynamicRouteOptionalVariables()
+    /**
+     * @expectedException \Exception
+     */
+    public function testDynamicRouteOptionalVariablesNotDefaultValues()
     {
         $collection = new RouteCollection();
-
-       /* $collection->addRoute('test2', 'GET', '/[{name}]', function ($name) {
-            return $name;
-        }, ['name' => 'janhuang']);
-
-        $result = $collection->dispatch('GET', '/');
-
-        $this->assertEquals('janhuang', $result);*/
 
         $collection->addRoute('test', 'GET', '/users/[{name}]', function ($name) {
             return $name;
         });
 
-        $regex = '~^(' . $collection->getRoute('test')->getRegex() . ')$~';
+        try {
+            $collection->dispatch('GET', '/users');
+        } catch (\Exception $e) {
+            throw new \Exception('damn it');
+        }
+    }
 
-        $this->assertRegExp($regex, '/users/10');
-        $this->assertRegExp($regex, '/users');
-        $this->assertRegExp($regex, '/users/');
+    public function testDynamicRouteOptionalVariablesHasDefaultValue()
+    {
+        $collection = new RouteCollection();
 
-        $response = $collection->dispatch('GET', '/users');
+        $collection->addRoute('test', 'GET', '/users/[{name}]', function ($name = null) {
+            return $name;
+        });
 
-        $this->assertEquals('', $response);
+        $this->assertEquals('', $collection->dispatch('GET', '/users'));
+
+        $collection->addRoute('test2', 'GET', '/[{name}]', function ($name) {
+            return $name;
+        }, ['name' => 'janhuang']);
+
+        $this->assertEquals('janhuang', $collection->dispatch('GET', '/'));
     }
 
     public function testDynamicRouteRequireVariables()

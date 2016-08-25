@@ -23,7 +23,7 @@ for ($n = 0; $n < 10; $n++) {
         });
     }
     for ($i = 0; $i < $nMatches; $i++) {
-        $res = $router->dispatch('GET', '/a/30000');
+        $res = $router->dispatch('GET', '/g/30000');
     }
     printf("FastD first route: %f\n", microtime(true) - $startTime);
 }

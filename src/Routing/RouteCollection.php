@@ -172,8 +172,10 @@ class RouteCollection
             }
             $route = $data['routes'][count($matches)];
 
-            $matches = array_slice($matches, 1, count($route->getVariables()));
-            $route->mergeParameters(array_combine($route->getVariables(), $matches));
+            preg_match('~^' . $route->getRegex() . '$~', $path, $match);
+
+            $match = array_slice($match, 1, count($route->getVariables()));
+            $route->mergeParameters(array_combine($route->getVariables(), $match));
 
             return $route;
         }
