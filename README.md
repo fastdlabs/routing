@@ -53,6 +53,8 @@ $collection->addRoute('name', 'GET', '/[{name}]', function ($name) {
 $response = $collection->dispatch('GET', '/'); // hello jan
 ```
 
+**注意,因为使用可选参数,必须设置默认值,否则路由会因为找不到默认值而出现异常**
+
 ### 同个路由, 多个方法
 
 ```php
