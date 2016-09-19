@@ -110,4 +110,19 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp($regex, '/articles/10');
         $this->assertRegExp($regex, '/articles');
     }
+
+    public function testDynamicRouteMatch()
+    {
+        $collection = new RouteCollection();
+
+        $collection->addRoute('profile', 'GET', '/user/{user}', function ($user) {
+            return $user;
+        });
+        $collection->addRoute('profile.age', 'GET', '/user/{user}/{age}', function ($user, $age) {
+            return $user . $age;
+        });
+
+        $this->assertEquals('jan', $collection->dispatch('GET', '/user/jan'));
+        $this->assertEquals('jan18', $collection->dispatch('GET', '/user/jan/18'));
+    }
 }
