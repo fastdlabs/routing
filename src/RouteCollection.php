@@ -176,7 +176,7 @@ class RouteCollection
 
             $match = array_slice($match, 1, count($route->getVariables()));
             $route->mergeParameters(array_combine($route->getVariables(), $match));
-
+            
             return $route;
         }
 

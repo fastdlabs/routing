@@ -10,14 +10,14 @@
 
 namespace FastD\Routing;
 
-use LogicException;
+use FastD\Routing\RouteException;
 
 /**
  * Class RouteNotFoundException
  *
  * @package FastD\Routing
  */
-class RouteNotFoundException extends LogicException
+class RouteNotFoundException extends RouteException
 {
     /**
      * RouteNotFoundException constructor.
