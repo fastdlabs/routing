@@ -10,6 +10,7 @@
 
 namespace FastD\Routing\Tests;
 
+use FastD\Routing\Route;
 use FastD\Routing\RouteCache;
 
 class RouteCacheTest extends \PHPUnit_Framework_TestCase
@@ -17,5 +18,9 @@ class RouteCacheTest extends \PHPUnit_Framework_TestCase
     public function testToCache()
     {
         $cache = new RouteCache();
+
+        $cache->addRoute(new Route('test', 'GET', '/', 'test@test'));
+
+        echo $cache->dump();
     }
 }
