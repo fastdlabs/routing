@@ -125,4 +125,9 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('jan', $collection->dispatch('GET', '/user/jan'));
         $this->assertEquals('jan18', $collection->dispatch('GET', '/user/jan/18'));
     }
+
+    public function testInit()
+    {
+        $collections = new RouteCollection();
+    }
 }

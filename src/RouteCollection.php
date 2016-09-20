@@ -67,6 +67,11 @@ class RouteCollection
      */
     protected $regexes = [];
 
+    public function __construct($dir = null)
+    {
+
+    }
+
     /**
      * @return array
      */
