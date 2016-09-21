@@ -22,6 +22,8 @@ class RouteCacheTest extends \PHPUnit_Framework_TestCase
         $collections->addRoute('test', 'GET', '/', function () {});
         $cache = new RouteCache($collections, __DIR__);
 
-        echo $cache->dump();
+        unset($cache);
+
+
     }
 }

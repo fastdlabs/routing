@@ -7,7 +7,7 @@
 
 ## 要求
 
-* PHP 7.0+
+* PHP 5.6+
 
 ## Composer
 
@@ -17,7 +17,7 @@ composer require "fastd/routing:3.0.x-dev"
 
 ## 使用
 
-可以通过 `RouteCollection` 对象设置路由，也可以通过路由列表创建路由.
+可以通过 `RouteCollection` 对象设置路由，也可以通过路由列表创建路由. 详细文档: [fastd/routing](docs/readme.md)
 
 ### 静态路由
 

@@ -3,3 +3,4 @@ composer.lock
 .idea
 phpunit
 *.cache
+route_closure_*
