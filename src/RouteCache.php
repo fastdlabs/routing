@@ -55,8 +55,12 @@ class RouteCache
         $statics = $this->collection->getStaticsMap();
         $dynamics = $this->collection->getDynamicsMap();
         $cacheData = [];
-        $dumpClosure = function (Closure $closure) {
-            return 'closure';
+        $dumpClosure = function ($callback) {
+            if (is_callable($callback)) {
+
+            } else if (is_array($callback)) {
+
+            }
         };
         $dump = function ($type, array $routes) use (&$cacheData, $dumpClosure) {
             foreach ($routes as $key => $list) {
