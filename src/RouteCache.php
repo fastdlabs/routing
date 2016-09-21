@@ -19,12 +19,14 @@ class RouteCache
 {
     const CACHE = '.route.cache';
 
-    protected $routes = [];
+    protected $collection;
 
     protected $dir;
 
     public function __construct(RouteCollection $routeCollection, $dir = null)
     {
+        $this->collection = $routeCollection;
+
         $this->dir = $this->targetDirectory($dir);
     }
 
@@ -43,18 +45,6 @@ class RouteCache
 
     public function dump()
     {
-        return var_export($this->routes, true);
-    }
-
-    public function addRoute(Route $route)
-    {
-        $this->routes[] = $route;
-
-        return $this;
-    }
-
-    public static function __set_state($an_array)
-    {
-
+        print_r($this->collection->getStaticsMap());
     }
 }

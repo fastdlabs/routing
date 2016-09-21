@@ -67,9 +67,11 @@ class RouteCollection
      */
     protected $regexes = [];
 
+    protected $cache;
+
     public function __construct($dir = null)
     {
-
+        $this->cache = new RouteCache($this, $dir);
     }
 
     /**
