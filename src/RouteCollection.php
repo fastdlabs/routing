@@ -67,6 +67,8 @@ class RouteCollection
     public function __construct($dir = null)
     {
         $this->cache = new RouteCache($this, $dir);
+
+        $this->cache->loadCache();
     }
 
     /**
@@ -244,5 +246,13 @@ class RouteCollection
         }
 
         return $path . $format . ([] === $queryString ? '' : '?' . http_build_query($queryString));
+    }
+
+    /**
+     * @return void
+     */
+    public function saveCache()
+    {
+        $this->cache->saveCache();
     }
 }

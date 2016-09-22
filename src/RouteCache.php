@@ -21,6 +21,8 @@ use FastD\Generator\Generator;
 class RouteCache
 {
     const CACHE = '.route.cache';
+    const CACHE_CLOSURE = 'route_closure_';
+    const CACHE_CLOSURE_INVOKE = 'invoke';
 
     /**
      * @var RouteCollection
@@ -55,8 +57,6 @@ class RouteCache
         $this->dir = $this->targetDirectory($dir);
 
         $this->cache = $this->dir . DIRECTORY_SEPARATOR . static::CACHE;
-
-        $this->loadCache();
     }
 
     /**
@@ -90,23 +90,11 @@ class RouteCache
             }
         }
 
-        $self = $this;
         $cacheData = [];
-        $includes = [];
 
-        $dumpClosure = function ($callback) use (&$includes, $self) {
+        $dumpClosure = function ($callback) use (&$includes) {
             if (is_callable($callback)) {
-                $hash = 'route_closure_' . md5(mt_rand(0, 999999));
-                $name = 'invoke';
-                $obj = new Generator($hash);
-                $method = new Method($name);
-                $method->setParams([new Param('test')]);
-                $method->setTodo('return "hello world";');
-                $obj->setMethods([$method]);
-                $cache = $self->dir . '/closures/' . $hash . '.php';
-                $obj->save($cache);
-                $includes[$hash] = $cache;
-                return $hash . '@' . $name;
+                return 'unsupport closure.';
             } else if (is_array($callback)) {
                 if (is_object($callback[0])) {
                     return get_class($callback[0]) . '@' . $callback[1];
@@ -126,6 +114,7 @@ class RouteCache
                         'method' => $route->getMethod(),
                         'variables' => $route->getVariables(),
                         'requirements' => $route->getRequirements(),
+                        'defaults' => $route->getParameters(),
                         'regex' => $route->getRegex(),
                         'callback' => (is_callable($callback) || is_array($callback)) ? $dumpClosure($callback) : $callback,
                     ];
@@ -135,8 +124,6 @@ class RouteCache
 
         $dump('statics', $statics);
         $dump('dynamics', $dynamics);
-
-        $cacheData['includes'] = $includes;
 
         return '<?php return ' . var_export($cacheData, true) . ';';
     }
@@ -148,10 +135,17 @@ class RouteCache
     {
         if (file_exists($this->cache)) {
             $cacheData = include $this->cache;
-            $this->includes = isset($cacheData['includes']) ? $cacheData['includes'] : [];
-            foreach ($this->includes as $include) {
-                if (file_exists($include)) {
-                    include $include;
+            foreach ($cacheData as $cache) {
+                foreach ($cache as $value) {
+                    foreach ($value as $route) {
+                        $this->collection->addRoute(
+                            $route['name'],
+                            $route['method'],
+                            $route['path'],
+                            $route['callback'],
+                            $route['defaults']
+                        );
+                    }
                 }
             }
         }
@@ -163,15 +157,5 @@ class RouteCache
     public function saveCache()
     {
         file_put_contents($this->cache, $this->dump());
-    }
-
-    /**
-     * @return void
-     */
-    public function __destruct()
-    {
-        if (file_exists($this->cache)) {
-            $this->saveCache();
-        }
     }
 }
