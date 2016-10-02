@@ -47,9 +47,9 @@ $response = $collection->dispatch('GET', '/janhuang'); // hello janhuang
 
 ```php
 $collection = new FastD\Routing\RouteCollection();
-$collection->addRoute('name', 'GET', '/[{name}]', function ($name) {
+$collection->addRoute('GET', '/[{name}]', function ($name) {
     return 'hello ' . $name;
-}, ['name' => 'jan']);
+}, 'name', ['name' => 'jan']);
 $response = $collection->dispatch('GET', '/'); // hello jan
 ```
 
@@ -59,12 +59,12 @@ $response = $collection->dispatch('GET', '/'); // hello jan
 
 ```php
 $collection = new FastD\Routing\RouteCollection();
-$collection->addRoute('name.get', 'GET', '/', function () {
+$collection->addRoute('GET', '/', function () {
     return 'hello GET';
-});
-$collection->addRoute('name.post', 'POST', '/', function () {
+}, 'name.get',);
+$collection->addRoute('POST', '/', function () {
     return 'hello POST';
-});
+}, 'name.post');
 $response = $collection->dispatch('GET', '/'); // hello GET
 $response = $collection->dispatch('POST', '/'); // hello POST
 ```
@@ -75,9 +75,9 @@ $response = $collection->dispatch('POST', '/'); // hello POST
 $collection = new RouteCollection();
 
 $collection->group('/user', function (RouteCollection $collection) {
-    $collection->addRoute('user.profile', 'GET', '/profile/{name}', function ($name) {
+    $collection->addRoute('GET', '/profile/{name}', function ($name) {
         return 'hello ' . $name;
-    });
+    }, 'user.profile');
 });
 
 $response = $collection->dispatch('GET', '/user/profile/janhuang'); // hello janhuang

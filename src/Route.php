@@ -39,13 +39,13 @@ class Route extends RouteRegex
     /**
      * Route constructor.
      *
-     * @param null $path
+     * @param string $method
+     * @param $path
      * @param $callback
      * @param null $name
-     * @param string $method
      * @param array $defaults
      */
-    public function __construct($path, $callback, $name = null, $method = 'ANY', array $defaults = [])
+    public function __construct($method = 'ANY', $path, $callback, $name = null, array $defaults = [])
     {
         parent::__construct($path);
 

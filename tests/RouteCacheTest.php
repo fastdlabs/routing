@@ -18,8 +18,8 @@ class RouteCacheTest extends \PHPUnit_Framework_TestCase
     {
         $collections = new RouteCollection(__DIR__);
 
-        $collections->addRoute('/', 'tests');
-        $collections->addRoute('/{id}', 'tests@');
+        $collections->addRoute('GET', '/', 'tests');
+        $collections->addRoute('GET', '/{id}', 'tests@');
 
         $collections->caching();
     }
@@ -31,7 +31,7 @@ class RouteCacheTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($collections->staticRoutes));
         $this->assertEquals(1, count($collections->dynamicRoutes));
 
-        $route = $collections->match('ANY', '/1');
+        $route = $collections->match('GET', '/1');
 
         $this->assertInstanceOf(Route::class, $route);
     }

@@ -122,7 +122,9 @@ class RouteCache
 
         foreach ($this->collection->dynamicRoutes as $key => $list) {
             foreach ($list as $name => $routeChunk) {
-                $cacheData[$key][$name]['regex'] = $routeChunk['regex'];
+                if (isset($routeChunk['regex'])) {
+                    $cacheData[$key][$name]['regex'] = $routeChunk['regex'];
+                }
                 foreach ($routeChunk['routes'] as $index => $route) {
                     if (is_object($route)) {
                         $cacheData[$key][$name]['routes'][$index] = [

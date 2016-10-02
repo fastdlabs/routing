@@ -101,14 +101,14 @@ class RouteCollection
     }
 
     /**
+     * @param $method
      * @param $path
      * @param $callback
      * @param null $name
-     * @param string $method
      * @param array $defaults
      * @return $this
      */
-    public function addRoute($path, $callback, $name = null, $method = 'ANY', array $defaults = [])
+    public function addRoute($method, $path, $callback, $name = null, array $defaults = [])
     {
         $name = empty($name) ? $path : $name;
 
@@ -118,7 +118,7 @@ class RouteCollection
 
         $path = implode('/', $this->with) . $path;
 
-        $route = new Route($path, $callback, $name, $method, $defaults);
+        $route = new Route($method, $path, $callback, $name, $defaults);
 
         if ($route->isStaticRoute()) {
             $this->staticRoutes[$method][$path] = $route;
@@ -156,7 +156,7 @@ class RouteCollection
         if (isset($this->staticRoutes[$method][$path])) {
             $route = $this->staticRoutes[$method][$path];
             if (!($route instanceof Route)) {
-                $route = new Route($route['path'], $route['callback'], $route['name'], $route['method'], $route['defaults']);
+                $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
             }
             return $route;
         }
@@ -174,7 +174,7 @@ class RouteCollection
             $route = $data['routes'][count($matches)];
 
             if (!($route instanceof Route)) {
-                $route = new Route($route['path'], $route['callback'], $route['name'], $route['method'], $route['defaults']);
+                $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
             }
 
             preg_match('~^' . $route->getRegex() . '$~', $path, $match);
