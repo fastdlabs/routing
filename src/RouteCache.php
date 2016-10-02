@@ -94,7 +94,7 @@ class RouteCache
         foreach ($this->collection->staticRoutes as $key => $list) {
             foreach ($list as $name => $route) {
                 if (is_object($route)) {
-                    $cacheData[$key][] = [
+                    $cacheData[$key][$route->getPath()] = [
                         'name' => $route->getName(),
                         'path' => $route->getPath(),
                         'method' => $route->getMethod(),

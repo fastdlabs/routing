@@ -154,7 +154,11 @@ class RouteCollection
     public function match($method, $path)
     {
         if (isset($this->staticRoutes[$method][$path])) {
-            return $this->staticRoutes[$method][$path];
+            $route = $this->staticRoutes[$method][$path];
+            if (!($route instanceof Route)) {
+                $route = new Route($route['path'], $route['callback'], $route['name'], $route['method'], $route['defaults']);
+            }
+            return $route;
         }
 
         if (!isset($this->dynamicRoutes[$method])) {
@@ -168,6 +172,10 @@ class RouteCollection
                 continue;
             }
             $route = $data['routes'][count($matches)];
+
+            if (!($route instanceof Route)) {
+                $route = new Route($route['path'], $route['callback'], $route['name'], $route['method'], $route['defaults']);
+            }
 
             preg_match('~^' . $route->getRegex() . '$~', $path, $match);
 

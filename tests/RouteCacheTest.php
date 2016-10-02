@@ -9,7 +9,7 @@
 
 namespace FastD\Routing\Tests;
 
-use FastD\Routing\RouteCache;
+use FastD\Routing\Route;
 use FastD\Routing\RouteCollection;
 
 class RouteCacheTest extends \PHPUnit_Framework_TestCase
@@ -30,5 +30,9 @@ class RouteCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, count($collections->staticRoutes));
         $this->assertEquals(1, count($collections->dynamicRoutes));
+
+        $route = $collections->match('ANY', '/1');
+
+        $this->assertInstanceOf(Route::class, $route);
     }
 }
