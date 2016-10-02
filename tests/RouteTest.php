@@ -9,15 +9,15 @@
 
 namespace FastD\Routing\Tests;
 
+use FastD\Routing\Exceptions\RouteNotFoundException;
 use FastD\Routing\Route;
 use FastD\Routing\RouteCollection;
-use FastD\Routing\RouteNotFoundException;
 
 class RouteTest extends \PHPUnit_Framework_TestCase
 {
     public function testRoute()
     {
-        $route = new Route('test', 'GET', '/test', []);
+        $route = new Route('/test', [], 'test', 'GET');
 
         $this->assertEquals('GET', $route->getMethod());
 
@@ -33,9 +33,9 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new RouteCollection();
 
-        $collection->addRoute('test', 'GET', '/users/[{name}]', function ($name) {
+        $collection->addRoute('/users/[{name}]', function ($name) {
             return $name;
-        });
+        }, 'test', 'GET');
 
         try {
             $collection->dispatch('GET', '/users');
@@ -48,22 +48,22 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new RouteCollection();
 
-        $collection->addRoute('test', 'GET', '/users/[{name}]', function ($name = null) {
+        $collection->addRoute('/users/[{name}]', function ($name = null) {
             return $name;
-        });
+        }, 'test', 'GET');
 
         $this->assertEquals('', $collection->dispatch('GET', '/users'));
 
-        $collection->addRoute('test2', 'GET', '/[{name}]', function ($name) {
+        $collection->addRoute('/[{name}]', function ($name) {
             return $name;
-        }, ['name' => 'janhuang']);
+        }, 'test2', 'GET',  ['name' => 'janhuang']);
 
         $this->assertEquals('janhuang', $collection->dispatch('GET', '/'));
     }
 
     public function testDynamicRouteRequireVariables()
     {
-        $route = new Route('test', 'GET', '/users/{name}', []);
+        $route = new Route('/users/{name}', [], 'test', 'GET');
 
         $regex = '~^(' . $route->getRegex() . ')$~';
 
@@ -71,19 +71,19 @@ class RouteTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \FastD\Routing\RouteNotFoundException
+     * @expectedException \FastD\Routing\Exceptions\RouteNotFoundException
      */
     public function testRouteCallbackParameters()
     {
         $collection = new RouteCollection();
 
-        $collection->addRoute('test', 'GET', '/user/{name}', function ($name) {
+        $collection->addRoute('/user/{name}', function ($name) {
             return $name;
-        }, ['name' => 'jan']);
+        }, 'test', 'GET', ['name' => 'jan']);
 
-        $collection->addRoute('test2', 'GET', '/user/{name}/{age}', function ($name, $age) {
+        $collection->addRoute('/user/{name}/{age}', function ($name, $age) {
             return $name . $age;
-        }, ['name' => 'janhuang']);
+        }, 'test2', 'GET', ['name' => 'janhuang']);
 
         $route = $collection->match('GET', '/user/test2');
 
@@ -103,9 +103,9 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('janhuang11', $collection->dispatch('GET', '/user/janhuang/11'));
 
-        $collection->addRoute('test2', 'GET', '/profile/{name}/{age}', function ($name, $age) {
+        $collection->addRoute('/profile/{name}/{age}', function ($name, $age) {
             return $name . $age;
-        }, ['name' => 'janhuang']);
+        }, 'test2', 'GET', ['name' => 'janhuang']);
 
         $this->assertEquals('janhuang', $collection->dispatch('GET', '/profile/janhuang'));
     }

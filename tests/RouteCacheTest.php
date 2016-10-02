@@ -16,18 +16,19 @@ class RouteCacheTest extends \PHPUnit_Framework_TestCase
 {
     public function testToCache()
     {
-        $collections = new RouteCollection();
+        $collections = new RouteCollection(__DIR__);
 
-        $collections->addRoute('test', 'GET', '/', 'tests');
-        $cache = new RouteCache($collections, __DIR__);
+        $collections->addRoute('/', 'tests');
+        $collections->addRoute('/{id}', 'tests@');
 
-        $cache->saveCache();
+        $collections->caching();
     }
 
     public function testLoadCache()
     {
         $collections = new RouteCollection(__DIR__);
 
-        $this->assertEquals(1, count($collections->getStaticsMap()));
+        $this->assertEquals(1, count($collections->staticRoutes));
+        $this->assertEquals(1, count($collections->dynamicRoutes));
     }
 }

@@ -9,10 +9,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Generator\Factory\Method;
-use FastD\Generator\Factory\Param;
-use FastD\Generator\Generator;
-
 /**
  * Class RouteCache
  *
@@ -21,8 +17,6 @@ use FastD\Generator\Generator;
 class RouteCache
 {
     const CACHE = '.route.cache';
-    const CACHE_CLOSURE = 'route_closure_';
-    const CACHE_CLOSURE_INVOKE = 'invoke';
 
     /**
      * @var RouteCollection
@@ -40,11 +34,6 @@ class RouteCache
     protected $cache;
 
     /**
-     * @var array
-     */
-    protected $includes = [];
-
-    /**
      * RouteCache constructor.
      *
      * @param RouteCollection $routeCollection
@@ -57,6 +46,8 @@ class RouteCache
         $this->dir = $this->targetDirectory($dir);
 
         $this->cache = $this->dir . DIRECTORY_SEPARATOR . static::CACHE;
+
+        $this->loadCache();
     }
 
     /**
@@ -81,34 +72,29 @@ class RouteCache
      */
     public function dump()
     {
-        $statics = $this->collection->getStaticsMap();
-        $dynamics = $this->collection->getDynamicsMap();
+        $statics = $this->dumpStatics();
 
-        foreach ($this->includes as $include) {
-            if (file_exists($include)) {
-                unlink($include);
-            }
-        }
+        $dynamics = $this->dumpDynamics();
 
+        return var_export([
+            'statics' => $statics,
+            'dynamics' => $dynamics,
+        ], true);
+    }
+
+    /**
+     * Dump static routes.
+     *
+     * @return array
+     */
+    protected function dumpStatics()
+    {
         $cacheData = [];
 
-        $dumpClosure = function ($callback) use (&$includes) {
-            if (is_callable($callback)) {
-                return 'unsupport closure.';
-            } else if (is_array($callback)) {
-                if (is_object($callback[0])) {
-                    return get_class($callback[0]) . '@' . $callback[1];
-                } else {
-                    return $callback;
-                }
-            }
-        };
-
-        $dump = function ($type, array $routes) use (&$cacheData, $dumpClosure) {
-            foreach ($routes as $key => $list) {
-                foreach ($list as $name => $route) {
-                    $callback = $route->getCallback();
-                    $cacheData[$type][$key][] = [
+        foreach ($this->collection->staticRoutes as $key => $list) {
+            foreach ($list as $name => $route) {
+                if (is_object($route)) {
+                    $cacheData[$key][] = [
                         'name' => $route->getName(),
                         'path' => $route->getPath(),
                         'method' => $route->getMethod(),
@@ -116,38 +102,66 @@ class RouteCache
                         'requirements' => $route->getRequirements(),
                         'defaults' => $route->getParameters(),
                         'regex' => $route->getRegex(),
-                        'callback' => (is_callable($callback) || is_array($callback)) ? $dumpClosure($callback) : $callback,
+                        'callback' => $route->getCallback(),
                     ];
                 }
             }
-        };
+        }
 
-        $dump('statics', $statics);
-        $dump('dynamics', $dynamics);
-
-        return '<?php return ' . var_export($cacheData, true) . ';';
+        return $cacheData;
     }
 
     /**
+     * Dump dynamic routes.
      *
+     * @return array
+     */
+    protected function dumpDynamics()
+    {
+        $cacheData = [];
+
+        foreach ($this->collection->dynamicRoutes as $key => $list) {
+            foreach ($list as $name => $routeChunk) {
+                $cacheData[$key][$name]['regex'] = $routeChunk['regex'];
+                foreach ($routeChunk['routes'] as $index => $route) {
+                    if (is_object($route)) {
+                        $cacheData[$key][$name]['routes'][$index] = [
+                            'name' => $route->getName(),
+                            'path' => $route->getPath(),
+                            'method' => $route->getMethod(),
+                            'variables' => $route->getVariables(),
+                            'requirements' => $route->getRequirements(),
+                            'defaults' => $route->getParameters(),
+                            'regex' => $route->getRegex(),
+                            'callback' => $route->getCallback(),
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $cacheData;
+    }
+
+    /**
+     * @return string
+     */
+    protected function wrapPhp()
+    {
+        return '<?php return ' . $this->dump() . ';';
+    }
+
+    /**
+     * Load routes cache.
+     *
+     * @return void
      */
     public function loadCache()
     {
         if (file_exists($this->cache)) {
             $cacheData = include $this->cache;
-            foreach ($cacheData as $cache) {
-                foreach ($cache as $value) {
-                    foreach ($value as $route) {
-                        $this->collection->addRoute(
-                            $route['name'],
-                            $route['method'],
-                            $route['path'],
-                            $route['callback'],
-                            $route['defaults']
-                        );
-                    }
-                }
-            }
+            $this->collection->dynamicRoutes = isset($cacheData['dynamics']) ? $cacheData['dynamics'] : [];
+            $this->collection->staticRoutes = isset($cacheData['statics']) ? $cacheData['statics'] : [];
         }
     }
 
@@ -156,6 +170,6 @@ class RouteCache
      */
     public function saveCache()
     {
-        file_put_contents($this->cache, $this->dump());
+        file_put_contents($this->cache, $this->wrapPhp());
     }
 }

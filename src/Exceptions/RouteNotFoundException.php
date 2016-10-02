@@ -7,9 +7,7 @@
  * @link      http://www.fast-d.cn/
  */
 
-namespace FastD\Routing;
-
-use FastD\Routing\RouteException;
+namespace FastD\Routing\Exceptions;
 
 /**
  * Class RouteNotFoundException

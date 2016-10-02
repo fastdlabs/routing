@@ -7,7 +7,7 @@
  * @link      http://www.fast-d.cn/
  */
 
-namespace FastD\Routing;
+namespace FastD\Routing\Exceptions;
 
 use RuntimeException;
 

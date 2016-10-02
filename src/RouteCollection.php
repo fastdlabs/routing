@@ -8,6 +8,7 @@
  */
 
 namespace FastD\Routing;
+use FastD\Routing\Exceptions\RouteNotFoundException;
 
 /**
  * Class RouteCollection
@@ -31,17 +32,17 @@ class RouteCollection
     /**
      * @var array
      */
-    protected $staticRoutes = [];
+    public $staticRoutes = [];
 
     /**
      * @var array
      */
-    protected $dynamicRoutes = [];
+    public $dynamicRoutes = [];
 
     /**
      * @var array
      */
-    protected $aliasMap = [];
+    public $aliasMap = [];
 
     /**
      * 路由列表计数器
@@ -62,29 +63,19 @@ class RouteCollection
      */
     protected $regexes = [];
 
+    /**
+     * @var RouteCache
+     */
     protected $cache;
 
+    /**
+     * RouteCollection constructor.
+     *
+     * @param null $dir
+     */
     public function __construct($dir = null)
     {
         $this->cache = new RouteCache($this, $dir);
-
-        $this->cache->loadCache();
-    }
-
-    /**
-     * @return array
-     */
-    public function getDynamicsMap()
-    {
-        return $this->dynamicRoutes;
-    }
-
-    /**
-     * @return array
-     */
-    public function getStaticsMap()
-    {
-        return $this->staticRoutes;
     }
 
     /**
@@ -110,22 +101,24 @@ class RouteCollection
     }
 
     /**
-     * @param $name
-     * @param $method
      * @param $path
      * @param $callback
+     * @param null $name
+     * @param string $method
      * @param array $defaults
      * @return $this
      */
-    public function addRoute($name, $method, $path, $callback, array $defaults = [])
+    public function addRoute($path, $callback, $name = null, $method = 'ANY', array $defaults = [])
     {
+        $name = empty($name) ? $path : $name;
+
         if (isset($this->aliasMap[$name])) {
             return $this;
         }
 
         $path = implode('/', $this->with) . $path;
 
-        $route = new Route($name, $method, $path, $callback, $defaults);
+        $route = new Route($path, $callback, $name, $method, $defaults);
 
         if ($route->isStaticRoute()) {
             $this->staticRoutes[$method][$path] = $route;
@@ -251,7 +244,7 @@ class RouteCollection
     /**
      * @return void
      */
-    public function saveCache()
+    public function caching()
     {
         $this->cache->saveCache();
     }

@@ -18,9 +18,9 @@ for ($n = 0; $n < 10; $n++) {
 
     $startTime = microtime(true);
     for ($i = 0, $str = 'a'; $i < $nRoutes; $i++, $str++) {
-        $router->addRoute('branch' . $i, 'GET', '/' . $str . '/{arg}', function () {
+        $router->addRoute('/' . $str . '/{arg}', function () {
             return 'hello world';
-        });
+        }, 'branch' . $i, 'GET');
     }
     for ($i = 0; $i < $nMatches; $i++) {
         $res = $router->dispatch('GET', '/g/30000');
