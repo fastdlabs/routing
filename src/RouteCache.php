@@ -72,14 +72,38 @@ class RouteCache
      */
     public function dump()
     {
-        $statics = $this->dumpStatics();
-
-        $dynamics = $this->dumpDynamics();
-
         return var_export([
-            'statics' => $statics,
-            'dynamics' => $dynamics,
+            'statics' => $this->dumpStatics(),
+            'dynamics' => $this->dumpDynamics(),
+            'alias' => $this->dumpAlias(),
         ], true);
+    }
+
+    /**
+     * @return array
+     */
+    protected function dumpAlias()
+    {
+        $cacheData = [];
+
+        foreach ($this->collection->aliasMap as $key => $list) {
+            foreach ($list as $name => $route) {
+                if (is_object($route)) {
+                    $cacheData[$key][$route->getPath()] = [
+                        'name' => $route->getName(),
+                        'path' => $route->getPath(),
+                        'method' => $route->getMethod(),
+                        'variables' => $route->getVariables(),
+                        'requirements' => $route->getRequirements(),
+                        'defaults' => $route->getParameters(),
+                        'regex' => $route->getRegex(),
+                        'callback' => $route->getCallback(),
+                    ];
+                }
+            }
+        }
+
+        return $cacheData;
     }
 
     /**
@@ -154,15 +178,25 @@ class RouteCache
     }
 
     /**
+     * @return bool
+     */
+    public function hasCache()
+    {
+        return file_exists($this->cache);
+    }
+
+    /**
      * Load routes cache.
      *
      * @return void
      */
     public function loadCache()
     {
-        if (file_exists($this->cache)) {
-            $cacheData = include $this->cache;
-            $this->collection->map($cacheData);
+        if ($this->hasCache()) {
+            $routes = include $this->cache;
+            $this->collection->staticRoutes = isset($routes['statics']) ? $routes['statics'] : [];
+            $this->collection->dynamicRoutes = isset($routes['dynamics']) ? $routes['dynamics'] : [];
+            $this->collection->aliasMap = isset($routes['alias']) ? $routes['alias'] : [];
         }
     }
 

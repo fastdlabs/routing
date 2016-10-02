@@ -66,7 +66,7 @@ class RouteCollection
     /**
      * @var RouteCache
      */
-    protected $cache;
+    public $cache;
 
     /**
      * RouteCollection constructor.
@@ -76,18 +76,6 @@ class RouteCollection
     public function __construct($dir = null)
     {
         $this->cache = new RouteCache($this, $dir);
-    }
-
-    /**
-     * @param array $routes
-     * @return $this
-     */
-    public function map(array $routes)
-    {
-        $this->staticRoutes = isset($routes['statics']) ? $routes['statics'] : [];
-        $this->dynamicRoutes = isset($routes['dynamics']) ? $routes['dynamics'] : [];
-
-        return $this;
     }
 
     /**

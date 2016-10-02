@@ -14,24 +14,33 @@ use FastD\Routing\RouteCollection;
 
 class RouteCacheTest extends \PHPUnit_Framework_TestCase
 {
-    public function testToCache()
+    protected $collections;
+
+    public function setUp()
     {
         $collections = new RouteCollection(__DIR__);
 
-        $collections->addRoute('GET', '/', 'tests');
-        $collections->addRoute('GET', '/{id}', 'tests@');
+        if (!$collections->cache->hasCache()) {
+            $collections->addRoute('GET', '/', 'tests');
+            $collections->addRoute('GET', '/{id}', 'tests@');
+        }
 
-        $collections->caching();
+        $this->collections = $collections;
+    }
+
+    public function testToCache()
+    {
+        if (!$this->collections->cache->hasCache()) {
+            $this->collections->caching();
+        }
     }
 
     public function testLoadCache()
     {
-        $collections = new RouteCollection(__DIR__);
+        $this->assertEquals(1, count($this->collections->staticRoutes));
+        $this->assertEquals(1, count($this->collections->dynamicRoutes));
 
-        $this->assertEquals(1, count($collections->staticRoutes));
-        $this->assertEquals(1, count($collections->dynamicRoutes));
-
-        $route = $collections->match('GET', '/1');
+        $route = $this->collections->match('GET', '/1');
 
         $this->assertInstanceOf(Route::class, $route);
     }
