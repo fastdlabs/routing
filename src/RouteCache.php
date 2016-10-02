@@ -162,8 +162,7 @@ class RouteCache
     {
         if (file_exists($this->cache)) {
             $cacheData = include $this->cache;
-            $this->collection->dynamicRoutes = isset($cacheData['dynamics']) ? $cacheData['dynamics'] : [];
-            $this->collection->staticRoutes = isset($cacheData['statics']) ? $cacheData['statics'] : [];
+            $this->collection->map($cacheData);
         }
     }
 

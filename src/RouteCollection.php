@@ -79,6 +79,18 @@ class RouteCollection
     }
 
     /**
+     * @param array $routes
+     * @return $this
+     */
+    public function map(array $routes)
+    {
+        $this->staticRoutes = isset($routes['statics']) ? $routes['statics'] : [];
+        $this->dynamicRoutes = isset($routes['dynamics']) ? $routes['dynamics'] : [];
+
+        return $this;
+    }
+
+    /**
      * @param          $path
      * @param callable $callback
      */
@@ -97,7 +109,13 @@ class RouteCollection
      */
     public function getRoute($name)
     {
-        return $this->aliasMap[$name] ?? false;
+        foreach ($this->aliasMap as $method => $routes) {
+            if (isset($routes[$name])) {
+                return $routes[$name];
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -112,7 +130,7 @@ class RouteCollection
     {
         $name = empty($name) ? $path : $name;
 
-        if (isset($this->aliasMap[$name])) {
+        if (isset($this->aliasMap[$method][$name])) {
             return $this;
         }
 
@@ -140,7 +158,7 @@ class RouteCollection
             unset($numGroups, $numVariables);
         }
 
-        $this->aliasMap[$name] = $route;
+        $this->aliasMap[$method][$name] = $route;
 
         return $this;
     }
@@ -153,39 +171,57 @@ class RouteCollection
      */
     public function match($method, $path)
     {
-        if (isset($this->staticRoutes[$method][$path])) {
+        if (!isset($this->staticRoutes[$method][$path])) {
+            if (!isset($this->staticRoutes['ANY'][$path])) {
+
+                $dynamicRoutes = $this->dynamicRoutes;
+                $routes = isset($dynamicRoutes[$method]) ? $dynamicRoutes[$method] : [];
+                unset($dynamicRoutes[$method]);
+
+                $match = function ($path, $data) {
+                    if (!preg_match($data['regex'], $path, $matches)) {
+                        return false;
+                    }
+                    $route = $data['routes'][count($matches)];
+
+                    if (!($route instanceof Route)) {
+                        $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
+                    }
+
+                    preg_match('~^' . $route->getRegex() . '$~', $path, $match);
+
+                    $match = array_slice($match, 1, count($route->getVariables()));
+                    $route->mergeParameters(array_combine($route->getVariables(), $match));
+
+                    return $route;
+                };
+
+                foreach ($routes as $data) {
+                    if (false !== ($route = $match($path, $data))) {
+                        return $route;
+                    }
+                }
+
+                foreach ($dynamicRoutes as $dynamicRoute) {
+                    foreach ($dynamicRoute as $data) {
+                        if (false !== ($route = $match($path, $data))) {
+                            $route->setMethod($method);
+                            return $route;
+                        }
+                    }
+                }
+
+                throw new RouteNotFoundException($path);
+            }
+            $route = $this->staticRoutes['ANY'][$path];
+        } else {
             $route = $this->staticRoutes[$method][$path];
-            if (!($route instanceof Route)) {
-                $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
-            }
-            return $route;
         }
 
-        if (!isset($this->dynamicRoutes[$method])) {
-            throw new RouteNotFoundException($path);
+        if (!($route instanceof Route)) {
+            $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
         }
-
-        $quoteMap = $this->dynamicRoutes[$method];
-
-        foreach ($quoteMap as $data) {
-            if (!preg_match($data['regex'], $path, $matches)) {
-                continue;
-            }
-            $route = $data['routes'][count($matches)];
-
-            if (!($route instanceof Route)) {
-                $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
-            }
-
-            preg_match('~^' . $route->getRegex() . '$~', $path, $match);
-
-            $match = array_slice($match, 1, count($route->getVariables()));
-            $route->mergeParameters(array_combine($route->getVariables(), $match));
-            
-            return $route;
-        }
-
-        throw new RouteNotFoundException($path);
+        return $route;
     }
 
     /**
@@ -203,17 +239,21 @@ class RouteCollection
     /**
      * @param $name
      * @param array $parameters
-     * @param null $format
+     * @param string $format
      * @return string
      * @throws \Exception
      */
-    public function generateUrl($name, array $parameters = [], $format = null)
+    public function generateUrl($name, array $parameters = [], $format = '')
     {
         if (false === ($route = $this->getRoute($name))) {
             throw new RouteNotFoundException($name);
         }
 
-        if (null !== $format) {
+        if (!($route instanceof Route)) {
+            $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
+        }
+
+        if (!empty($format)) {
             $format = '.' . $format;
         } else {
             $format = '';

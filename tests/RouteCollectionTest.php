@@ -14,114 +14,144 @@ use FastD\Routing\Router;
 
 class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var RouteCollection
+     */
+    protected $collection;
+
+    public function setUp()
+    {
+        $collection = new RouteCollection();
+
+        $collection->addRoute('GET', '/test', []);
+        $collection->addRoute('GET', '/test/{name}', []);
+        $collection->addRoute('GET', '/user/profile/{name}', []);
+        $collection->addRoute('POST', '/user/profile/{name}', []);
+        $collection->addRoute('ANY', '/user/email/{name}', []);
+
+        $this->collection = $collection;
+    }
+
     public function testAddRouteToCollection()
     {
-        $collection = new RouteCollection();
-
-        $collection->addRoute('GET', '/test', [], 'test1');
-        $collection->addRoute('GET', '/test/{name}', [], 'test2');
-        $collection->addRoute('GET', '/user/profile/{name}', function ( ) {
-            return 'get profile';
-        }, 'test3');
-        $collection->addRoute('POST', '/user/profile/{name}', function () {
-            return 'post profile';
-        }, 'user');
-
-        $route = $collection->match('GET', '/user/profile/janhuang');
-
-        $this->assertEquals('get profile', call_user_func_array($route->getCallback(), []));
-
-        $route = $collection->match('POST', '/user/profile/janhuang');
-
-        $this->assertEquals('post profile', call_user_func_array($route->getCallback(), []));
+        $this->assertEquals(count($this->collection->staticRoutes), 1);
+        $this->assertEquals(count($this->collection->dynamicRoutes), 3);
+        $this->assertEquals(count($this->collection->dynamicRoutes['GET'][0]['routes']), 2);
+        $this->assertEquals(count($this->collection->dynamicRoutes['POST'][0]['routes']), 1);
     }
 
-    public function testAddRouteToCollectionGroup()
+    public function testRouteGetMethodMatch()
+    {
+        $route = $this->collection->match('GET', '/test');
+
+        $this->assertEquals('GET', $route->getMethod());
+        $this->assertEquals('/test', $route->getName());
+        $this->assertEquals($route->getName(), $route->getPath());
+        $this->assertTrue($route->isStaticRoute());
+    }
+
+    public function testRoutePostMethodMatch()
+    {
+        $route = $this->collection->match('POST', '/user/profile/jan');
+
+        $this->assertEquals('POST', $route->getMethod());
+        $this->assertEquals($route->getName(), $route->getPath());
+        $this->assertFalse($route->isStaticRoute());
+        $this->assertEquals(['name' => 'jan'], $route->getParameters());
+        $this->assertEquals(['name'], $route->getVariables());
+    }
+
+    public function testRouteAnyMethodMatch()
+    {
+        $route = $this->collection->match('POST', '/user/email/jan');
+
+        $this->assertEquals('POST', $route->getMethod());
+    }
+
+    public function testRouteGenerator()
+    {
+        $url = $this->collection->generateUrl('/user/email/{name}', ['name' => 'jan']);
+
+        $this->assertEquals('/user/email/jan', $url);
+
+        $url = $this->collection->generateUrl('/user/email/{name}', ['name' => 'jan'], 'html');
+
+        $this->assertEquals('/user/email/jan.html', $url);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDynamicRouteOptionalVariablesNotDefaultValues()
     {
         $collection = new RouteCollection();
 
-        $collection->group('/user', function (RouteCollection $collection) {
-            $collection->addRoute('GET', '/test', function () {
-                return 'hello collection group';
-            }, 'test1');
-        });
+        $collection->addRoute('GET', '/users/[{name}]', function ($name) {
+            return $name;
+        }, 'test');
 
-        $route = $collection->match('GET', '/user/test');
-
-        $this->assertEquals('hello collection group', call_user_func_array($route->getCallback(), []));
-    }
-
-    public function testRouteMatch()
-    {
-        $collection = new RouteCollection();
-
-        for ($i = 0; $i < 15; $i++) {
-            $collection->addRoute('GET', '/test_' . $i, function () use ($i) {
-                return $i;
-            }, 'test' . $i);
+        try {
+            $collection->dispatch('GET', '/users');
+        } catch (\Exception $e) {
+            throw new \Exception('damn it');
         }
-
-        $route = $collection->match('GET', '/test_1');
-
-        $this->assertEquals(1, call_user_func_array($route->getCallback(), []));
-
-        $route = $collection->match('GET', '/test_10');
-
-        $this->assertEquals(10, call_user_func_array($route->getCallback(), []));
-
-        $route = $collection->match('GET', '/test_13');
-
-        $this->assertEquals(13, call_user_func_array($route->getCallback(), []));
     }
 
-    public function testGenerateUrl()
+    public function testDynamicRouteOptionalVariablesHasDefaultValue()
     {
         $collection = new RouteCollection();
 
-        $collection->addRoute('GET', '/user/profile', function () {
-
-        }, 'static1');
-
-//        $this->assertEquals('GET', '/user/profile', $collection->generateUrl('static1'));
-
-        $collection->addRoute('GET', '/user/{name}/profile', function ($name) {
+        $collection->addRoute('GET', '/users/[{name}]', function ($name = null) {
             return $name;
-        }, 'test1');
+        }, 'test');
 
-        $path = $collection->generateUrl('test1', ['name' => 'janhuang']);
+        $this->assertEquals('', $collection->dispatch('GET', '/users'));
 
-        $this->assertEquals('/user/janhuang/profile', $path);
-
-        $collection->addRoute('GET', '/articles/[{id}]', function ($name) {
+        $collection->addRoute('GET', '/[{name}]', function ($name) {
             return $name;
-        }, 'test2');
+        }, 'test2',  ['name' => 'janhuang']);
 
-        $path = $collection->generateUrl('test2');
-
-        $this->assertEquals('/articles', $path);
-
-        $path = $collection->generateUrl('test2', ['id' => '10']);
-
-        $this->assertEquals('/articles/10', $path);
-
-        $regex = '~^(' . $collection->getRoute('test2')->getRegex() . ')$~';
-
-        $this->assertRegExp($regex, '/articles/10');
-        $this->assertRegExp($regex, '/articles');
+        $this->assertEquals('janhuang', $collection->dispatch('GET', '/'));
     }
 
-    public function testDynamicRouteMatch()
+
+    /**
+     * @expectedException \FastD\Routing\Exceptions\RouteNotFoundException
+     */
+    public function testRouteCallbackParameters()
     {
         $collection = new RouteCollection();
 
-        $collection->addRoute('GET', '/user/{user}', function ($user) {
-            return $user;
-        }, 'profile');
-        $collection->addRoute('GET', '/user/{user}/{age}', function ($user, $age) {
-            return $user . $age;
-        }, 'profile.age');
+        $collection->addRoute('GET', '/user/{name}', function ($name) {
+            return $name;
+        }, 'test',['name' => 'jan']);
 
-        $this->assertEquals('jan', $collection->dispatch('GET', '/user/jan'));
-        $this->assertEquals('jan18', $collection->dispatch('GET', '/user/jan/18'));
+        $collection->addRoute('GET', '/user/{name}/{age}', function ($name, $age) {
+            return $name . $age;
+        }, 'test2', ['name' => 'janhuang']);
+
+        $route = $collection->match('GET', '/user/test2');
+
+        $this->assertEquals([
+            'name' => 'test2'
+        ], $route->getParameters());
+
+        $route = $collection->match('GET', '/user/test2/123');
+
+        $this->assertEquals([
+            'name' => 'test2',
+            'age' => 123
+        ], $route->getParameters());
+
+
+        $this->assertEquals('janhuang', $collection->dispatch('GET', '/user/janhuang'));
+
+        $this->assertEquals('janhuang11', $collection->dispatch('GET', '/user/janhuang/11'));
+
+        $collection->addRoute('GET', '/profile/{name}/{age}', function ($name, $age) {
+            return $name . $age;
+        }, 'test2', ['name' => 'janhuang', 'age' => 18]);
+
+        $this->assertEquals('janhuang', $collection->dispatch('GET', '/profile/janhuang'));
     }
 }
