@@ -44,4 +44,13 @@ class RouteCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Route::class, $route);
     }
+
+    public function testRouteCacheGenerateUrl()
+    {
+        $routeCollection = new RouteCollection(__DIR__);
+
+        $this->assertEquals('/', $routeCollection->generateUrl('/'));
+        $this->assertEquals('/.html', $routeCollection->generateUrl('/', [], 'html'));
+        $this->assertEquals('/.html', $routeCollection->generateUrl('/', ['foo' => 'bar'], 'html'));
+    }
 }
