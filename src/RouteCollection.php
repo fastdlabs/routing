@@ -8,6 +8,7 @@
  */
 
 namespace FastD\Routing;
+
 use FastD\Routing\Exceptions\RouteNotFoundException;
 
 /**
@@ -23,6 +24,11 @@ class RouteCollection
      * @var array
      */
     protected $with = [];
+
+    /**
+     * @var string
+     */
+    protected $ascribe;
 
     /**
      * @var Route
@@ -79,6 +85,17 @@ class RouteCollection
     }
 
     /**
+     * @param $name
+     * @return $this
+     */
+    public function ascribe($name)
+    {
+        $this->ascribe = $name;
+
+        return $this;
+    }
+
+    /**
      * @param          $path
      * @param callable $callback
      */
@@ -112,6 +129,19 @@ class RouteCollection
      * @param $callback
      * @param null $name
      * @param array $defaults
+     * @return Route
+     */
+    protected function createRoute($method, $path, $callback, $name = null, $defaults = [])
+    {
+        return new Route($method, $path, $callback, $name, $defaults);
+    }
+
+    /**
+     * @param $method
+     * @param $path
+     * @param $callback
+     * @param null $name
+     * @param array $defaults
      * @return $this
      */
     public function addRoute($method, $path, $callback, $name = null, array $defaults = [])
@@ -124,7 +154,7 @@ class RouteCollection
 
         $path = implode('/', $this->with) . $path;
 
-        $route = new Route($method, $path, $callback, $name, $defaults);
+        $route = $this->createRoute($method, $path, $callback, $name, $defaults);
 
         if ($route->isStaticRoute()) {
             $this->staticRoutes[$method][$path] = $route;
@@ -161,7 +191,6 @@ class RouteCollection
     {
         if (!isset($this->staticRoutes[$method][$path])) {
             if (!isset($this->staticRoutes['ANY'][$path])) {
-
                 $dynamicRoutes = $this->dynamicRoutes;
                 $routes = isset($dynamicRoutes[$method]) ? $dynamicRoutes[$method] : [];
                 unset($dynamicRoutes[$method]);
@@ -173,7 +202,7 @@ class RouteCollection
                     $route = $data['routes'][count($matches)];
 
                     if (!($route instanceof Route)) {
-                        $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
+                        $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
                     }
 
                     preg_match('~^' . $route->getRegex() . '$~', $path, $match);
@@ -207,8 +236,9 @@ class RouteCollection
         }
 
         if (!($route instanceof Route)) {
-            $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
+            $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
         }
+
         return $route;
     }
 
@@ -238,7 +268,7 @@ class RouteCollection
         }
 
         if (!($route instanceof Route)) {
-            $route = new Route($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
+            $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
         }
 
         if (!empty($format)) {
@@ -275,6 +305,11 @@ class RouteCollection
         }
 
         return $path . $format . ([] === $queryString ? '' : '?' . http_build_query($queryString));
+    }
+
+    public function dump()
+    {
+
     }
 
     /**
