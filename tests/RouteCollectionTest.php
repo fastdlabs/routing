@@ -155,4 +155,14 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('janhuang', $collection->dispatch('GET', '/profile/janhuang'));
     }
 
+    public function testRouteMatch()
+    {
+        $collection = new RouteCollection();
+
+        $collection->addRoute('GET', '/test/', '');
+
+        $route = $collection->getRoute("/test");
+
+        var_dump($route);
+    }
 }
