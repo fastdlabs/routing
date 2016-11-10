@@ -12,7 +12,7 @@ include __DIR__ . '/vendor/autoload.php';
 
 for ($n = 0; $n < 10; $n++) {
     $nRoutes = 100;
-    $nMatches = 3000;
+    $nMatches = 300;
 
     $router = new \FastD\Routing\RouteCollection();
 

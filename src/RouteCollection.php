@@ -76,12 +76,10 @@ class RouteCollection
 
     /**
      * RouteCollection constructor.
-     *
-     * @param null $dir
      */
-    public function __construct($dir = null)
+    public function __construct()
     {
-        $this->cache = new RouteCache($this, $dir);
+        $this->cache = new RouteCache($this);
     }
 
     /**
@@ -307,16 +305,19 @@ class RouteCollection
         return $path . $format . ([] === $queryString ? '' : '?' . http_build_query($queryString));
     }
 
-    public function dump()
+    /**
+     * @param $dir
+     */
+    public function loadCaching($dir)
     {
-
+        $this->cache->loadCache($dir);
     }
 
     /**
-     * @return void
+     * @param $dir
      */
-    public function caching()
+    public function caching($dir)
     {
-        $this->cache->saveCache();
+        $this->cache->saveCache($dir);
     }
 }

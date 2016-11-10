@@ -9,48 +9,40 @@
 
 namespace FastD\Routing\Tests;
 
-use FastD\Routing\Route;
 use FastD\Routing\RouteCollection;
 
 class RouteCacheTest extends \PHPUnit_Framework_TestCase
 {
-    protected $collections;
+    /**
+     * @var RouteCollection
+     */
+    protected $collection;
+
+    protected $cache;
 
     public function setUp()
     {
-        $collections = new RouteCollection(__DIR__);
+        $collection = new RouteCollection();
 
-        if (!$collections->cache->hasCache()) {
-            $collections->addRoute('GET', '/', 'tests');
-            $collections->addRoute('GET', '/{id}', 'tests@');
+        if (!$collection->cache->hasCache()) {
+            $collection->addRoute('GET', '/test', []);
+            $collection->addRoute('GET', '/test/{name}', []);
+            $collection->addRoute('GET', '/user/profile/{name}', []);
+            $collection->addRoute('POST', '/user/profile/{name}', []);
+            $collection->addRoute('ANY', '/user/email/{name}', []);
+        } else {
+            $collection->loadCaching(__DIR__);
         }
 
-        $this->collections = $collections;
+        $this->collection = $collection;
     }
 
-    public function testToCache()
+    public function testCache()
     {
-        if (!$this->collections->cache->hasCache()) {
-            $this->collections->caching();
-        }
-    }
+        $route = $this->collection->match('GET', '/test/123');
 
-    public function testLoadCache()
-    {
-        $this->assertEquals(1, count($this->collections->staticRoutes));
-        $this->assertEquals(1, count($this->collections->dynamicRoutes));
-
-        $route = $this->collections->match('GET', '/1');
-
-        $this->assertInstanceOf(Route::class, $route);
-    }
-
-    public function testRouteCacheGenerateUrl()
-    {
-        $routeCollection = new RouteCollection(__DIR__);
-
-        $this->assertEquals('/', $routeCollection->generateUrl('/'));
-        $this->assertEquals('/.html', $routeCollection->generateUrl('/', [], 'html'));
-        $this->assertEquals('/.html', $routeCollection->generateUrl('/', ['foo' => 'bar'], 'html'));
+        $this->assertEquals([
+            'name' => '123',
+        ], $route->getParameters());
     }
 }

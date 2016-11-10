@@ -37,17 +37,12 @@ class RouteCache
      * RouteCache constructor.
      *
      * @param RouteCollection $routeCollection
-     * @param null $dir
      */
-    public function __construct(RouteCollection $routeCollection, $dir = null)
+    public function __construct(RouteCollection $routeCollection)
     {
         $this->collection = $routeCollection;
 
-        $this->dir = $this->targetDirectory($dir);
-
         $this->cache = $this->dir . DIRECTORY_SEPARATOR . static::CACHE;
-
-        $this->loadCache();
     }
 
     /**
@@ -186,12 +181,12 @@ class RouteCache
     }
 
     /**
-     * Load routes cache.
-     *
-     * @return void
+     * @param $dir
      */
-    public function loadCache()
+    public function loadCache($dir)
     {
+        $this->dir = $this->targetDirectory($dir);
+
         if ($this->hasCache()) {
             $routes = include $this->cache;
             $this->collection->staticRoutes = isset($routes['statics']) ? $routes['statics'] : [];
@@ -201,10 +196,12 @@ class RouteCache
     }
 
     /**
-     * @return void
+     * @param $dir
      */
-    public function saveCache()
+    public function saveCache($dir)
     {
+        $this->dir = $this->targetDirectory($dir);
+
         file_put_contents($this->cache, $this->wrapPhp());
     }
 }

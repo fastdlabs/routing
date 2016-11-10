@@ -73,7 +73,10 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $url = $this->collection->generateUrl('/user/email/{name}', ['name' => 'jan']);
 
         $this->assertEquals('/user/email/jan', $url);
+    }
 
+    public function testRouteGeneratorHasSuffix()
+    {
         $url = $this->collection->generateUrl('/user/email/{name}', ['name' => 'jan'], 'html');
 
         $this->assertEquals('/user/email/jan.html', $url);
@@ -130,19 +133,17 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
             return $name . $age;
         }, 'test2', ['name' => 'janhuang']);
 
-        $route = $collection->match('GET', '/user/test2');
+        $route1 = $collection->match('GET', '/user/test2');
+        $route2 = $collection->match('GET', '/user/test2/123');
 
         $this->assertEquals([
             'name' => 'test2'
-        ], $route->getParameters());
-
-        $route = $collection->match('GET', '/user/test2/123');
+        ], $route1->getParameters());
 
         $this->assertEquals([
             'name' => 'test2',
             'age' => 123
-        ], $route->getParameters());
-
+        ], $route2->getParameters());
 
         $this->assertEquals('janhuang', $collection->dispatch('GET', '/user/janhuang'));
 
@@ -153,16 +154,5 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         }, 'test2', ['name' => 'janhuang', 'age' => 18]);
 
         $this->assertEquals('janhuang', $collection->dispatch('GET', '/profile/janhuang'));
-    }
-
-    public function testRouteMatch()
-    {
-        $collection = new RouteCollection();
-
-        $collection->addRoute('GET', '/test/', '');
-
-        $route = $collection->getRoute("/test");
-
-        print_r($collection);
     }
 }
