@@ -231,7 +231,7 @@ class Route
 
         if (preg_match_all('/\{(\w+)\}/i', $route, $match)) {
             foreach ($match[1] as $val) {
-                $pattern = '?P<' . $val . '>' . (isset($this->requirements[$val]) ? $this->requirements[$val] : '\w*');
+                $pattern = '?P<' . $val . '>' . (isset($this->requirements[$val]) ? $this->requirements[$val] : '[\w,]*');
                 $default = null;
                 $limited = '{1}';
                 if (array_key_exists($val, $this->getDefaults())) {
