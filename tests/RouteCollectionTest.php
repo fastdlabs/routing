@@ -163,6 +163,6 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $route = $collection->getRoute("/test");
 
-        var_dump($route);
+        print_r($collection);
     }
 }
