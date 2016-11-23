@@ -214,7 +214,7 @@ class RouteCollection
             return $this->getRoute($name);
         }
 
-        $path = implode('/', $this->with) . $path;
+        $path = rtrim(str_replace('//','/', implode('/', $this->with) . $path));
 
         $route = $this->createRoute($method, $path, $callback, $defaults);
 
