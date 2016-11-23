@@ -96,6 +96,7 @@ class RouteCollection
     /**
      * @param          $path
      * @param callable $callback
+     * @return $this
      */
     public function group($path, callable $callback)
     {
@@ -104,6 +105,8 @@ class RouteCollection
         $callback($this);
 
         array_pop($this->with);
+
+        return $this;
     }
 
     /**
