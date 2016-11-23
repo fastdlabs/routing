@@ -15,7 +15,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 {
     public function testRoute()
     {
-        $route = new Route('GET', '/test', [], 'test');
+        $route = new Route('GET', '/test', []);
 
         $this->assertEquals('GET', $route->getMethod());
 
@@ -26,7 +26,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
     public function testDynamicRouteRequireVariables()
     {
-        $route = new Route('GET', '/users/{name}', [], 'test');
+        $route = new Route('GET', '/users/{name}', []);
 
         $regex = '~^(' . $route->getRegex() . ')$~';
 

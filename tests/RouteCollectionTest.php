@@ -45,8 +45,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $route = $this->collection->match('GET', '/test');
 
         $this->assertEquals('GET', $route->getMethod());
-        $this->assertEquals('/test', $route->getName());
-        $this->assertEquals($route->getName(), $route->getPath());
+        $this->assertNull($route->getName());
         $this->assertTrue($route->isStaticRoute());
     }
 
@@ -55,7 +54,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $route = $this->collection->match('POST', '/user/profile/jan');
 
         $this->assertEquals('POST', $route->getMethod());
-        $this->assertEquals($route->getName(), $route->getPath());
+        $this->assertNull($route->getName());
         $this->assertFalse($route->isStaticRoute());
         $this->assertEquals(['name' => 'jan'], $route->getParameters());
         $this->assertEquals(['name'], $route->getVariables());
@@ -91,7 +90,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $collection->addRoute('GET', '/users/[{name}]', function ($name) {
             return $name;
-        }, 'test');
+        });
 
         try {
             $collection->dispatch('GET', '/users');
@@ -106,13 +105,13 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $collection->addRoute('GET', '/users/[{name}]', function ($name = null) {
             return $name;
-        }, 'test');
+        });
 
         $this->assertEquals('', $collection->dispatch('GET', '/users'));
 
         $collection->addRoute('GET', '/[{name}]', function ($name) {
             return $name;
-        }, 'test2',  ['name' => 'janhuang']);
+        },  ['name' => 'janhuang']);
 
         $this->assertEquals('janhuang', $collection->dispatch('GET', '/'));
     }
@@ -127,11 +126,11 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $collection->addRoute('GET', '/user/{name}', function ($name) {
             return $name;
-        }, 'test',['name' => 'jan']);
+        },['name' => 'jan']);
 
         $collection->addRoute('GET', '/user/{name}/{age}', function ($name, $age) {
             return $name . $age;
-        }, 'test2', ['name' => 'janhuang']);
+        }, ['name' => 'janhuang']);
 
         $route1 = $collection->match('GET', '/user/test2');
         $route2 = $collection->match('GET', '/user/test2/123');
@@ -151,7 +150,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 
         $collection->addRoute('GET', '/profile/{name}/{age}', function ($name, $age) {
             return $name . $age;
-        }, 'test2', ['name' => 'janhuang', 'age' => 18]);
+        }, ['name' => 'janhuang', 'age' => 18]);
 
         $this->assertEquals('janhuang', $collection->dispatch('GET', '/profile/janhuang'));
     }

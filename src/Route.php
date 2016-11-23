@@ -42,22 +42,17 @@ class Route extends RouteRegex
      * @param string $method
      * @param $path
      * @param $callback
-     * @param null $name
      * @param array $defaults
      */
-    public function __construct($method = 'ANY', $path, $callback, $name = null, array $defaults = [])
+    public function __construct($method = 'ANY', $path, $callback, array $defaults = [])
     {
         parent::__construct($path);
 
-        $name = empty($name) ? $path : $name;
+        $this->withMethod($method);
 
-        $this->setName($name);
+        $this->withCallback($callback);
 
-        $this->setMethod($method);
-
-        $this->setCallback($callback);
-
-        $this->setParameters($defaults);
+        $this->withParameters($defaults);
     }
 
     /**
@@ -72,7 +67,7 @@ class Route extends RouteRegex
      * @param string $name
      * @return $this
      */
-    public function setName($name)
+    public function withName($name)
     {
         $this->name = $name;
 
@@ -83,7 +78,7 @@ class Route extends RouteRegex
      * @param array|string $method
      * @return $this
      */
-    public function setMethod($method)
+    public function withMethod($method)
     {
         $this->method = $method;
 
@@ -102,7 +97,7 @@ class Route extends RouteRegex
      * @param string $callback
      * @return $this
      */
-    public function setCallback($callback = null)
+    public function withCallback($callback = null)
     {
         $this->callback = $callback;
 
@@ -129,7 +124,7 @@ class Route extends RouteRegex
      * @param array $parameters
      * @return $this
      */
-    public function setParameters(array $parameters)
+    public function withParameters(array $parameters)
     {
         $this->parameters = $parameters;
 
@@ -145,5 +140,16 @@ class Route extends RouteRegex
         $this->parameters = array_merge($this->parameters, array_filter($parameters));
 
         return $this;
+    }
+
+    /**
+     * use laravel using.
+     *
+     * @param $name
+     * @return Route
+     */
+    public function name($name)
+    {
+        return $this->withName($name);
     }
 }

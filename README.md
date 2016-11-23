@@ -23,7 +23,7 @@ composer require "fastd/routing:3.0.x-dev"
 
 ```php
 $collection = new FastD\Routing\RouteCollection();
-$collection->addRoute('name', 'GET', '/', function () {
+$collection->get('/', function () {
     return 'hello world';
 });
 $response = $collection->dispatch('GET', '/'); // hello world
@@ -33,7 +33,7 @@ $response = $collection->dispatch('GET', '/'); // hello world
 
 ```php
 $collection = new FastD\Routing\RouteCollection();
-$collection->addRoute('name', 'GET', '/{name}', function ($name) {
+$collection->get('/{name}', function ($name) {
     return 'hello ' . $name;
 });
 $response = $collection->dispatch('GET', '/janhuang'); // hello janhuang
@@ -47,9 +47,9 @@ $response = $collection->dispatch('GET', '/janhuang'); // hello janhuang
 
 ```php
 $collection = new FastD\Routing\RouteCollection();
-$collection->addRoute('GET', '/[{name}]', function ($name) {
+$collection->get('/[{name}]', function ($name) {
     return 'hello ' . $name;
-}, 'name', ['name' => 'jan']);
+}, ['name' => 'jan']);
 $response = $collection->dispatch('GET', '/'); // hello jan
 ```
 
@@ -59,12 +59,12 @@ $response = $collection->dispatch('GET', '/'); // hello jan
 
 ```php
 $collection = new FastD\Routing\RouteCollection();
-$collection->addRoute('GET', '/', function () {
+$collection->get('/', function () {
     return 'hello GET';
-}, 'name.get',);
-$collection->addRoute('POST', '/', function () {
+});
+$collection->post('/', function () {
     return 'hello POST';
-}, 'name.post');
+});
 $response = $collection->dispatch('GET', '/'); // hello GET
 $response = $collection->dispatch('POST', '/'); // hello POST
 ```
@@ -75,9 +75,9 @@ $response = $collection->dispatch('POST', '/'); // hello POST
 $collection = new RouteCollection();
 
 $collection->group('/user', function (RouteCollection $collection) {
-    $collection->addRoute('GET', '/profile/{name}', function ($name) {
+    $collection->get('/profile/{name}', function ($name) {
         return 'hello ' . $name;
-    }, 'user.profile');
+    });
 });
 
 $response = $collection->dispatch('GET', '/user/profile/janhuang'); // hello janhuang

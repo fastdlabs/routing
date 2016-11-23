@@ -36,12 +36,12 @@ class RouteCollection
     protected $activeRoute;
 
     /**
-     * @var array
+     * @var Route[]
      */
     public $staticRoutes = [];
 
     /**
-     * @var array
+     * @var Route[]
      */
     public $dynamicRoutes = [];
 
@@ -107,6 +107,72 @@ class RouteCollection
     }
 
     /**
+     * @param $path
+     * @param $callback
+     * @param array $defaults
+     * @return RouteCollection
+     */
+    public function get($path, $callback, array $defaults = [])
+    {
+        return $this->addRoute('GET', $path, $callback, $defaults);
+    }
+
+    /**
+     * @param $path
+     * @param $callback
+     * @param array $defaults
+     * @return RouteCollection
+     */
+    public function post($path, $callback, array $defaults = [])
+    {
+        return $this->addRoute('POST', $path, $callback, $defaults);
+    }
+
+    /**
+     * @param $path
+     * @param $callback
+     * @param array $defaults
+     * @return RouteCollection
+     */
+    public function put($path, $callback, array $defaults = [])
+    {
+        return $this->addRoute('PUT', $path, $callback, $defaults);
+    }
+
+    /**
+     * @param $path
+     * @param $callback
+     * @param array $defaults
+     * @return RouteCollection
+     */
+    public function delete($path, $callback, array $defaults = [])
+    {
+        return $this->addRoute('DELETE', $path, $callback, $defaults);
+    }
+
+    /**
+     * @param $path
+     * @param $callback
+     * @param array $defaults
+     * @return RouteCollection
+     */
+    public function head($path, $callback, array $defaults = [])
+    {
+        return $this->addRoute('HEAD', $path, $callback, $defaults);
+    }
+
+    /**
+     * @param $path
+     * @param $callback
+     * @param array $defaults
+     * @return RouteCollection
+     */
+    public function patch($path, $callback, array $defaults = [])
+    {
+        return $this->addRoute('PATCH', $path, $callback, $defaults);
+    }
+
+    /**
      * @param $name
      * @return bool|Route
      */
@@ -125,34 +191,32 @@ class RouteCollection
      * @param $method
      * @param $path
      * @param $callback
-     * @param null $name
      * @param array $defaults
      * @return Route
      */
-    protected function createRoute($method, $path, $callback, $name = null, $defaults = [])
+    protected function createRoute($method, $path, $callback, $defaults = [])
     {
-        return new Route($method, $path, $callback, $name, $defaults);
+        return new Route($method, $path, $callback, $defaults);
     }
 
     /**
      * @param $method
      * @param $path
      * @param $callback
-     * @param null $name
      * @param array $defaults
-     * @return $this
+     * @return Route
      */
-    public function addRoute($method, $path, $callback, $name = null, array $defaults = [])
+    public function addRoute($method, $path, $callback, array $defaults = [])
     {
-        $name = empty($name) ? $path : $name;
+        $name = $path;
 
-        if (isset($this->aliasMap[$method][$name])) {
-            return $this;
+        if (isset($this->aliasMap[$method][$path])) {
+            return $this->getRoute($name);
         }
 
         $path = implode('/', $this->with) . $path;
 
-        $route = $this->createRoute($method, $path, $callback, $name, $defaults);
+        $route = $this->createRoute($method, $path, $callback, $defaults);
 
         if ($route->isStaticRoute()) {
             $this->staticRoutes[$method][$path] = $route;
@@ -176,7 +240,7 @@ class RouteCollection
 
         $this->aliasMap[$method][$name] = $route;
 
-        return $this;
+        return $route;
     }
 
     /**
@@ -200,7 +264,10 @@ class RouteCollection
                     $route = $data['routes'][count($matches)];
 
                     if (!($route instanceof Route)) {
-                        $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
+                        $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults']);
+                        if (isset($route['name'])) {
+                            $route->name($route['name']);
+                        }
                     }
 
                     preg_match('~^' . $route->getRegex() . '$~', $path, $match);
@@ -220,7 +287,7 @@ class RouteCollection
                 foreach ($dynamicRoutes as $dynamicRoute) {
                     foreach ($dynamicRoute as $data) {
                         if (false !== ($route = $match($path, $data))) {
-                            $route->setMethod($method);
+                            $route->withMethod($method);
                             return $route;
                         }
                     }
@@ -234,7 +301,11 @@ class RouteCollection
         }
 
         if (!($route instanceof Route)) {
-            $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
+            if (isset($route['name'])) {
+                $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults'])->name($route['name']);
+            } else {
+                $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults']);
+            }
         }
 
         return $route;
@@ -266,7 +337,11 @@ class RouteCollection
         }
 
         if (!($route instanceof Route)) {
-            $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['name'], $route['defaults']);
+            if (isset($route['name'])) {
+                $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults'])->name($route['name']);
+            } else {
+                $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults']);
+            }
         }
 
         if (!empty($format)) {
