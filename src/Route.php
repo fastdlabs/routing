@@ -37,6 +37,11 @@ class Route extends RouteRegex
     protected $name;
 
     /**
+     * @var
+     */
+    protected $middleware = [];
+
+    /**
      * Route constructor.
      *
      * @param string $method
@@ -140,6 +145,11 @@ class Route extends RouteRegex
         $this->parameters = array_merge($this->parameters, array_filter($parameters));
 
         return $this;
+    }
+
+    public function middleware()
+    {
+
     }
 
     /**

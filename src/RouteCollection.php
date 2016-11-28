@@ -70,19 +70,6 @@ class RouteCollection
     protected $regexes = [];
 
     /**
-     * @var RouteCache
-     */
-    public $cache;
-
-    /**
-     * RouteCollection constructor.
-     */
-    public function __construct()
-    {
-        $this->cache = new RouteCache($this);
-    }
-
-    /**
      * @param $name
      * @return $this
      */
@@ -266,13 +253,6 @@ class RouteCollection
                     }
                     $route = $data['routes'][count($matches)];
 
-                    if (!($route instanceof Route)) {
-                        $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults']);
-                        if (isset($route['name'])) {
-                            $route->name($route['name']);
-                        }
-                    }
-
                     preg_match('~^' . $route->getRegex() . '$~', $path, $match);
 
                     $match = array_slice($match, 1, count($route->getVariables()));
@@ -303,14 +283,6 @@ class RouteCollection
             $route = $this->staticRoutes[$method][$path];
         }
 
-        if (!($route instanceof Route)) {
-            if (isset($route['name'])) {
-                $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults'])->name($route['name']);
-            } else {
-                $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults']);
-            }
-        }
-
         return $route;
     }
 
@@ -337,14 +309,6 @@ class RouteCollection
     {
         if (false === ($route = $this->getRoute($name))) {
             throw new RouteNotFoundException($name);
-        }
-
-        if (!($route instanceof Route)) {
-            if (isset($route['name'])) {
-                $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults'])->name($route['name']);
-            } else {
-                $route = $this->createRoute($route['method'], $route['path'], $route['callback'], $route['defaults']);
-            }
         }
 
         if (!empty($format)) {
@@ -381,21 +345,5 @@ class RouteCollection
         }
 
         return $path . $format . ([] === $queryString ? '' : '?' . http_build_query($queryString));
-    }
-
-    /**
-     * @param $dir
-     */
-    public function loadCaching($dir)
-    {
-        $this->cache->loadCache($dir);
-    }
-
-    /**
-     * @param $dir
-     */
-    public function caching($dir)
-    {
-        $this->cache->saveCache($dir);
     }
 }
