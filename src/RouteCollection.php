@@ -26,11 +26,6 @@ class RouteCollection
     protected $with = [];
 
     /**
-     * @var string
-     */
-    protected $ascribe;
-
-    /**
      * @var Route
      */
     protected $activeRoute;
@@ -70,17 +65,6 @@ class RouteCollection
     protected $regexes = [];
 
     /**
-     * @param $name
-     * @return $this
-     */
-    public function ascribe($name)
-    {
-        $this->ascribe = $name;
-
-        return $this;
-    }
-
-    /**
      * @param          $path
      * @param callable $callback
      * @return $this
@@ -100,7 +84,7 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
-     * @return RouteCollection
+     * @return Route
      */
     public function get($path, $callback, array $defaults = [])
     {
@@ -111,7 +95,7 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
-     * @return RouteCollection
+     * @return Route
      */
     public function post($path, $callback, array $defaults = [])
     {
@@ -122,7 +106,7 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
-     * @return RouteCollection
+     * @return Route
      */
     public function put($path, $callback, array $defaults = [])
     {
@@ -133,7 +117,7 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
-     * @return RouteCollection
+     * @return Route
      */
     public function delete($path, $callback, array $defaults = [])
     {
@@ -144,7 +128,7 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
-     * @return RouteCollection
+     * @return Route
      */
     public function head($path, $callback, array $defaults = [])
     {
@@ -155,7 +139,7 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
-     * @return RouteCollection
+     * @return Route
      */
     public function patch($path, $callback, array $defaults = [])
     {
@@ -184,7 +168,7 @@ class RouteCollection
      * @param array $defaults
      * @return Route
      */
-    protected function createRoute($method, $path, $callback, $defaults = [])
+    public function createRoute($method, $path, $callback, $defaults = [])
     {
         return new Route($method, $path, $callback, $defaults);
     }
@@ -198,13 +182,13 @@ class RouteCollection
      */
     public function addRoute($method, $path, $callback, array $defaults = [])
     {
+        $path = rtrim(str_replace('//','/', implode('/', $this->with) . $path));
+
         $name = $path;
 
         if (isset($this->aliasMap[$method][$path])) {
             return $this->getRoute($name);
         }
-
-        $path = rtrim(str_replace('//','/', implode('/', $this->with) . $path));
 
         $route = $this->createRoute($method, $path, $callback, $defaults);
 
@@ -284,18 +268,6 @@ class RouteCollection
         }
 
         return $route;
-    }
-
-    /**
-     * @param string $method
-     * @param string $path
-     * @return mixed
-     */
-    public function dispatch($method, $path)
-    {
-        $route = $this->match($method, $path);
-
-        return call_user_func_array($route->getCallback(), $route->getParameters());
     }
 
     /**

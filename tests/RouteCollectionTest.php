@@ -10,7 +10,6 @@
 namespace FastD\Routing\Tests;
 
 use FastD\Routing\RouteCollection;
-use FastD\Routing\Router;
 
 class RouteCollectionTest extends \PHPUnit_Framework_TestCase
 {
@@ -81,9 +80,6 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('/user/email/jan.html', $url);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testDynamicRouteOptionalVariablesNotDefaultValues()
     {
         $collection = new RouteCollection();
@@ -93,7 +89,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         });
 
         try {
-            $collection->dispatch('GET', '/users');
+            $collection->match('GET', '/users');
         } catch (\Exception $e) {
             throw new \Exception('damn it');
         }
@@ -107,51 +103,9 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
             return $name;
         });
 
-        $this->assertEquals('', $collection->dispatch('GET', '/users'));
-
         $collection->addRoute('GET', '/[{name}]', function ($name) {
             return $name;
         },  ['name' => 'janhuang']);
 
-        $this->assertEquals('janhuang', $collection->dispatch('GET', '/'));
-    }
-
-
-    /**
-     * @expectedException \FastD\Routing\Exceptions\RouteNotFoundException
-     */
-    public function testRouteCallbackParameters()
-    {
-        $collection = new RouteCollection();
-
-        $collection->addRoute('GET', '/user/{name}', function ($name) {
-            return $name;
-        },['name' => 'jan']);
-
-        $collection->addRoute('GET', '/user/{name}/{age}', function ($name, $age) {
-            return $name . $age;
-        }, ['name' => 'janhuang']);
-
-        $route1 = $collection->match('GET', '/user/test2');
-        $route2 = $collection->match('GET', '/user/test2/123');
-
-        $this->assertEquals([
-            'name' => 'test2'
-        ], $route1->getParameters());
-
-        $this->assertEquals([
-            'name' => 'test2',
-            'age' => 123
-        ], $route2->getParameters());
-
-        $this->assertEquals('janhuang', $collection->dispatch('GET', '/user/janhuang'));
-
-        $this->assertEquals('janhuang11', $collection->dispatch('GET', '/user/janhuang/11'));
-
-        $collection->addRoute('GET', '/profile/{name}/{age}', function ($name, $age) {
-            return $name . $age;
-        }, ['name' => 'janhuang', 'age' => 18]);
-
-        $this->assertEquals('janhuang', $collection->dispatch('GET', '/profile/janhuang'));
     }
 }
