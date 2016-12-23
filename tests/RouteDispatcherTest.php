@@ -23,17 +23,16 @@ class RouteDispatcherTest extends \PHPUnit_Framework_TestCase
         $routeCollection = new RouteCollection();
 
         $routeCollection->get('/', function () {
-            echo 'hello world';
+            return 'hello world';
         });
 
         $dispatcher = new Dispatcher([
             new RouteMiddleware($routeCollection)
         ]);
 
-        $request = new ServerRequest();
+        $response = $dispatcher->dispatch(new ServerRequest('GET', '/'));
 
-        $response = $dispatcher->dispatch($request);
-
-        print_r($response->getBody()->getSize());
+        $response->getBody()->rewind();
+        print_r($response->getBody()->getContents());
     }
 }
