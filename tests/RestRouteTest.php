@@ -7,11 +7,9 @@
  * @link      http://www.fast-d.cn/
  */
 
-namespace FastD\Routing\Tests;
-
 use FastD\Routing\RouteCollection;
 
-class RESTfulTest extends \PHPUnit_Framework_TestCase
+class RestRouteTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var RouteCollection

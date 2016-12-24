@@ -147,6 +147,11 @@ class Route extends RouteRegex
         return $this;
     }
 
+    public function withMiddleware()
+    {
+
+    }
+
     /**
      * @param $middleware
      * @return $this

@@ -13,7 +13,6 @@ namespace FastD\Routing;
 use FastD\Http\ServerRequest;
 use FastD\Middleware\Delegate;
 use FastD\Middleware\ServerMiddleware;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class RouteMiddleware
@@ -34,7 +33,12 @@ class RouteMiddleware extends ServerMiddleware
     {
         parent::__construct(function (ServerRequest $request, Delegate $next) use ($routeCollection) {
             $route = $routeCollection->match($request->getMethod(), str_replace('//', '/', $request->getUri()->getPath()));
-            return call_user_func_array($route->getCallback(), $route->getParameters());
+            $response = call_user_func_array($route->getCallback(), $route->getParameters());
+            try {
+                return $next($request);
+            } catch (\Exception $e) {
+                return $response;
+            }
         });
     }
 }

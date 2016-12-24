@@ -7,11 +7,9 @@
  * @link      http://www.fast-d.cn/
  */
 
-namespace FastD\Routing\Tests;
-
 use FastD\Routing\RouteCollection;
 
-class RouteCollectionTest extends \PHPUnit_Framework_TestCase
+class RouteCollectionTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var RouteCollection
@@ -23,7 +21,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
 
         $collection->addRoute('GET', '/test', []);
-        $collection->addRoute('GET', '/test/{name}', []);
+        $collection->addRoute('GET', '/test/{name}', [])->name('test');
         $collection->addRoute('GET', '/user/profile/{name}', []);
         $collection->addRoute('POST', '/user/profile/{name}', []);
         $collection->addRoute('ANY', '/user/email/{name}', []);
@@ -69,8 +67,9 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     public function testRouteGenerator()
     {
         $url = $this->collection->generateUrl('/user/email/{name}', ['name' => 'jan']);
-
         $this->assertEquals('/user/email/jan', $url);
+//        $url = $this->collection->generateUrl('test', ['name' => 'jan']);
+//        $this->assertEquals('/test/jan', $url);
     }
 
     public function testRouteGeneratorHasSuffix()
@@ -99,7 +98,7 @@ class RouteCollectionTest extends \PHPUnit_Framework_TestCase
     {
         $collection = new RouteCollection();
 
-        $collection->addRoute('GET', '/users/[{name}]', function ($name = null) {
+        $collection->get('/users/[{name}]', function ($name = null) {
             return $name;
         });
 

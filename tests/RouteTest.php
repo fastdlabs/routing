@@ -7,30 +7,26 @@
  * @link      http://www.fast-d.cn/
  */
 
-namespace FastD\Routing\Tests;
-
 use FastD\Routing\Route;
 
-class RouteTest extends \PHPUnit_Framework_TestCase
+class RouteTest extends PHPUnit_Framework_TestCase
 {
-    public function testRoute()
+    public function testStaticRoute()
     {
         $route = new Route('GET', '/test', []);
-
+        $route->withName('test');
+        $this->assertEquals('test', $route->getName());
         $this->assertEquals('GET', $route->getMethod());
-
         $this->assertEquals('/test', $route->getPath());
-
+        $this->assertEmpty($route->getParameters());
         $this->assertNull($route->getRegex());
     }
 
     public function testDynamicRouteRequireVariables()
     {
         $route = new Route('GET', '/users/{name}', []);
-
         $regex = '~^(' . $route->getRegex() . ')$~';
-
         $this->assertRegExp($regex, '/users/10');
+        $route->middleware(function () {});
     }
-
 }

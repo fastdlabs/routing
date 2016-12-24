@@ -9,7 +9,12 @@
 
 namespace FastD\Routing\Exceptions;
 
+use FastD\Routing\Route;
+
 class RouteNotAllowException extends RouteException
 {
+    public function __construct(Route $route)
+    {
 
+    }
 }
