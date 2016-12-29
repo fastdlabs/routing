@@ -14,7 +14,7 @@ class BeforeMiddleware extends \FastD\Middleware\ServerMiddleware
         parent::__construct(function (\FastD\Http\Request $request, \FastD\Middleware\Delegate $next) {
             $str = 'before';
             echo $str;
-            return $str;
+            return $next;
         });
     }
 }

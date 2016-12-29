@@ -9,6 +9,9 @@
 
 namespace FastD\Routing;
 
+use FastD\Middleware\ServerMiddleware;
+use FastD\Middleware\ServerMiddlewareInterface;
+
 /**
  * Class Route
  *
@@ -37,7 +40,7 @@ class Route extends RouteRegex
     protected $name;
 
     /**
-     * @var
+     * @var ServerMiddlewareInterface[]
      */
     protected $middleware = [];
 
@@ -147,20 +150,32 @@ class Route extends RouteRegex
         return $this;
     }
 
-    public function withMiddleware()
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function withMiddleware(callable $callback)
     {
+        $this->middleware[] = new ServerMiddleware($callback);
 
+        return $this;
     }
 
     /**
-     * @param $middleware
+     * @return array
+     */
+    public function getMiddleware()
+    {
+        return $this->middleware;
+    }
+
+    /**
+     * @param $callback
      * @return $this
      */
-    public function middleware($middleware)
+    public function middleware(callable $callback)
     {
-        $this->middleware[] = $middleware;
-
-        return $this;
+        return $this->withMiddleware($callback);
     }
 
     /**

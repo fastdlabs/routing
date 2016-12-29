@@ -8,9 +8,8 @@
  */
 
 use FastD\Http\ServerRequest;
-use FastD\Middleware\Dispatcher;
 use FastD\Routing\RouteCollection;
-use FastD\Routing\RouteMiddleware;
+use FastD\Routing\RouteDispatcher;
 
 class RouteDispatcherTest extends PHPUnit_Framework_TestCase
 {
@@ -26,9 +25,8 @@ class RouteDispatcherTest extends PHPUnit_Framework_TestCase
         $routeCollection->get('/', function () {
             echo 'hello world';
         });
-        $dispatcher = new Dispatcher([
+        $dispatcher = new RouteDispatcher($routeCollection, [
             new AfterMiddleware(),
-            new RouteMiddleware($routeCollection),
             new BeforeMiddleware(),
         ]);
         $response = $dispatcher->dispatch(new ServerRequest('GET', '/'));
