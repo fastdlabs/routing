@@ -118,11 +118,11 @@ REGEX;
         preg_match_all('~' . self::VARIABLE_REGEX . '~x', $this->path, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $match) {
-            $path = str_replace($match[0], '(' . ($match[2] ?? static::DEFAULT_DISPATCH_REGEX) . ')', $path);
+            $path = str_replace($match[0], '(' . (isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX) . ')', $path);
 
             $this->variables[] = $match[1];
 
-            $this->requirements[$match[1]] = $match[2] ?? static::DEFAULT_DISPATCH_REGEX;
+            $this->requirements[$match[1]] = isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX;
         }
 
         $this->regex = str_replace(['[(', '+)]'], ['?(', '*)'], $path);

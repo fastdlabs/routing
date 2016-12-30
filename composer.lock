@@ -57,12 +57,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JanHuang/middleware.git",
-                "reference": "0966c55ca75999d0121d85ca8baeefc68527797d"
+                "reference": "9b340b80a09807dfd3081c898580843fe6ad97b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JanHuang/middleware/zipball/0966c55ca75999d0121d85ca8baeefc68527797d",
-                "reference": "0966c55ca75999d0121d85ca8baeefc68527797d",
+                "url": "https://api.github.com/repos/JanHuang/middleware/zipball/9b340b80a09807dfd3081c898580843fe6ad97b4",
+                "reference": "9b340b80a09807dfd3081c898580843fe6ad97b4",
                 "shasum": ""
             },
             "require": {
@@ -90,7 +90,7 @@
                     "email": "bboyjanhuang@gmail.com"
                 }
             ],
-            "time": "2016-12-15 02:32:19"
+            "time": "2016-12-30 03:34:56"
         },
         {
             "name": "fastd/session",

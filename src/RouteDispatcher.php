@@ -66,7 +66,7 @@ class RouteDispatcher extends Dispatcher
         $route = $this->routeCollection->match($request->getMethod(), $request->getUri()->getPath());
         // scan all middleware
         foreach ($route->getMiddleware() as $middleware) {
-            $this->stack->withoutMiddleware($middleware);
+            $this->stack->with($middleware);
         }
 
         $this->stack->withoutMiddleware($this->createRouteMiddleware($route));
