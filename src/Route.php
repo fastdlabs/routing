@@ -40,7 +40,7 @@ class Route extends RouteRegex
     protected $name;
 
     /**
-     * @var ServerMiddlewareInterface[]
+     * @var ServerMiddleware[]
      */
     protected $middleware = [];
 
@@ -162,7 +162,7 @@ class Route extends RouteRegex
     }
 
     /**
-     * @return array
+     * @return ServerMiddleware[]
      */
     public function getMiddleware()
     {

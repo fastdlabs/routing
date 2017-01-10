@@ -10,6 +10,7 @@
 namespace FastD\Routing;
 
 
+use FastD\Http\Response;
 use FastD\Http\ServerRequest;
 use FastD\Middleware\Delegate;
 use FastD\Middleware\Dispatcher;
@@ -45,10 +46,19 @@ class RouteDispatcher extends Dispatcher
      * @param Route $route
      * @return ServerMiddlewareInterface
      */
-    protected function createRouteMiddleware(Route $route)
+    protected function createRouteMiddleware(Route $route, array $params = [])
     {
-        return new ServerMiddleware(function (ServerRequest $request, Delegate $next) use ($route) {
-            $response = call_user_func_array($route->getCallback(), $route->getParameters());
+        return new ServerMiddleware(function (ServerRequest $request, Delegate $next) use ($route, $params) {
+            $params = array_merge($params, $route->getParameters());
+            if (is_string(($callback = $route->getCallback()))) {
+                list($class, $method) = explode('@', $callback);
+                $response = call_user_func_array([$class, $method], $params);
+            } else if (is_callable($callback)) {
+                $response = call_user_func_array($callback, $params);
+            } else {
+                $response = new Response('Don\'t support callback, Please setting callable function or class@method.');
+            }
+
             try {
                 return $next($request);
             } catch (\Exception $e) {
@@ -59,17 +69,18 @@ class RouteDispatcher extends Dispatcher
 
     /**
      * @param ServerRequestInterface $request
+     * @param array $params
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function dispatch(ServerRequestInterface $request)
+    public function dispatch(ServerRequestInterface $request, array $params = [])
     {
         $route = $this->routeCollection->match($request->getMethod(), $request->getUri()->getPath());
         // scan all middleware
         foreach ($route->getMiddleware() as $middleware) {
-            $this->stack->with($middleware);
+            $this->stack->withAddMiddleware($middleware);
         }
 
-        $this->stack->withoutMiddleware($this->createRouteMiddleware($route));
+        $this->stack->withAddMiddleware($this->createRouteMiddleware($route, $params));
 
         return parent::dispatch($request);
     }

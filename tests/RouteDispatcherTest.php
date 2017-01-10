@@ -29,7 +29,20 @@ class RouteDispatcherTest extends PHPUnit_Framework_TestCase
             new AfterMiddleware(),
             new BeforeMiddleware(),
         ]);
-        $response = $dispatcher->dispatch(new ServerRequest('GET', '/'));
-        echo $response->getBody();
+        $dispatcher->dispatch(new ServerRequest('GET', '/'));
+        $this->expectOutputString('afterbefore');
+    }
+
+    public function testDispatcherRouteParams()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->get('/', function ($name) {
+            echo 'hello ' . $name;
+        });
+        $dispatcher = new RouteDispatcher($routeCollection);
+
+        $dispatcher->dispatch(new ServerRequest('GET', '/'), ['foo']);
+
+        $this->expectOutputString('hello foo');
     }
 }
