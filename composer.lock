@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "5b110bb454cb9a5e3835785c93277a92",
-    "content-hash": "0cb2dca53d9ba8a6af8dfef15285766e",
+    "hash": "af375c838738abddc7b1e7c222085676",
+    "content-hash": "d056bcc7682e13f80d238e5eff32be48",
     "packages": [
         {
             "name": "fastd/http",
@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/JanHuang/http.git",
-                "reference": "6adadb134900824b9f1dfc219e2fa721b8ff2f58"
+                "reference": "b03d2169038e04f30b8c60a642be6a495534b60c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JanHuang/http/zipball/6adadb134900824b9f1dfc219e2fa721b8ff2f58",
-                "reference": "6adadb134900824b9f1dfc219e2fa721b8ff2f58",
+                "url": "https://api.github.com/repos/JanHuang/http/zipball/b03d2169038e04f30b8c60a642be6a495534b60c",
+                "reference": "b03d2169038e04f30b8c60a642be6a495534b60c",
                 "shasum": ""
             },
             "require": {
@@ -44,31 +44,29 @@
                     "email": "bboyjanhuang@gmail.com"
                 }
             ],
-            "description": "FastD Http.",
+            "description": "FastD Http",
             "keywords": [
                 "FastD",
                 "http"
             ],
-            "time": "2016-12-21 15:53:10"
+            "time": "2017-01-10 04:13:41"
         },
         {
             "name": "fastd/middleware",
-            "version": "1.0.x-dev",
+            "version": "v1.0.0-rc1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/JanHuang/middleware.git",
-                "reference": "9b340b80a09807dfd3081c898580843fe6ad97b4"
+                "reference": "859ec55c7b373f56922289a8a396b6b39f8fd1f5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/JanHuang/middleware/zipball/9b340b80a09807dfd3081c898580843fe6ad97b4",
-                "reference": "9b340b80a09807dfd3081c898580843fe6ad97b4",
+                "url": "https://api.github.com/repos/JanHuang/middleware/zipball/859ec55c7b373f56922289a8a396b6b39f8fd1f5",
+                "reference": "859ec55c7b373f56922289a8a396b6b39f8fd1f5",
                 "shasum": ""
             },
             "require": {
                 "fastd/http": "3.0.x-dev",
-                "fastd/session": "1.0.x-dev",
-                "fastd/storage": "3.0.x-dev",
                 "php": ">=5.6"
             },
             "require-dev": {
@@ -86,90 +84,11 @@
             ],
             "authors": [
                 {
-                    "name": "JanHuang",
-                    "email": "bboyjanhuang@gmail.com"
-                }
-            ],
-            "time": "2016-12-30 03:34:56"
-        },
-        {
-            "name": "fastd/session",
-            "version": "1.0.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/JanHuang/session.git",
-                "reference": "9c78eb08565127d013a0a93348ca14a9d0172039"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/JanHuang/session/zipball/9c78eb08565127d013a0a93348ca14a9d0172039",
-                "reference": "9c78eb08565127d013a0a93348ca14a9d0172039",
-                "shasum": ""
-            },
-            "require": {
-                "fastd/storage": "3.0.x-dev",
-                "php": ">=5.6"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "FastD\\Session\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "authors": [
-                {
                     "name": "janhuang",
                     "email": "bboyjanhuang@gmail.com"
                 }
             ],
-            "time": "2016-11-14 02:52:29"
-        },
-        {
-            "name": "fastd/storage",
-            "version": "3.0.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/JanHuang/storage.git",
-                "reference": "20cf46256764c52f2b490394d10ab2fcd49377b1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/JanHuang/storage/zipball/20cf46256764c52f2b490394d10ab2fcd49377b1",
-                "reference": "20cf46256764c52f2b490394d10ab2fcd49377b1",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.6"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "FastD\\Storage\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "janhuang",
-                    "email": "bboyjanhuang@gmail.com"
-                }
-            ],
-            "description": "FastD php simple framework Storage Component",
-            "keywords": [
-                "FastD",
-                "storage"
-            ],
-            "time": "2016-11-11 06:53:27"
+            "time": "2017-01-09 15:19:40"
         },
         {
             "name": "psr/http-message",
@@ -1535,10 +1454,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "fastd/middleware": 20,
-        "fastd/http": 20,
-        "fastd/session": 20,
-        "fastd/storage": 20
+        "fastd/middleware": 5,
+        "fastd/http": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

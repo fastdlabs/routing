@@ -12,9 +12,9 @@ class BeforeMiddleware extends \FastD\Middleware\ServerMiddleware
     public function __construct()
     {
         parent::__construct(function (\FastD\Http\Request $request, \FastD\Middleware\Delegate $next) {
-            $str = 'before';
+            $str = 'before' . PHP_EOL;
             echo $str;
-            return $next;
+            return $next($request);
         });
     }
 }

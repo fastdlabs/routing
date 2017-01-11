@@ -9,14 +9,17 @@
 
 namespace FastD\Routing;
 
+use FastD\Middleware\DelegateInterface;
+use FastD\Middleware\ServerMiddleware;
 use FastD\Routing\Exceptions\RouteNotFoundException;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class RouteCollection
  *
  * @package FastD\Routing
  */
-class RouteCollection
+class RouteCollection extends ServerMiddleware
 {
     const ROUTES_CHUNK = 10;
 
@@ -63,6 +66,21 @@ class RouteCollection
      * @var array
      */
     protected $regexes = [];
+
+    /**
+     * RouteCollection constructor.
+     * @param callable $callback
+     */
+    public function __construct(callable $callback = null)
+    {
+        if (null === $callback) {
+            $callback = function (ServerRequestInterface $request, DelegateInterface $delegate = null) {
+
+            };
+        }
+
+        parent::__construct($callback);
+    }
 
     /**
      * @param          $path
@@ -182,7 +200,7 @@ class RouteCollection
      */
     public function addRoute($method, $path, $callback, array $defaults = [])
     {
-        $path = rtrim(str_replace('//','/', implode('/', $this->with) . $path));
+        $path = rtrim(str_replace('//', '/', implode('/', $this->with) . $path));
 
         $name = $path;
 
@@ -218,29 +236,34 @@ class RouteCollection
     }
 
     /**
-     * @param $method
-     * @param $path
+     * @param ServerRequestInterface $serverRequest
      * @return Route
      * @throws RouteNotFoundException
      */
-    public function match($method, $path)
+    public function match(ServerRequestInterface $serverRequest)
     {
+        $method = $serverRequest->getMethod();
+        $path = $serverRequest->getUri()->getPath();
+
         if (!isset($this->staticRoutes[$method][$path])) {
             if (!isset($this->staticRoutes['ANY'][$path])) {
                 $dynamicRoutes = $this->dynamicRoutes;
                 $routes = isset($dynamicRoutes[$method]) ? $dynamicRoutes[$method] : [];
                 unset($dynamicRoutes[$method]);
 
-                $match = function ($path, $data) {
+                $match = function ($path, $data) use ($serverRequest) {
                     if (!preg_match($data['regex'], $path, $matches)) {
                         return false;
                     }
                     $route = $data['routes'][count($matches)];
-
                     preg_match('~^' . $route->getRegex() . '$~', $path, $match);
 
                     $match = array_slice($match, 1, count($route->getVariables()));
-                    $route->mergeParameters(array_combine($route->getVariables(), $match));
+                    $attributes = array_combine($route->getVariables(), $match);
+                    $route->withParameters($attributes);
+                    foreach ($attributes as $key => $attribute) {
+                        $serverRequest->withAttribute($key, $attribute);
+                    }
 
                     return $route;
                 };

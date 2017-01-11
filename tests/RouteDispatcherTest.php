@@ -8,41 +8,39 @@
  */
 
 use FastD\Http\ServerRequest;
+use FastD\Middleware\Delegate;
 use FastD\Routing\RouteCollection;
 use FastD\Routing\RouteDispatcher;
 
-class RouteDispatcherTest extends PHPUnit_Framework_TestCase
+class RouteDispatcherTest extends TestCase
 {
-    public function setUp()
-    {
-        include_once __DIR__ . '/middleware/AfterMiddleware.php';
-        include_once __DIR__ . '/middleware/BeforeMiddleware.php';
-    }
-
     public function testDispatcher()
     {
         $routeCollection = new RouteCollection();
-        $routeCollection->get('/', function () {
+        $routeCollection->get('/', function (ServerRequest $request, Delegate $delegate) {
             echo 'hello world';
         });
         $dispatcher = new RouteDispatcher($routeCollection, [
-            new AfterMiddleware(),
             new BeforeMiddleware(),
+            new AfterMiddleware(),
         ]);
-        $dispatcher->dispatch(new ServerRequest('GET', '/'));
-        $this->expectOutputString('afterbefore');
+        $dispatcher->dispatch($this->createRequest('GET', '/'));
+        $this->expectOutputString(<<<EOF
+before
+after
+hello world
+EOF
+);
     }
 
     public function testDispatcherRouteParams()
     {
         $routeCollection = new RouteCollection();
-        $routeCollection->get('/', function ($name) {
-            echo 'hello ' . $name;
+        $routeCollection->get('/{name}', function (ServerRequest $request, Delegate $delegate) {
+            echo 'hello ' . $request->getAttribute('name');
         });
         $dispatcher = new RouteDispatcher($routeCollection);
-
-        $dispatcher->dispatch(new ServerRequest('GET', '/'), ['foo']);
-
+        $dispatcher->dispatch($this->createRequest('GET', '/foo'));
         $this->expectOutputString('hello foo');
     }
 }

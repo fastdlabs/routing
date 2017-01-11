@@ -10,7 +10,6 @@
             "email": "bboyjanhuang@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
     "require": {
         "php": ">=5.6",
         "fastd/middleware": "~1.0.0@rc",
@@ -23,5 +22,10 @@
         "psr-4": {
             "FastD\\Routing\\": "src"
         }
+    },
+    "autoload-dev": {
+        "files": [
+            "tests/TestCase.php"
+        ]
     }
 }

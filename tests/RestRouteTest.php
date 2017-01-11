@@ -9,7 +9,7 @@
 
 use FastD\Routing\RouteCollection;
 
-class RestRouteTest extends PHPUnit_Framework_TestCase
+class RestRouteTest extends TestCase
 {
     /**
      * @var RouteCollection
@@ -31,20 +31,20 @@ class RestRouteTest extends PHPUnit_Framework_TestCase
 
     public function testLists()
     {
-        $route = $this->collection->match('GET', '/test');
+        $route = $this->collection->match($this->createRequest('GET', '/test'));
 
         $this->assertEquals([], $route->getParameters());
     }
 
     public function testDetails()
     {
-        $route = $this->collection->match('GET', '/test/123');
+        $route = $this->collection->match($this->createRequest('GET', '/test/123'));
 
         $this->assertEquals([
             'id' => 123
         ], $route->getParameters());
 
-        $route = $this->collection->match('GET', '/test/1,2,3');
+        $route = $this->collection->match($this->createRequest('GET', '/test/1,2,3'));
 
         $this->assertEquals([
             'id' => '1,2,3'
@@ -53,7 +53,7 @@ class RestRouteTest extends PHPUnit_Framework_TestCase
 
     public function testAdd()
     {
-        $route = $this->collection->match('POST', '/test/123');
+        $route = $this->collection->match($this->createRequest('POST', '/test/123'));
 
         $this->assertEquals([
             'id' => 123
@@ -62,7 +62,7 @@ class RestRouteTest extends PHPUnit_Framework_TestCase
 
     public function testUpdate()
     {
-        $route = $this->collection->match('PATCH', '/test/123');
+        $route = $this->collection->match($this->createRequest('PATCH', '/test/123'));
 
         $this->assertEquals([
             'id' => 123
@@ -71,7 +71,7 @@ class RestRouteTest extends PHPUnit_Framework_TestCase
 
     public function testDelete()
     {
-        $route = $this->collection->match('DELETE', '/test/123');
+        $route = $this->collection->match($this->createRequest('DELETE', '/test/123'));
 
         $this->assertEquals([
             'id' => 123

@@ -10,7 +10,6 @@
 namespace FastD\Routing;
 
 use FastD\Middleware\ServerMiddleware;
-use FastD\Middleware\ServerMiddlewareInterface;
 
 /**
  * Class Route
@@ -155,6 +154,17 @@ class Route extends RouteRegex
      * @return $this
      */
     public function withMiddleware(callable $callback)
+    {
+        $this->middleware = [new ServerMiddleware($callback)];
+
+        return $this;
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function withAddMiddleware(callable $callback)
     {
         $this->middleware[] = new ServerMiddleware($callback);
 
