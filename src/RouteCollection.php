@@ -200,9 +200,7 @@ class RouteCollection extends ServerMiddleware
      */
     public function addRoute($method, $path, $callback, array $defaults = [])
     {
-        $path = rtrim(str_replace('//', '/', implode('/', $this->with) . $path));
-
-        $name = $path;
+        $name = $path = implode('/', $this->with) . $path;
 
         if (isset($this->aliasMap[$method][$path])) {
             return $this->getRoute($name);

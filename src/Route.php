@@ -178,24 +178,4 @@ class Route extends RouteRegex
     {
         return $this->middleware;
     }
-
-    /**
-     * @param $callback
-     * @return $this
-     */
-    public function middleware(callable $callback)
-    {
-        return $this->withMiddleware($callback);
-    }
-
-    /**
-     * use laravel using.
-     *
-     * @param $name
-     * @return Route
-     */
-    public function name($name)
-    {
-        return $this->withName($name);
-    }
 }

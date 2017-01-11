@@ -21,7 +21,7 @@ class TestCase extends PHPUnit_Framework_TestCase
         $collection = new RouteCollection();
 
         $collection->addRoute('GET', '/', []);
-        $collection->addRoute('GET', '/foo/{name}', [])->name('test');
+        $collection->addRoute('GET', '/foo/{name}', [])->withName('test');
         $collection->addRoute('POST', '/foo/{name}', [], ['name' => 'bar']);
         $collection->addRoute('GET', '/bar/{name}', []);
         $collection->addRoute('POST', '/foo/bar/{name}', []);
@@ -29,6 +29,7 @@ class TestCase extends PHPUnit_Framework_TestCase
         $this->collection = $collection;
 
         include_once __DIR__ . '/middleware/AfterMiddleware.php';
+        include_once __DIR__ . '/middleware/BreakerMiddleware.php';
         include_once __DIR__ . '/middleware/BeforeMiddleware.php';
     }
 

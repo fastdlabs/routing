@@ -7,6 +7,7 @@
  * @link      http://www.fast-d.cn/
  */
 
+use FastD\Http\Response;
 use FastD\Http\ServerRequest;
 use FastD\Middleware\Delegate;
 use FastD\Routing\RouteCollection;
@@ -42,5 +43,20 @@ EOF
         $dispatcher = new RouteDispatcher($routeCollection);
         $dispatcher->dispatch($this->createRequest('GET', '/foo'));
         $this->expectOutputString('hello foo');
+    }
+
+    public function testDispatcherMiddlewareBreaker()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->get('/{name}', function (ServerRequest $request, Delegate $delegate) {
+            return new Response('hello ' . $request->getAttribute('name'));
+        });
+        $dispatcher = new RouteDispatcher($routeCollection, [
+            new BreakerMiddleware(),
+        ]);
+        $response = $dispatcher->dispatch($this->createRequest('GET', '/break'));
+        $this->assertEquals('break', $response->getBody());
+        $response = $dispatcher->dispatch($this->createRequest('GET', '/foo'));
+        $this->assertEquals('hello foo', $response->getBody());
     }
 }
