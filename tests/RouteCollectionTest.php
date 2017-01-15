@@ -56,4 +56,11 @@ class RouteCollectionTest extends TestCase
         $url = $this->collection->generateUrl('/foo/{name}', ['name' => 'bar'], 'html');
         $this->assertEquals('/foo/bar.html', $url);
     }
+
+    public function testAddRouteName()
+    {
+        $route = $this->collection->get(['/default', 'name' => 'default'], []);
+        $defaultRoute = $this->collection->getRoute('default');
+        $this->assertEquals($route, $defaultRoute);
+    }
 }

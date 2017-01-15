@@ -20,11 +20,11 @@ class RouteDispatcherTest extends TestCase
         $routeCollection = new RouteCollection();
         $routeCollection->get('/', function (ServerRequest $request, Delegate $delegate) {
             echo 'hello world';
-        });
-        $dispatcher = new RouteDispatcher($routeCollection, [
+        })->middleware('default');
+        $dispatcher = new RouteDispatcher($routeCollection, ['default' => [
             new BeforeMiddleware(),
             new AfterMiddleware(),
-        ]);
+        ]]);
         $dispatcher->dispatch($this->createRequest('GET', '/'));
         $this->expectOutputString(<<<EOF
 before
@@ -48,12 +48,12 @@ EOF
     public function testDispatcherMiddlewareBreaker()
     {
         $routeCollection = new RouteCollection();
+
         $routeCollection->get('/{name}', function (ServerRequest $request, Delegate $delegate) {
             return new Response('hello ' . $request->getAttribute('name'));
-        });
-        $dispatcher = new RouteDispatcher($routeCollection, [
-            new BreakerMiddleware(),
-        ]);
+        })->withAddMiddleware(new BreakerMiddleware());
+
+        $dispatcher = new RouteDispatcher($routeCollection);
         $response = $dispatcher->dispatch($this->createRequest('GET', '/break'));
         $this->assertEquals('break', $response->getBody());
         $response = $dispatcher->dispatch($this->createRequest('GET', '/foo'));

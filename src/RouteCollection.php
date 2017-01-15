@@ -9,8 +9,7 @@
 
 namespace FastD\Routing;
 
-use FastD\Middleware\DelegateInterface;
-use FastD\Middleware\ServerMiddleware;
+
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -19,7 +18,7 @@ use Psr\Http\Message\ServerRequestInterface;
  *
  * @package FastD\Routing
  */
-class RouteCollection extends ServerMiddleware
+class RouteCollection
 {
     const ROUTES_CHUNK = 10;
 
@@ -66,21 +65,6 @@ class RouteCollection extends ServerMiddleware
      * @var array
      */
     protected $regexes = [];
-
-    /**
-     * RouteCollection constructor.
-     * @param callable $callback
-     */
-    public function __construct(callable $callback = null)
-    {
-        if (null === $callback) {
-            $callback = function (ServerRequestInterface $request, DelegateInterface $delegate = null) {
-
-            };
-        }
-
-        parent::__construct($callback);
-    }
 
     /**
      * @param          $path
@@ -200,7 +184,12 @@ class RouteCollection extends ServerMiddleware
      */
     public function addRoute($method, $path, $callback, array $defaults = [])
     {
-        $name = $path = implode('/', $this->with) . $path;
+        if (is_array($path)) {
+            $name = $path['name'];
+            $path = $path[0];
+        } else {
+            $name = $path = implode('/', $this->with) . $path;
+        }
 
         if (isset($this->aliasMap[$method][$path])) {
             return $this->getRoute($name);

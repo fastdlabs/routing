@@ -10,13 +10,7 @@
 namespace FastD\Routing;
 
 
-use FastD\Http\Response;
-use FastD\Http\ServerRequest;
-use FastD\Middleware\ClientMiddleware;
-use FastD\Middleware\Delegate;
 use FastD\Middleware\Dispatcher;
-use FastD\Middleware\ServerMiddleware;
-use FastD\Middleware\ServerMiddlewareInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -31,6 +25,11 @@ class RouteDispatcher extends Dispatcher
     protected $routeCollection;
 
     /**
+     * @var array
+     */
+    protected $stackMap = [];
+
+    /**
      * RouteDispatcher constructor.
      *
      * @param RouteCollection $routeCollection
@@ -40,37 +39,9 @@ class RouteDispatcher extends Dispatcher
     {
         $this->routeCollection = $routeCollection;
 
-        parent::__construct($stack);
-    }
+        $this->stackMap = $stack;
 
-    /**
-     * @param Route $route
-     * @return ServerMiddlewareInterface
-     */
-    protected function createRouteMiddleware(Route $route)
-    {
-        return new ServerMiddleware(function (ServerRequest $request, Delegate $next) use ($route) {
-            if (is_string(($callback = $route->getCallback()))) {
-                list($class, $method) = explode('@', $callback);
-                $response = call_user_func_array([new $class, $method], [$request, $next]);
-            } else if (is_callable($callback)) {
-                $response = call_user_func_array($callback, [$request, $next]);
-            } else if (is_array($callback)) {
-                $class = $callback[0];
-                if (is_string($class)) {
-                    $class = new $class;
-                }
-                $response = call_user_func_array([$class, $callback[1]], [$request, $next]);
-            } else {
-                $response = new Response('Don\'t support callback, Please setting callable function or class@method.');
-            }
-
-            try {
-                return $next($request);
-            } catch (\Exception $e) {
-                return $response;
-            }
-        });
+        parent::__construct([]);
     }
 
     /**
@@ -81,12 +52,25 @@ class RouteDispatcher extends Dispatcher
     {
         $route = $this->routeCollection->match($request);
 
-        // scan all middleware
+        // set middleware list
+        foreach ($route->getMiddlewareKey() as $key) {
+            $middlewareList = $this->stackMap[$key];
+            if (is_array($middlewareList)) {
+                foreach ($this->stackMap[$key] as $middleware) {
+                    $this->stack->withAddMiddleware($middleware);
+                }
+            } else {
+                $this->stack->withAddMiddleware($middlewareList);
+            }
+        }
+
+        // append route middleware
         foreach ($route->getMiddleware() as $middleware) {
             $this->stack->withAddMiddleware($middleware);
         }
 
-        $this->stack->withAddMiddleware($this->createRouteMiddleware($route));
+        // wrapper route middleware
+        $this->stack->withAddMiddleware(new RouteMiddleware($route));
 
         return parent::dispatch($request);
     }

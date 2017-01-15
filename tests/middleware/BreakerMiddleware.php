@@ -13,13 +13,16 @@ use FastD\Middleware\ServerMiddleware;
  */
 class BreakerMiddleware extends ServerMiddleware
 {
-    public function __construct()
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $serverRequest
+     * @param \FastD\Middleware\DelegateInterface $delegate
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function handle(\Psr\Http\Message\ServerRequestInterface $serverRequest, \FastD\Middleware\DelegateInterface $delegate)
     {
-        parent::__construct(function (ServerRequest $request, Delegate $next) {
-            if ('break' == $request->getAttribute('name')) {
-                return new Response('break');
-            }
-            return $next($request);
-        });
+        if ('break' == $serverRequest->getAttribute('name')) {
+            return new Response('break');
+        }
+        return $delegate($serverRequest);
     }
 }

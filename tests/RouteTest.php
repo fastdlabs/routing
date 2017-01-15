@@ -27,6 +27,5 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $route = new Route('GET', '/users/{name}', []);
         $regex = '~^(' . $route->getRegex() . ')$~';
         $this->assertRegExp($regex, '/users/10');
-        $route->withAddMiddleware(function () {});
     }
 }

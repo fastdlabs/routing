@@ -7,7 +7,7 @@
  * @link      https://www.github.com/janhuang
  * @link      http://www.fast-d.cn/
  */
-class BeforeMiddleware extends \FastD\Middleware\ServerMiddleware
+class DefaultMiddleware extends \FastD\Middleware\ServerMiddleware
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $serverRequest
@@ -16,8 +16,6 @@ class BeforeMiddleware extends \FastD\Middleware\ServerMiddleware
      */
     public function handle(\Psr\Http\Message\ServerRequestInterface $serverRequest, \FastD\Middleware\DelegateInterface $delegate)
     {
-        $str = 'before' . PHP_EOL;
-        echo $str;
-        return $delegate($serverRequest);
+        // TODO: Implement handle() method.
     }
 }
