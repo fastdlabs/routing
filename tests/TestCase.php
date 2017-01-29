@@ -31,6 +31,7 @@ class TestCase extends PHPUnit_Framework_TestCase
         include_once __DIR__ . '/middleware/AfterMiddleware.php';
         include_once __DIR__ . '/middleware/BreakerMiddleware.php';
         include_once __DIR__ . '/middleware/BeforeMiddleware.php';
+        include_once __DIR__ . '/middleware/DefaultMiddleware.php';
     }
 
     public function createRequest($method, $path)

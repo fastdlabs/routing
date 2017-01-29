@@ -16,6 +16,6 @@ class DefaultMiddleware extends \FastD\Middleware\ServerMiddleware
      */
     public function handle(\Psr\Http\Message\ServerRequestInterface $serverRequest, \FastD\Middleware\DelegateInterface $delegate)
     {
-        // TODO: Implement handle() method.
+        echo 'default';
     }
 }

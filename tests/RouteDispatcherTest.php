@@ -20,7 +20,7 @@ class RouteDispatcherTest extends TestCase
         $routeCollection = new RouteCollection();
         $routeCollection->get('/', function (ServerRequest $request, Delegate $delegate) {
             echo 'hello world';
-        })->middleware('default');
+        })->withMiddleware('default');
         $dispatcher = new RouteDispatcher($routeCollection, ['default' => [
             new BeforeMiddleware(),
             new AfterMiddleware(),
@@ -31,7 +31,7 @@ before
 after
 hello world
 EOF
-);
+        );
     }
 
     public function testDispatcherRouteParams()
@@ -58,5 +58,26 @@ EOF
         $this->assertEquals('break', $response->getBody());
         $response = $dispatcher->dispatch($this->createRequest('GET', '/foo'));
         $this->assertEquals('hello foo', $response->getBody());
+    }
+
+    public function testDispatcherCallMiddleware()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection
+            ->get('/{name}', function (ServerRequest $request, Delegate $delegate) {
+                return new Response('hello ' . $request->getAttribute('name'));
+            })
+            ->withAddMiddleware(new AfterMiddleware())
+            ->withAddMiddleware(new BeforeMiddleware())
+            ->withAddMiddleware(new DefaultMiddleware())
+        ;
+        $dispatcher = new RouteDispatcher($routeCollection);
+        $dispatcher->callMiddleware($this->createRequest('GET', '/foo'));
+        $this->expectOutputString(<<<EOF
+after
+before
+default
+EOF
+);
     }
 }

@@ -11,6 +11,8 @@ namespace FastD\Routing;
 
 
 use FastD\Middleware\Dispatcher;
+use FastD\Middleware\ServerMiddlewareInterface;
+use FastD\Routing\Exceptions\RouteException;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -19,6 +21,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RouteDispatcher extends Dispatcher
 {
+    public $route;
+
     /**
      * @var RouteCollection
      */
@@ -27,21 +31,56 @@ class RouteDispatcher extends Dispatcher
     /**
      * @var array
      */
-    protected $stackMap = [];
+    protected $definition = [];
 
     /**
      * RouteDispatcher constructor.
      *
      * @param RouteCollection $routeCollection
-     * @param $stack
+     * @param $definition
      */
-    public function __construct(RouteCollection $routeCollection, $stack = [])
+    public function __construct(RouteCollection $routeCollection, $definition = [])
     {
         $this->routeCollection = $routeCollection;
 
-        $this->stackMap = $stack;
+        $this->definition = $definition;
 
         parent::__construct([]);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return Route
+     */
+    protected function wrap(ServerRequestInterface $request)
+    {
+        $this->route = $this->routeCollection->match($request);
+
+        // set middleware list
+        foreach ($this->route->getMiddleware() as $middleware) {
+            if ($middleware instanceof ServerMiddlewareInterface) {
+                $this->stack->withAddMiddleware($middleware);
+            } else if (is_string($middleware)) {
+                foreach ($this->definition[$middleware] as $value) {
+                    $this->stack->withAddMiddleware($value);
+                }
+            } else {
+                throw new RouteException(sprintf('Don\'t support %s middleware', gettype($middleware)));
+            }
+        }
+
+        return $this->route;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function callMiddleware(ServerRequestInterface $request)
+    {
+        $this->wrap($request);
+
+        return parent::dispatch($request);
     }
 
     /**
@@ -50,25 +89,7 @@ class RouteDispatcher extends Dispatcher
      */
     public function dispatch(ServerRequestInterface $request)
     {
-        $route = $this->routeCollection->match($request);
-
-        // set middleware list
-        foreach ($route->getMiddlewareKey() as $key) {
-            $middlewareList = $this->stackMap[$key];
-            if (is_array($middlewareList)) {
-                foreach ($this->stackMap[$key] as $middleware) {
-                    $this->stack->withAddMiddleware($middleware);
-                }
-            } else {
-                $this->stack->withAddMiddleware($middlewareList);
-            }
-        }
-
-        // append route middleware
-        foreach ($route->getMiddleware() as $middleware) {
-            $this->stack->withAddMiddleware($middleware);
-        }
-
+        $route = $this->wrap($request);
         // wrapper route middleware
         $this->stack->withAddMiddleware(new RouteMiddleware($route));
 

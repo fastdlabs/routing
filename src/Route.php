@@ -45,11 +45,6 @@ class Route extends RouteRegex
     protected $middleware = [];
 
     /**
-     * @var array
-     */
-    protected $middlewareKey = [];
-
-    /**
      * Route constructor.
      *
      * @param string $method
@@ -156,29 +151,10 @@ class Route extends RouteRegex
     }
 
     /**
-     * @return array
-     */
-    public function getMiddlewareKey()
-    {
-        return $this->middlewareKey;
-    }
-
-    /**
-     * @param $key
+     * @param $middleware
      * @return $this
      */
-    public function middleware($key)
-    {
-        $this->middlewareKey[] = $key;
-
-        return $this;
-    }
-
-    /**
-     * @param ServerMiddlewareInterface $middleware
-     * @return $this
-     */
-    public function withMiddleware(ServerMiddlewareInterface $middleware)
+    public function withMiddleware($middleware)
     {
         $this->middleware = [$middleware];
 
@@ -186,10 +162,10 @@ class Route extends RouteRegex
     }
 
     /**
-     * @param ServerMiddlewareInterface $middleware
+     * @param $middleware
      * @return $this
      */
-    public function withAddMiddleware(ServerMiddlewareInterface $middleware)
+    public function withAddMiddleware($middleware)
     {
         $this->middleware[] = $middleware;
 
