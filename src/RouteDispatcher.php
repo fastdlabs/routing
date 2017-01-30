@@ -50,14 +50,14 @@ class RouteDispatcher extends Dispatcher
 
     /**
      * @param ServerRequestInterface $request
-     * @return Route
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    protected function wrap(ServerRequestInterface $request)
+    public function dispatch(ServerRequestInterface $request)
     {
-        $this->route = $this->routeCollection->match($request);
+        $route = $this->routeCollection->match($request);
 
         // set middleware list
-        foreach ($this->route->getMiddleware() as $middleware) {
+        foreach ($route->getMiddleware() as $middleware) {
             if ($middleware instanceof ServerMiddlewareInterface) {
                 $this->stack->withAddMiddleware($middleware);
             } else if (is_string($middleware)) {
@@ -69,27 +69,6 @@ class RouteDispatcher extends Dispatcher
             }
         }
 
-        return $this->route;
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    public function callMiddleware(ServerRequestInterface $request)
-    {
-        $this->wrap($request);
-
-        return parent::dispatch($request);
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    public function dispatch(ServerRequestInterface $request)
-    {
-        $route = $this->wrap($request);
         // wrapper route middleware
         $this->stack->withAddMiddleware(new RouteMiddleware($route));
 

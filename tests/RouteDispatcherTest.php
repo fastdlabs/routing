@@ -72,7 +72,7 @@ EOF
             ->withAddMiddleware(new DefaultMiddleware())
         ;
         $dispatcher = new RouteDispatcher($routeCollection);
-        $dispatcher->callMiddleware($this->createRequest('GET', '/foo'));
+        $dispatcher->dispatch($this->createRequest('GET', '/foo'));
         $this->expectOutputString(<<<EOF
 after
 before
