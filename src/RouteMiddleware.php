@@ -58,10 +58,7 @@ class RouteMiddleware extends ServerMiddleware
             $response = new Response('Don\'t support callback, Please setting callable function or class@method.');
         }
         unset($callback);
-        try {
-            return $delegate($serverRequest);
-        } catch (\Exception $e) {
-            return $response;
-        }
+
+        return $response;
     }
 }
