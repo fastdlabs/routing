@@ -62,7 +62,7 @@ class RouteDispatcher extends Dispatcher
                 $this->stack->withAddMiddleware($middleware);
             } else if (is_string($middleware)) {
                 foreach ($this->definition[$middleware] as $value) {
-                    $this->stack->withAddMiddleware($value);
+                    $this->stack->withAddMiddleware(is_string($value) ? new $value : $value);
                 }
             } else {
                 throw new RouteException(sprintf('Don\'t support %s middleware', gettype($middleware)));
