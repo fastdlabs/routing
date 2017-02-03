@@ -58,10 +58,6 @@ REGEX;
     {
         $this->path = $path;
 
-        if ('*' === substr($path, -1)) {
-            $this->regex = str_replace('/*', '(\/[_a-zA-Z0-9-]+){1,}', $this->path);
-        }
-
         $this->parseRoute();
     }
 
@@ -70,8 +66,8 @@ REGEX;
      */
     public function isStaticRoute()
     {
-        if (empty($this->path)) {
-            return true;
+        if ('*' === substr($this->path, -1)) {
+            return false;
         }
 
         return false === strpos($this->path, '{');
@@ -116,6 +112,19 @@ REGEX;
     {
         if ($this->isStaticRoute()) {
             return $this->getPath();
+        }
+
+        if ('*' === substr($this->path, -1)) {
+            $requirement = '([\/_a-zA-Z0-9-]+){1,}';
+            $this->regex = str_replace('/*', $requirement, $this->path);
+            $this->variables = [
+                'fuzzy_path'
+            ];
+            $this->requirements = [
+                'fuzzy_path' => $requirement,
+            ];
+            unset($requirement);
+            return $this->regex;
         }
 
         $path = $this->getPath();

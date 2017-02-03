@@ -28,4 +28,19 @@ class RouteTest extends PHPUnit_Framework_TestCase
         $regex = '~^(' . $route->getRegex() . ')$~';
         $this->assertRegExp($regex, '/users/10');
     }
+
+    public function testRouteIsStatic()
+    {
+        $route = new Route('GET', '/foo/*', []);
+
+        $this->assertFalse($route->isStaticRoute());
+    }
+
+    public function testRouteFuzzyMatching()
+    {
+        $route = new Route('GET', '/foo/*', []);
+        $regex = '~^(' . $route->getRegex() . ')$~';
+        $this->assertRegExp($regex, '/foo/10');
+        $this->assertRegExp($regex, '/foo/bar');
+    }
 }

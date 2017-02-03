@@ -10,7 +10,6 @@
 namespace FastD\Routing;
 
 use FastD\Middleware\ServerMiddleware;
-use FastD\Middleware\ServerMiddlewareInterface;
 
 /**
  * Class Route

@@ -13,7 +13,7 @@ class RouteCollectionTest extends TestCase
     {
         $this->assertEquals(count($this->collection->staticRoutes), 1);
         $this->assertEquals(count($this->collection->dynamicRoutes), 2);
-        $this->assertEquals(count($this->collection->dynamicRoutes['GET'][0]['routes']), 2);
+        $this->assertEquals(count($this->collection->dynamicRoutes['GET'][0]['routes']), 3);
         $this->assertEquals(count($this->collection->dynamicRoutes['POST'][0]['routes']), 2);
     }
 
@@ -62,5 +62,20 @@ class RouteCollectionTest extends TestCase
         $route = $this->collection->get(['/default', 'name' => 'default'], []);
         $defaultRoute = $this->collection->getRoute('default');
         $this->assertEquals($route, $defaultRoute);
+    }
+
+    public function testMatchFuzzyRoute()
+    {
+        $request1 = $this->createRequest('GET', '/fuzzy/bar');
+        $request2 = $this->createRequest('GET', '/fuzzy/foo/bar');
+        $route1 = $this->collection->match($request1);
+        $route2 = $this->collection->match($request2);
+        $this->assertEquals($route1, $route2);
+
+        $response = call_user_func_array($route1->getCallback(), [$request1]);
+        $this->assertEquals('/bar', (string) $response->getBody());
+
+        $response = call_user_func_array($route2->getCallback(), [$request2]);
+        $this->assertEquals('/foo/bar', (string) $response->getBody());
     }
 }

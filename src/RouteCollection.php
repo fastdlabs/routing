@@ -12,6 +12,7 @@ namespace FastD\Routing;
 
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 
 /**
  * Class RouteCollection
@@ -237,14 +238,12 @@ class RouteCollection
                 $dynamicRoutes = $this->dynamicRoutes;
                 $routes = isset($dynamicRoutes[$method]) ? $dynamicRoutes[$method] : [];
                 unset($dynamicRoutes[$method]);
-
                 $match = function ($path, $data) use ($serverRequest) {
                     if (!preg_match($data['regex'], $path, $matches)) {
                         return false;
                     }
                     $route = $data['routes'][count($matches)];
                     preg_match('~^' . $route->getRegex() . '$~', $path, $match);
-
                     $match = array_slice($match, 1, count($route->getVariables()));
                     $attributes = array_combine($route->getVariables(), $match);
                     $route->withParameters($attributes);
