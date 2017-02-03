@@ -8,6 +8,7 @@
  */
 
 namespace FastD\Routing;
+use SebastianBergmann\CodeCoverage\Report\PHP;
 
 /**
  * Class RouteRegex
@@ -56,6 +57,10 @@ REGEX;
     public function __construct($path = null)
     {
         $this->path = $path;
+
+        if ('*' === substr($path, -1)) {
+            $this->regex = str_replace('/*', '(\/[_a-zA-Z0-9-]+){1,}', $this->path);
+        }
 
         $this->parseRoute();
     }
@@ -126,6 +131,12 @@ REGEX;
         }
 
         $this->regex = str_replace(['[(', '+)]'], ['?(', '*)'], $path);
+
+        if ('/' === substr($this->regex, -1)) {
+            $this->regex .= '?';
+        }
+
+        unset($matches, $path);
 
         return $this->regex;
     }

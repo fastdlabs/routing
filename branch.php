@@ -10,6 +10,8 @@
 
 include __DIR__ . '/vendor/autoload.php';
 
+$request = new \FastD\Http\ServerRequest('GET', '/g/30000');
+
 for ($n = 0; $n < 10; $n++) {
     $nRoutes = 100;
     $nMatches = 300;
@@ -20,10 +22,10 @@ for ($n = 0; $n < 10; $n++) {
     for ($i = 0, $str = 'a'; $i < $nRoutes; $i++, $str++) {
         $router->addRoute('GET', '/' . $str . '/{arg}', function () {
             return 'hello world';
-        }, 'branch' . $i);
+        });
     }
     for ($i = 0; $i < $nMatches; $i++) {
-        $res = $router->dispatch('GET', '/g/30000');
+        $res = $router->match($request);
     }
     printf("FastD first route: %f\n", microtime(true) - $startTime);
 }
