@@ -61,8 +61,16 @@ class RouteDispatcher extends Dispatcher
             if ($middleware instanceof ServerMiddlewareInterface) {
                 $this->stack->withAddMiddleware($middleware);
             } else if (is_string($middleware)) {
-                foreach ($this->definition[$middleware] as $value) {
-                    $this->stack->withAddMiddleware(is_string($value) ? new $value : $value);
+                if (!isset($this->definition[$middleware])) {
+                    throw new \RuntimeException(sprintf('Middleware %s is not defined.'));
+                }
+                $definition = $this->definition[$middleware];
+                if (is_array($definition)) {
+                    foreach ($definition as $value) {
+                        $this->stack->withAddMiddleware(is_string($value) ? new $value : $value);
+                    }
+                } else {
+                    $this->stack->withAddMiddleware(is_string($definition) ? new $definition : $definition);
                 }
             } else {
                 throw new RouteException(sprintf('Don\'t support %s middleware', gettype($middleware)));
