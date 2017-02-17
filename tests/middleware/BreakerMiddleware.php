@@ -1,8 +1,6 @@
 <?php
 use FastD\Http\Response;
-use FastD\Http\ServerRequest;
-use FastD\Middleware\Delegate;
-use FastD\Middleware\ServerMiddleware;
+use FastD\Middleware\Middleware;
 
 /**
  * @author    jan huang <bboyjanhuang@gmail.com>
@@ -11,7 +9,7 @@ use FastD\Middleware\ServerMiddleware;
  * @link      https://www.github.com/janhuang
  * @link      http://www.fast-d.cn/
  */
-class BreakerMiddleware extends ServerMiddleware
+class BreakerMiddleware extends Middleware
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $serverRequest

@@ -7,7 +7,7 @@
  * @link      https://www.github.com/janhuang
  * @link      http://www.fast-d.cn/
  */
-class AfterMiddleware extends \FastD\Middleware\ServerMiddleware
+class AfterMiddleware extends \FastD\Middleware\Middleware
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $serverRequest

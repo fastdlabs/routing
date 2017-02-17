@@ -11,7 +11,7 @@ namespace FastD\Routing;
 
 
 use FastD\Middleware\Dispatcher;
-use FastD\Middleware\ServerMiddlewareInterface;
+use FastD\Middleware\MiddlewareInterface;
 use FastD\Routing\Exceptions\RouteException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -58,8 +58,8 @@ class RouteDispatcher extends Dispatcher
 
         // set middleware list
         foreach ($route->getMiddleware() as $middleware) {
-            if ($middleware instanceof ServerMiddlewareInterface) {
-                $this->stack->withAddMiddleware($middleware);
+            if ($middleware instanceof MiddlewareInterface) {
+                $this->withAddMiddleware($middleware);
             } else if (is_string($middleware)) {
                 if (!isset($this->definition[$middleware])) {
                     throw new \RuntimeException(sprintf('Middleware %s is not defined.'));
@@ -67,10 +67,10 @@ class RouteDispatcher extends Dispatcher
                 $definition = $this->definition[$middleware];
                 if (is_array($definition)) {
                     foreach ($definition as $value) {
-                        $this->stack->withAddMiddleware(is_string($value) ? new $value : $value);
+                        $this->withAddMiddleware(is_string($value) ? new $value : $value);
                     }
                 } else {
-                    $this->stack->withAddMiddleware(is_string($definition) ? new $definition : $definition);
+                    $this->withAddMiddleware(is_string($definition) ? new $definition : $definition);
                 }
             } else {
                 throw new RouteException(sprintf('Don\'t support %s middleware', gettype($middleware)));
@@ -78,7 +78,7 @@ class RouteDispatcher extends Dispatcher
         }
 
         // wrapper route middleware
-        $this->stack->withAddMiddleware(new RouteMiddleware($route));
+        $this->withAddMiddleware(new RouteMiddleware($route));
 
         return parent::dispatch($request);
     }

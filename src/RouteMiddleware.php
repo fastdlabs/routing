@@ -12,7 +12,7 @@ namespace FastD\Routing;
 
 use FastD\Http\Response;
 use FastD\Middleware\DelegateInterface;
-use FastD\Middleware\ServerMiddleware;
+use FastD\Middleware\Middleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -20,7 +20,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Class RouteMiddleware
  * @package FastD\Routing
  */
-class RouteMiddleware extends ServerMiddleware
+class RouteMiddleware extends Middleware
 {
     /**
      * @var Route
