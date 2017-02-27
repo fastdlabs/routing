@@ -39,6 +39,17 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals(['name'], $route->getVariables());
     }
 
+    public function testMultiVarRouteMatch()
+    {
+        $this->collection->addRoute('PUT', '/{name}/{type}', []);
+        $serverRequest = $this->createRequest('PUT', '/foo/bar');
+        $route = $this->collection->match($serverRequest);
+        $this->assertEquals([
+            'name' => 'foo',
+            'type' => 'bar',
+        ], $route->getParameters());
+    }
+
     public function testRouteAnyMethodMatch()
     {
         $route = $this->collection->match($this->createRequest('POST', '/foo/bar'));
