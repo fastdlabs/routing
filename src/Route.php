@@ -9,7 +9,6 @@
 
 namespace FastD\Routing;
 
-use FastD\Middleware\ServerMiddleware;
 
 /**
  * Class Route
@@ -24,9 +23,9 @@ class Route extends RouteRegex
     protected $parameters = [];
 
     /**
-     * @var string|array
+     * @var string
      */
-    protected $method = 'ANY';
+    protected $method = 'GET';
 
     /**
      * @var \Closure
@@ -39,7 +38,7 @@ class Route extends RouteRegex
     protected $name;
 
     /**
-     * @var ServerMiddleware[]
+     * @var array
      */
     protected $middleware = [];
 
@@ -51,7 +50,7 @@ class Route extends RouteRegex
      * @param $callback
      * @param array $defaults
      */
-    public function __construct($method = 'ANY', $path, $callback, array $defaults = [])
+    public function __construct($method, $path, $callback, array $defaults = [])
     {
         parent::__construct($path);
 
@@ -166,13 +165,17 @@ class Route extends RouteRegex
      */
     public function withAddMiddleware($middleware)
     {
-        $this->middleware[] = $middleware;
+        if (is_array($middleware)) {
+            $this->middleware = array_merge($this->middleware, $middleware);
+        } else {
+            $this->middleware[] = $middleware;
+        }
 
         return $this;
     }
 
     /**
-     * @return ServerMiddleware[]
+     * @return array
      */
     public function getMiddleware()
     {

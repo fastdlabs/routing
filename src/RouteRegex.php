@@ -8,7 +8,7 @@
  */
 
 namespace FastD\Routing;
-use SebastianBergmann\CodeCoverage\Report\PHP;
+
 
 /**
  * Class RouteRegex

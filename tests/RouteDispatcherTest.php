@@ -80,4 +80,25 @@ default
 EOF
 );
     }
+
+    public function testDispatcherCollectionGroupMiddleware()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->group(['prefix' => '/demo', 'middleware' => 'default'], function (RouteCollection $routeCollection) {
+            $routeCollection->get('/{name}', function (ServerRequest $request, Delegate $delegate) {
+                echo 'hello ' . $request->getAttribute('name');
+            });
+        });
+        $dispatcher = new RouteDispatcher($routeCollection, ['default' => [
+            new BeforeMiddleware(),
+            new AfterMiddleware(),
+        ]]);
+        $dispatcher->dispatch($this->createRequest('GET', '/demo/world'));
+        $this->expectOutputString(<<<EOF
+before
+after
+hello world
+EOF
+        );
+    }
 }

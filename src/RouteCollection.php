@@ -12,7 +12,6 @@ namespace FastD\Routing;
 
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
-use SebastianBergmann\CodeCoverage\Report\PHP;
 
 /**
  * Class RouteCollection
@@ -27,6 +26,11 @@ class RouteCollection
      * @var array
      */
     protected $with = [];
+
+    /**
+     * @var array
+     */
+    protected $middleware = [];
 
     /**
      * @var Route
@@ -74,11 +78,18 @@ class RouteCollection
      */
     public function group($path, callable $callback)
     {
+        if (is_array($path)) {
+            $this->middleware = isset($path['middleware']) ? $path['middleware'] : [];
+            $path = $path['prefix'];
+        }
+
         array_push($this->with, $path);
 
         $callback($this);
 
         array_pop($this->with);
+
+        $this->middleware = [];
 
         return $this;
     }
@@ -192,11 +203,12 @@ class RouteCollection
             $name = $path = implode('/', $this->with) . $path;
         }
 
-        if (isset($this->aliasMap[$method][$path])) {
+        if (isset($this->aliasMap[$method][$name])) {
             return $this->getRoute($name);
         }
 
         $route = $this->createRoute($method, $path, $callback, $defaults);
+        $route->withName($name)->withAddMiddleware($this->middleware);
 
         if ($route->isStaticRoute()) {
             $this->staticRoutes[$method][$path] = $route;
@@ -234,49 +246,36 @@ class RouteCollection
         $path = $serverRequest->getUri()->getPath();
 
         if (!isset($this->staticRoutes[$method][$path])) {
-            if (!isset($this->staticRoutes['ANY'][$path])) {
-                $dynamicRoutes = $this->dynamicRoutes;
-                $routes = isset($dynamicRoutes[$method]) ? $dynamicRoutes[$method] : [];
-                unset($dynamicRoutes[$method]);
-                $match = function ($path, $data) use ($serverRequest) {
-                    if (!preg_match($data['regex'], $path, $matches)) {
-                        return false;
-                    }
-                    $route = $data['routes'][count($matches)];
-                    preg_match('~^' . $route->getRegex() . '$~', $path, $match);
-                    $match = array_slice($match, 1, count($route->getVariables()));
-                    $attributes = array_combine($route->getVariables(), $match);
-                    $route->withParameters($attributes);
-                    foreach ($attributes as $key => $attribute) {
-                        $serverRequest->withAttribute($key, $attribute);
-                    }
-
-                    return $route;
-                };
-
-                foreach ($routes as $data) {
-                    if (false !== ($route = $match($path, $data))) {
-                        return $route;
-                    }
-                }
-
-                foreach ($dynamicRoutes as $dynamicRoute) {
-                    foreach ($dynamicRoute as $data) {
-                        if (false !== ($route = $match($path, $data))) {
-                            $route->withMethod($method);
-                            return $route;
-                        }
-                    }
-                }
-
+            if (!isset($this->dynamicRoutes[$method])) {
                 throw new RouteNotFoundException($path);
             }
-            $route = $this->staticRoutes['ANY'][$path];
+            $routes = $this->dynamicRoutes[$method];
+            $match = function ($path, $data) use ($serverRequest) {
+                if (!preg_match($data['regex'], $path, $matches)) {
+                    return false;
+                }
+                $route = $data['routes'][count($matches)];
+                preg_match('~^' . $route->getRegex() . '$~', $path, $match);
+                $match = array_slice($match, 1, count($route->getVariables()));
+                $attributes = array_combine($route->getVariables(), $match);
+                $attributes = array_filter($attributes);
+                $route->mergeParameters($attributes);
+                foreach ($route->getParameters() as $key => $attribute) {
+                    $serverRequest->withAttribute($key, $attribute);
+                }
+                return $route;
+            };
+
+            foreach ($routes as $data) {
+                if (false !== ($route = $match($path, $data))) {
+                    return $route;
+                }
+            }
         } else {
-            $route = $this->staticRoutes[$method][$path];
+            return $this->staticRoutes[$method][$path];
         }
 
-        return $route;
+        throw new RouteNotFoundException($path);
     }
 
     /**

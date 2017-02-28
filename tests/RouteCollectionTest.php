@@ -1,4 +1,6 @@
 <?php
+use FastD\Routing\RouteCollection;
+
 /**
  * @author    jan huang <bboyjanhuang@gmail.com>
  * @copyright 2016
@@ -17,12 +19,18 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals(count($this->collection->dynamicRoutes['POST'][0]['routes']), 2);
     }
 
+    public function testRouteName()
+    {
+        $route = $this->collection->getRoute('hello');
+        $this->assertEquals('hello', $route->getName());
+    }
+
     public function testRouteGetMethodMatch()
     {
         $route = $this->collection->match($this->createRequest('GET', '/'));
 
         $this->assertEquals('GET', $route->getMethod());
-        $this->assertNull($route->getName());
+        $this->assertEquals('/', $route->getName());
         $this->assertTrue($route->isStaticRoute());
     }
 
@@ -32,11 +40,21 @@ class RouteCollectionTest extends TestCase
         $route = $this->collection->match($serverRequest);
 
         $this->assertEquals('POST', $route->getMethod());
-        $this->assertNull($route->getName());
+        $this->assertEquals('/foo/{name}', $route->getName());
         $this->assertFalse($route->isStaticRoute());
         $this->assertEquals(['name' => 'bar'], $route->getParameters());
         $this->assertEquals($serverRequest->getAttributes(), $route->getParameters());
         $this->assertEquals(['name'], $route->getVariables());
+    }
+
+    public function testDefaultMatch()
+    {
+        $collection = new RouteCollection();
+        $collection->get('/hello/[{name}]', '', ['name' => 'world']);
+        $route = $collection->match($this->createRequest('GET', '/hello'));
+        $this->assertEquals($route->getParameters(), ['name' => 'world']);
+        $route = $collection->match($this->createRequest('GET', '/hello/foo'));
+        $this->assertEquals($route->getParameters(), ['name' => 'foo']);
     }
 
     public function testMultiVarRouteMatch()
@@ -88,5 +106,16 @@ class RouteCollectionTest extends TestCase
 
         $response = call_user_func_array($route2->getCallback(), [$request2]);
         $this->assertEquals('/foo/bar', (string) $response->getBody());
+    }
+
+    public function testGroupMiddleware()
+    {
+        $this->collection->group(['prefix' => '/middleware', 'middleware' => 'demo'], function () {
+            $this->collection->get(['/demo', 'name' => 'demo'], '');
+        });
+
+        $route = $this->collection->getRoute('demo');
+
+        $this->assertEquals($route->getMiddleware(), ['demo']);
     }
 }

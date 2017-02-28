@@ -25,6 +25,7 @@ class TestCase extends PHPUnit_Framework_TestCase
         $collection->addRoute('POST', '/foo/{name}', [], ['name' => 'bar']);
         $collection->addRoute('GET', '/bar/{name}', []);
         $collection->addRoute('POST', '/foo/bar/{name}', []);
+        $collection->addRoute('GET', ['/hello', 'name' => 'hello'], []);
         $collection->addRoute('GET', '/fuzzy/*', function (ServerRequest $request) {
             return new \FastD\Http\Response($request->getAttribute('fuzzy_path'));
         });
