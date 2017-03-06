@@ -56,6 +56,17 @@ class RouteDispatcher extends Dispatcher
     {
         $route = $this->routeCollection->match($request);
 
+        $this->callMiddleware($route);
+
+        return parent::dispatch($request);
+    }
+
+    /**
+     * @param Route $route
+     * @return $this
+     */
+    public function callMiddleware(Route $route)
+    {
         // set middleware list
         foreach ($route->getMiddleware() as $middleware) {
             if ($middleware instanceof MiddlewareInterface) {
@@ -80,6 +91,6 @@ class RouteDispatcher extends Dispatcher
         // wrapper route middleware
         $this->withAddMiddleware(new RouteMiddleware($route));
 
-        return parent::dispatch($request);
+        return $this;
     }
 }
