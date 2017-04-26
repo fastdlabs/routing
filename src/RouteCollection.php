@@ -10,6 +10,7 @@
 namespace FastD\Routing;
 
 
+use FastD\Http\ServerRequest;
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -176,6 +177,14 @@ class RouteCollection
     }
 
     /**
+     * @return Route
+     */
+    public function getActiveRoute()
+    {
+        return $this->activeRoute;
+    }
+
+    /**
      * @param $method
      * @param $path
      * @param $callback
@@ -245,37 +254,45 @@ class RouteCollection
         $method = $serverRequest->getMethod();
         $path = $serverRequest->getUri()->getPath();
 
-        if (!isset($this->staticRoutes[$method][$path])) {
-            if (!isset($this->dynamicRoutes[$method])) {
-                throw new RouteNotFoundException($path);
-            }
-            $routes = $this->dynamicRoutes[$method];
-            $match = function ($path, $data) use ($serverRequest) {
-                if (!preg_match($data['regex'], $path, $matches)) {
-                    return false;
-                }
-                $route = $data['routes'][count($matches)];
-                preg_match('~^' . $route->getRegex() . '$~', $path, $match);
-                $match = array_slice($match, 1, count($route->getVariables()));
-                $attributes = array_combine($route->getVariables(), $match);
-                $attributes = array_filter($attributes);
-                $route->mergeParameters($attributes);
-                foreach ($route->getParameters() as $key => $attribute) {
-                    $serverRequest->withAttribute($key, $attribute);
-                }
-                return $route;
-            };
-
-            foreach ($routes as $data) {
-                if (false !== ($route = $match($path, $data))) {
-                    return $route;
-                }
-            }
-        } else {
-            return $this->staticRoutes[$method][$path];
+        if (isset($this->staticRoutes[$method][$path])) {
+            return $this->activeRoute = $this->staticRoutes[$method][$path];
         }
 
-        throw new RouteNotFoundException($path);
+        if (
+            !isset($this->dynamicRoutes[$method])
+            || false === $route = $this->matchDynamicRoute($serverRequest, $method, $path)
+        ) {
+            throw new RouteNotFoundException($path);
+        }
+
+        return $this->activeRoute = $route;
+    }
+
+    /**
+     * @param ServerRequestInterface $serverRequest
+     * @param string $method
+     * @param string $path
+     * @return bool|Route
+     */
+    protected function matchDynamicRoute(ServerRequestInterface $serverRequest, $method, $path)
+    {
+        foreach ($this->dynamicRoutes[$method] as $data) {
+            if (!preg_match($data['regex'], $path, $matches)) {
+                continue;
+            }
+            $route = $data['routes'][count($matches)];
+            preg_match('~^' . $route->getRegex() . '$~', $path, $match);
+            $match = array_slice($match, 1, count($route->getVariables()));
+            $attributes = array_combine($route->getVariables(), $match);
+            $attributes = array_filter($attributes);
+            $route->mergeParameters($attributes);
+            foreach ($route->getParameters() as $key => $attribute) {
+                $serverRequest->withAttribute($key, $attribute);
+            }
+            return $route;
+        }
+
+        return false;
     }
 
     /**
