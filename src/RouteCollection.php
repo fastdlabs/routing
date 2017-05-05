@@ -162,6 +162,20 @@ class RouteCollection
     }
 
     /**
+     * @param $path
+     * @param $handle
+     * @return Route[]
+     */
+    public function resource($path, $handle)
+    {
+        $routes = [];
+        foreach (['GET', 'POST', 'PATCH', 'DELETE'] as $method) {
+            $routes[] = $this->addRoute($method, $path, $handle);
+        }
+        return $routes;
+    }
+
+    /**
      * @param $name
      * @return bool|Route
      */
@@ -293,54 +307,5 @@ class RouteCollection
         }
 
         return false;
-    }
-
-    /**
-     * @param $name
-     * @param array $parameters
-     * @param string $format
-     * @return string
-     * @throws \Exception
-     */
-    public function generateUrl($name, array $parameters = [], $format = '')
-    {
-        if (false === ($route = $this->getRoute($name))) {
-            throw new RouteNotFoundException($name);
-        }
-
-        if (!empty($format)) {
-            $format = '.' . $format;
-        } else {
-            $format = '';
-        }
-
-        if ($route->isStaticRoute()) {
-            return $route->getPath() . $format;
-        }
-
-        $parameters = array_merge($route->getParameters(), $parameters);
-        $queryString = [];
-
-        foreach ($parameters as $key => $parameter) {
-            if (!in_array($key, $route->getVariables())) {
-                $queryString[$key] = $parameter;
-                unset($parameters[$key]);
-            }
-        }
-
-        $search = array_map(function ($v) {
-            return '{' . $v . '}';
-        }, array_keys($parameters));
-
-        $replace = $parameters;
-
-        $path = str_replace($search, $replace, $route->getPath());
-
-        if (false !== strpos($path, '[')) {
-            $path = str_replace(['[', ']'], '', $path);
-            $path = rtrim(preg_replace('~(({.*?}))~', '', $path), '/');
-        }
-
-        return $path . $format . ([] === $queryString ? '' : '?' . http_build_query($queryString));
     }
 }

@@ -33,11 +33,6 @@ class Route extends RouteRegex
     protected $callback;
 
     /**
-     * @var string
-     */
-    protected $name;
-
-    /**
      * @var array
      */
     protected $middleware = [];
@@ -59,25 +54,6 @@ class Route extends RouteRegex
         $this->withCallback($callback);
 
         $this->withParameters($defaults);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     * @return $this
-     */
-    public function withName($name)
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     /**
