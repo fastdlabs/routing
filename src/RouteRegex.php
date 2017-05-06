@@ -118,10 +118,10 @@ REGEX;
             $requirement = '([\/_a-zA-Z0-9-]+){1,}';
             $this->regex = str_replace('/*', $requirement, $this->path);
             $this->variables = [
-                'fuzzy_path'
+                'path'
             ];
             $this->requirements = [
-                'fuzzy_path' => $requirement,
+                'path' => $requirement,
             ];
             unset($requirement);
             return $this->regex;

@@ -31,7 +31,6 @@ class Route extends RouteRegex
      * @var \Closure
      */
     protected $callback;
-
     /**
      * @var array
      */
@@ -130,7 +129,7 @@ class Route extends RouteRegex
      */
     public function withMiddleware($middleware)
     {
-        $this->middleware = [$middleware];
+        $this->middleware = is_array($middleware) ? $middleware : [$middleware];
 
         return $this;
     }
@@ -141,11 +140,11 @@ class Route extends RouteRegex
      */
     public function withAddMiddleware($middleware)
     {
-        if (is_array($middleware)) {
-            $this->middleware = array_merge($this->middleware, $middleware);
-        } else {
-            $this->middleware[] = $middleware;
+        if (!is_array($middleware)) {
+            $middleware = [$middleware];
         }
+
+        $this->middleware = array_merge($this->middleware, $middleware);
 
         return $this;
     }

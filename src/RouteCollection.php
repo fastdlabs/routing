@@ -73,18 +73,16 @@ class RouteCollection
     protected $regexes = [];
 
     /**
-     * @param          $path
+     * @param          $prefix
      * @param callable $callback
+     * @param $middleware
      * @return $this
      */
-    public function group($path, callable $callback)
+    public function group($prefix, callable $callback, $middleware = null)
     {
-        if (is_array($path)) {
-            $this->middleware = isset($path['middleware']) ? $path['middleware'] : [];
-            $path = $path['prefix'];
-        }
+        !empty($middleware) && $this->middleware = $middleware;
 
-        array_push($this->with, $path);
+        array_push($this->with, $prefix);
 
         $callback($this);
 
@@ -231,7 +229,7 @@ class RouteCollection
         }
 
         $route = $this->createRoute($method, $path, $callback, $defaults);
-        $route->withName($name)->withAddMiddleware($this->middleware);
+        $route->withAddMiddleware($this->middleware);
 
         if ($route->isStaticRoute()) {
             $this->staticRoutes[$method][$path] = $route;
