@@ -21,6 +21,9 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RouteDispatcher extends Dispatcher
 {
+    /**
+     * @var Route
+     */
     public $route;
 
     /**

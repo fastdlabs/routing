@@ -84,11 +84,11 @@ EOF
     public function testDispatcherCollectionGroupMiddleware()
     {
         $routeCollection = new RouteCollection();
-        $routeCollection->group(['prefix' => '/demo', 'middleware' => 'default'], function (RouteCollection $routeCollection) {
+        $routeCollection->group('/demo', function (RouteCollection $routeCollection) {
             $routeCollection->get('/{name}', function (ServerRequest $request, Delegate $delegate) {
                 echo 'hello ' . $request->getAttribute('name');
             });
-        });
+        }, ['default']);
         $dispatcher = new RouteDispatcher($routeCollection, ['default' => [
             new BeforeMiddleware(),
             new AfterMiddleware(),

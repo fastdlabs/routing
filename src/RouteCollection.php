@@ -10,7 +10,6 @@
 namespace FastD\Routing;
 
 
-use FastD\Http\ServerRequest;
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -174,21 +173,6 @@ class RouteCollection
     }
 
     /**
-     * @param $name
-     * @return bool|Route
-     */
-    public function getRoute($name)
-    {
-        foreach ($this->aliasMap as $method => $routes) {
-            if (isset($routes[$name])) {
-                return $routes[$name];
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * @return Route
      */
     public function getActiveRoute()
@@ -217,16 +201,7 @@ class RouteCollection
      */
     public function addRoute($method, $path, $callback, array $defaults = [])
     {
-        if (is_array($path)) {
-            $name = $path['name'];
-            $path = $path[0];
-        } else {
-            $name = $path = implode('/', $this->with) . $path;
-        }
-
-        if (isset($this->aliasMap[$method][$name])) {
-            return $this->getRoute($name);
-        }
+        $path = implode('/', $this->with) . $path;
 
         $route = $this->createRoute($method, $path, $callback, $defaults);
         $route->withAddMiddleware($this->middleware);
@@ -251,7 +226,7 @@ class RouteCollection
             unset($numGroups, $numVariables);
         }
 
-        $this->aliasMap[$method][$name] = $route;
+        $this->aliasMap[$method][$path] = $route;
 
         return $route;
     }
@@ -272,7 +247,7 @@ class RouteCollection
 
         if (
             !isset($this->dynamicRoutes[$method])
-            || false === $route = $this->matchDynamicRoute($serverRequest, $method, $path)
+            || false === ($route = $this->matchDynamicRoute($serverRequest, $method, $path))
         ) {
             throw new RouteNotFoundException($path);
         }

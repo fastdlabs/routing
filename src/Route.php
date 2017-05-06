@@ -28,9 +28,10 @@ class Route extends RouteRegex
     protected $method = 'GET';
 
     /**
-     * @var \Closure
+     * @var mixed
      */
     protected $callback;
+
     /**
      * @var array
      */

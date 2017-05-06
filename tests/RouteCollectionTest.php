@@ -19,18 +19,11 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals(count($this->collection->dynamicRoutes['POST'][0]['routes']), 2);
     }
 
-    public function testRouteName()
-    {
-        $route = $this->collection->getRoute('hello');
-        $this->assertEquals('hello', $route->getName());
-    }
-
     public function testRouteGetMethodMatch()
     {
         $route = $this->collection->match($this->createRequest('GET', '/'));
 
         $this->assertEquals('GET', $route->getMethod());
-        $this->assertEquals('/', $route->getName());
         $this->assertTrue($route->isStaticRoute());
     }
 
@@ -40,7 +33,6 @@ class RouteCollectionTest extends TestCase
         $route = $this->collection->match($serverRequest);
 
         $this->assertEquals('POST', $route->getMethod());
-        $this->assertEquals('/foo/{name}', $route->getName());
         $this->assertFalse($route->isStaticRoute());
         $this->assertEquals(['name' => 'bar'], $route->getParameters());
         $this->assertEquals($serverRequest->getAttributes(), $route->getParameters());
@@ -74,25 +66,6 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals('POST', $route->getMethod());
     }
 
-    public function testRouteGenerator()
-    {
-        $url = $this->collection->generateUrl('/foo/{name}', ['name' => 'bar']);
-        $this->assertEquals('/foo/bar', $url);
-    }
-
-    public function testRouteGeneratorHasSuffix()
-    {
-        $url = $this->collection->generateUrl('/foo/{name}', ['name' => 'bar'], 'html');
-        $this->assertEquals('/foo/bar.html', $url);
-    }
-
-    public function testAddRouteName()
-    {
-        $route = $this->collection->get(['/default', 'name' => 'default'], []);
-        $defaultRoute = $this->collection->getRoute('default');
-        $this->assertEquals($route, $defaultRoute);
-    }
-
     public function testMatchFuzzyRoute()
     {
         $request1 = $this->createRequest('GET', '/fuzzy/bar');
@@ -110,13 +83,11 @@ class RouteCollectionTest extends TestCase
 
     public function testGroupMiddleware()
     {
-        $this->collection->group(['prefix' => '/middleware', 'middleware' => 'demo'], function () {
-            $this->collection->get(['/demo', 'name' => 'demo'], '');
+        $this->collection->group('/middleware', function () {
+            $this->collection->get('/demo', '');
         });
 
-        $route = $this->collection->getRoute('demo');
-
-        $this->assertEquals($route->getMiddleware(), ['demo']);
+//        $this->assertEquals($route->getMiddleware(), ['demo']);
     }
 
     public function testGetActiveRoute()
