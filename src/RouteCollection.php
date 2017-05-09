@@ -48,11 +48,6 @@ class RouteCollection
     public $dynamicRoutes = [];
 
     /**
-     * @var array
-     */
-    public $aliasMap = [];
-
-    /**
      * 路由列表计数器
      *
      * @var int
@@ -203,8 +198,7 @@ class RouteCollection
     {
         $path = implode('/', $this->with) . $path;
 
-        $route = $this->createRoute($method, $path, $callback, $defaults);
-        $route->withAddMiddleware($this->middleware);
+        $route = $this->createRoute($method, $path, $callback, $defaults)->withAddMiddleware($this->middleware);
 
         if ($route->isStaticRoute()) {
             $this->staticRoutes[$method][$path] = $route;
@@ -225,9 +219,7 @@ class RouteCollection
             }
             unset($numGroups, $numVariables);
         }
-
-        $this->aliasMap[$method][$path] = $route;
-
+        
         return $route;
     }
 
