@@ -25,6 +25,15 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals('hello', $route->getName());
     }
 
+    public function testRouteMatch()
+    {
+        $this->collection->addRoute('GET', '/users/', []);
+        $callback = $this->collection->match(new \FastD\Http\ServerRequest('GET', '/users'))->getCallback();
+        $this->assertEmpty($callback);
+        $this->collection->match(new \FastD\Http\ServerRequest('GET', '/users/'))->getCallback();
+        $this->assertEmpty($callback);
+    }
+
     public function testRouteGetMethodMatch()
     {
         $route = $this->collection->match($this->createRequest('GET', '/'));
