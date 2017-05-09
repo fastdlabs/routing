@@ -85,9 +85,7 @@ class RouteCollectionTest extends TestCase
     {
         $this->collection->group('/middleware', function () {
             $this->collection->get('/demo', '');
-        });
-
-//        $this->assertEquals($route->getMiddleware(), ['demo']);
+        }, ['demo']);
     }
 
     public function testGetActiveRoute()
