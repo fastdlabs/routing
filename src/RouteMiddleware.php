@@ -37,23 +37,28 @@ class RouteMiddleware extends Middleware
     }
 
     /**
-     * @param ServerRequestInterface $serverRequest
-     * @param DelegateInterface $delegate
+     * @param ServerRequestInterface $request
+     * @param DelegateInterface $next
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $serverRequest, DelegateInterface $delegate)
+    public function handle(ServerRequestInterface $request, DelegateInterface $next = null)
     {
         if (is_string(($callback = $this->route->getCallback()))) {
-            list($class, $method) = explode('@', $callback);
-            $response = call_user_func_array([new $class, $method], [$serverRequest, $delegate]);
+            if (false !== strpos($callback, '@')) {
+                list($class, $method) = explode('@', $callback);
+            } else {
+                $class = $callback;
+                $method = 'handle';
+            }
+            $response = call_user_func_array([new $class, $method], [$request, $next]);
         } else if (is_callable($callback)) {
-            $response = call_user_func_array($callback, [$serverRequest, $delegate]);
+            $response = call_user_func_array($callback, [$request, $next]);
         } else if (is_array($callback)) {
             $class = $callback[0];
             if (is_string($class)) {
                 $class = new $class;
             }
-            $response = call_user_func_array([$class, $callback[1]], [$serverRequest, $delegate]);
+            $response = call_user_func_array([$class, $callback[1]], [$request, $next]);
         } else {
             $response = new Response('Don\'t support callback, Please setting callable function or class@method.');
         }

@@ -1,4 +1,5 @@
 <?php
+use FastD\Http\ServerRequest;
 use FastD\Routing\RouteCollection;
 
 /**
@@ -9,50 +10,61 @@ use FastD\Routing\RouteCollection;
  * @link      http://www.fast-d.cn/
  */
 
-class RouteCollectionTest extends TestCase
+class RouteCollectionTest extends PHPUnit_Framework_TestCase
 {
-    public function testAddRouteToCollection()
+    /**
+     * @var RouteCollection
+     */
+    protected $collection;
+
+    public function setUp()
     {
-        $this->assertEquals(count($this->collection->staticRoutes), 1);
-        $this->assertEquals(count($this->collection->dynamicRoutes), 2);
-        $this->assertEquals(count($this->collection->dynamicRoutes['GET'][0]['routes']), 3);
-        $this->assertEquals(count($this->collection->dynamicRoutes['POST'][0]['routes']), 2);
+        $collection = new RouteCollection();
+
+        $collection->addRoute('GET', '/', []);
+        $collection->addRoute('GET', '/foo/{name}', []);
+        $collection->addRoute('POST', '/foo/[{name}]', [])->withParameters(['name' => 'bar']);
+        $collection->addRoute('GET', '/bar/{name}', []);
+        $collection->addRoute('POST', '/foo/bar/{name}', []);
+        $collection->addRoute('GET', '/hello', []);
+        $collection->addRoute('GET', '/fuzzy/*', function (ServerRequest $request) {
+            return new \FastD\Http\Response($request->getAttribute('path'));
+        });
+
+        $this->collection = $collection;
     }
 
-    public function testRouteGetMethodMatch()
+    public function testRouteMatches()
     {
-        $route = $this->collection->match($this->createRequest('GET', '/'));
-
+        $route = $this->collection->match(new ServerRequest('GET', '/'));
         $this->assertEquals('GET', $route->getMethod());
-        $this->assertTrue($route->isStaticRoute());
-    }
+        $this->assertTrue($route->isStatic());
 
-    public function testRoutePostMethodMatch()
-    {
-        $serverRequest = $this->createRequest('POST', '/foo/bar');
-        $route = $this->collection->match($serverRequest);
+        $route = $this->collection->match(new ServerRequest('GET', '/foo/bar'));
+        $this->assertFalse($route->isStatic());
 
-        $this->assertEquals('POST', $route->getMethod());
-        $this->assertFalse($route->isStaticRoute());
-        $this->assertEquals(['name' => 'bar'], $route->getParameters());
-        $this->assertEquals($serverRequest->getAttributes(), $route->getParameters());
-        $this->assertEquals(['name'], $route->getVariables());
+        $route = $this->collection->match(new ServerRequest('GET', '/foo/bar/'));
+        $this->assertFalse($route->isStatic());
+
+        $route = $this->collection->match(new ServerRequest('GET', '/hello'));
+        $this->assertTrue($route->isStatic());
+
+        $route = $this->collection->match(new ServerRequest('GET', '/hello/'));
+        $this->assertTrue($route->isStatic());
     }
 
     public function testDefaultMatch()
     {
-        $collection = new RouteCollection();
-        $collection->get('/hello/[{name}]', '', ['name' => 'world']);
-        $route = $collection->match($this->createRequest('GET', '/hello'));
-        $this->assertEquals($route->getParameters(), ['name' => 'world']);
-        $route = $collection->match($this->createRequest('GET', '/hello/foo'));
-        $this->assertEquals($route->getParameters(), ['name' => 'foo']);
+        $route = $this->collection->match(new ServerRequest('POST', '/foo/'));
+        $this->assertEquals($route->getParameters(), ['name' => 'bar']);
+        $route = $this->collection->match(new ServerRequest('POST', '/foo/demo'));
+        $this->assertEquals($route->getParameters(), ['name' => 'demo']);
     }
 
     public function testMultiVarRouteMatch()
     {
         $this->collection->addRoute('PUT', '/{name}/{type}', []);
-        $serverRequest = $this->createRequest('PUT', '/foo/bar');
+        $serverRequest = new ServerRequest('PUT', '/foo/bar');
         $route = $this->collection->match($serverRequest);
         $this->assertEquals([
             'name' => 'foo',
@@ -62,14 +74,14 @@ class RouteCollectionTest extends TestCase
 
     public function testRouteAnyMethodMatch()
     {
-        $route = $this->collection->match($this->createRequest('POST', '/foo/bar'));
+        $route = $this->collection->match(new ServerRequest('POST', '/foo/bar'));
         $this->assertEquals('POST', $route->getMethod());
     }
 
     public function testMatchFuzzyRoute()
     {
-        $request1 = $this->createRequest('GET', '/fuzzy/bar');
-        $request2 = $this->createRequest('GET', '/fuzzy/foo/bar');
+        $request1 = new ServerRequest('GET', '/fuzzy/bar');
+        $request2 = new ServerRequest('GET', '/fuzzy/foo/bar');
         $route1 = $this->collection->match($request1);
         $route2 = $this->collection->match($request2);
         $this->assertEquals($route1, $route2);
@@ -85,12 +97,12 @@ class RouteCollectionTest extends TestCase
     {
         $this->collection->group('/middleware', function () {
             $this->collection->get('/demo', '');
-        }, ['demo']);
+        });
     }
 
     public function testGetActiveRoute()
     {
-        $route = $this->collection->match($this->createRequest('GET', '/'));
+        $route = $this->collection->match(new ServerRequest('GET', '/'));
         $this->assertEquals($route, $this->collection->getActiveRoute());
     }
 }

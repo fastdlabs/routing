@@ -22,11 +22,6 @@ use Psr\Http\Message\ServerRequestInterface;
 class RouteDispatcher extends Dispatcher
 {
     /**
-     * @var Route
-     */
-    public $route;
-
-    /**
      * @var RouteCollection
      */
     protected $routeCollection;
@@ -40,15 +35,23 @@ class RouteDispatcher extends Dispatcher
      * RouteDispatcher constructor.
      *
      * @param RouteCollection $routeCollection
-     * @param $definition
+     * @param MiddlewareInterface[] $definition
      */
-    public function __construct(RouteCollection $routeCollection, $definition = [])
+    public function __construct(RouteCollection $routeCollection, array $definition = [])
     {
         $this->routeCollection = $routeCollection;
 
         $this->definition = $definition;
 
-        parent::__construct([]);
+        parent::__construct();
+    }
+
+    /**
+     * @return RouteCollection
+     */
+    public function getCollection()
+    {
+        return $this->routeCollection;
     }
 
     /**
@@ -72,26 +75,25 @@ class RouteDispatcher extends Dispatcher
         // set middleware list
         foreach ($route->getMiddleware() as $middleware) {
             if ($middleware instanceof MiddlewareInterface) {
-                $this->withAddMiddleware($middleware);
+                $this->before($middleware);
             } else if (is_string($middleware)) {
                 if (!isset($this->definition[$middleware])) {
-                    throw new \RuntimeException(sprintf('Middleware %s is not defined.'));
+                    throw new \LogicException(sprintf('Middleware %s is not defined.'));
                 }
                 $definition = $this->definition[$middleware];
                 if (is_array($definition)) {
                     foreach ($definition as $value) {
-                        $this->withAddMiddleware(is_string($value) ? new $value : $value);
+                        $this->before(is_string($value) ? new $value : $value);
                     }
                 } else {
-                    $this->withAddMiddleware(is_string($definition) ? new $definition : $definition);
+                    $this->before(is_string($definition) ? new $definition : $definition);
                 }
             } else {
                 throw new RouteException(sprintf('Don\'t support %s middleware', gettype($middleware)));
             }
         }
-
         // wrapper route middleware
-        $this->withAddMiddleware(new RouteMiddleware($route));
+        $this->before(new RouteMiddleware($route));
 
         return parent::dispatch($request);
     }

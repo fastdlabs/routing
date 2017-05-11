@@ -35,7 +35,9 @@ class Route extends RouteRegex
     /**
      * @var array
      */
-    protected $middleware = [];
+    protected $middleware = [
+
+    ];
 
     /**
      * Route constructor.
@@ -43,17 +45,14 @@ class Route extends RouteRegex
      * @param string $method
      * @param $path
      * @param $callback
-     * @param array $defaults
      */
-    public function __construct($method, $path, $callback, array $defaults = [])
+    public function __construct($method, $path, $callback)
     {
         parent::__construct($path);
 
         $this->withMethod($method);
 
         $this->withCallback($callback);
-
-        $this->withParameters($defaults);
     }
 
     /**
@@ -130,7 +129,7 @@ class Route extends RouteRegex
      */
     public function withMiddleware($middleware)
     {
-        $this->middleware = is_array($middleware) ? $middleware : [$middleware];
+        $this->middleware = [$middleware];
 
         return $this;
     }
@@ -141,11 +140,11 @@ class Route extends RouteRegex
      */
     public function withAddMiddleware($middleware)
     {
-        if (!is_array($middleware)) {
-            $middleware = [$middleware];
+        if (is_array($middleware)) {
+            $this->middleware = array_merge($this->middleware, $middleware);
+        } else {
+            $this->middleware[] = $middleware;
         }
-
-        $this->middleware = array_merge($this->middleware, $middleware);
 
         return $this;
     }

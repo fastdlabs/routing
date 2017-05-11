@@ -30,7 +30,7 @@ class RouteTest extends PHPUnit_Framework_TestCase
     public function testRouteIsStatic()
     {
         $route = new Route('GET', '/foo/*', []);
-        $this->assertFalse($route->isStaticRoute());
+        $this->assertFalse($route->isStatic());
     }
 
     public function testRouteFuzzyMatching()
