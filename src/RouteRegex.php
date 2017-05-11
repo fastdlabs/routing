@@ -19,9 +19,9 @@ class RouteRegex
 {
     const VARIABLE_REGEX = <<<'REGEX'
 \{
-    \s* ([a-zA-Z][a-zA-Z0-9_]*) \s*
+    ([a-zA-Z0-9_?*]*)
     (?:
-        : \s* ([^{}]*(?:\{(?-1)\}[^{}]*)*)
+        :([^{}]*(?:\{(?-1)\}[^{}]*)*)
     )?
 \}
 REGEX;
@@ -122,28 +122,18 @@ REGEX;
 
         $this->isStatic = false;
 
-        if ('*' === substr($path, -1)) {
-            $requirement = '([\/_a-zA-Z0-9-]+){1,}';
-            $this->regex = str_replace('/*', $requirement, $path);
-            $this->variables = [
-                'path'
-            ];
-            $this->requirements = [
-                'path' => $requirement,
-            ];
-            unset($requirement, $path);
-            return $this->regex;
+        if (preg_match_all('~' . self::VARIABLE_REGEX . '~x', $path, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $path = str_replace($match[0], '(' . (isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX) . ')', $path);
+                $this->variables[] = $match[1];
+                $this->requirements[$match[1]] = isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX;
+            }
+        } else {
+            $this->variables[] = 'path';
+            $this->requirements['path'] = '([\/_a-zA-Z0-9-]*)';
         }
 
-        preg_match_all('~' . self::VARIABLE_REGEX . '~x', $path, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $match) {
-            $path = str_replace($match[0], '(' . (isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX) . ')', $path);
-            $this->variables[] = $match[1];
-            $this->requirements[$match[1]] = isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX;
-        }
-
-        $this->regex = str_replace(['[(', '+)]'], ['?(', '*)'], $path) . '/?';
+        $this->regex = str_replace(['*', '[(', '+)]'], ['([\/_a-zA-Z0-9-]*)', '?(', '*)'], $path) . '/?';
 
         unset($matches, $path);
 

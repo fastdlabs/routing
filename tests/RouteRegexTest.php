@@ -24,7 +24,7 @@ class RouteRegexTest extends PHPUnit_Framework_TestCase
 
     public function testMatchingLastCharset()
     {
-        $regex = new RouteRegex('/{name}/');
+        $regex = new RouteRegex('/[{name}]/');
         $this->assertRegExp('~^' . $regex->getRegex() . '$~', '/foo');
         $this->assertRegExp('~^' . $regex->getRegex() . '$~', '/foo');
 
