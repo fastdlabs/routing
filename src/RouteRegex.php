@@ -120,6 +120,19 @@ REGEX;
             return $this->path;
         }
 
+        if ('*' === substr($this->path, -1)) {
+            $requirement = '([\/_a-zA-Z0-9-]+){1,}';
+            $this->regex = str_replace('/*', $requirement, $this->path);
+            $this->variables = [
+                'path'
+            ];
+            $this->requirements = [
+                'path' => $requirement,
+            ];
+            unset($requirement);
+            return $this->regex;
+        }
+
         $this->isStatic = false;
 
         if (preg_match_all('~' . self::VARIABLE_REGEX . '~x', $path, $matches, PREG_SET_ORDER)) {
@@ -128,12 +141,9 @@ REGEX;
                 $this->variables[] = $match[1];
                 $this->requirements[$match[1]] = isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX;
             }
-        } else {
-            $this->variables[] = 'path';
-            $this->requirements['path'] = '([\/_a-zA-Z0-9-]*)';
         }
 
-        $this->regex = str_replace(['*', '[(', '+)]'], ['([\/_a-zA-Z0-9-]*)', '?(', '*)'], $path) . '/?';
+        $this->regex = str_replace(['[(', '+)]'], ['?(', '*)'], $path) . '/?';
 
         unset($matches, $path);
 
