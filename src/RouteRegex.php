@@ -121,6 +121,7 @@ REGEX;
         }
 
         if ('*' === substr($this->path, -1)) {
+            $this->isStatic = false;
             $requirement = '([\/_a-zA-Z0-9-]+){1,}';
             $this->regex = str_replace('/*', $requirement, $this->path);
             $this->variables = [

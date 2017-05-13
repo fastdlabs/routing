@@ -89,10 +89,10 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($route1, $route2);
 
         $response = call_user_func_array($route1->getCallback(), [$request1]);
-        $this->assertEquals('bar', (string) $response->getBody());
+        $this->assertEquals('/bar', (string) $response->getBody());
 
         $response = call_user_func_array($route2->getCallback(), [$request2]);
-        $this->assertEquals('foo/bar', (string) $response->getBody());
+        $this->assertEquals('/foo/bar', (string) $response->getBody());
     }
 
     public function testGroupMiddleware()
