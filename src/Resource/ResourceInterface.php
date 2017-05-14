@@ -11,6 +11,7 @@ namespace FastD\Routing\Resource;
 
 
 use FastD\Middleware\Middleware;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Interface ResourceInterface
@@ -18,4 +19,8 @@ use FastD\Middleware\Middleware;
  */
 abstract class ResourceInterface extends Middleware
 {
+    /**
+     * @param ServerRequestInterface $request
+     */
+    abstract public function data(ServerRequestInterface $request);
 }

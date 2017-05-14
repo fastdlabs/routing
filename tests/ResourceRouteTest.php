@@ -24,6 +24,14 @@ class Resource extends ResourceInterface
     {
         return new \FastD\Http\Response('hello world');
     }
+
+    /**
+     * @param ServerRequestInterface $request
+     */
+    public function data(ServerRequestInterface $request)
+    {
+        // TODO: Implement data() method.
+    }
 }
 
 class ResourceRouteTest extends PHPUnit_Framework_TestCase
@@ -36,5 +44,11 @@ class ResourceRouteTest extends PHPUnit_Framework_TestCase
         $dispatcher->after($middleware);
         echo $dispatcher->dispatch(new \FastD\Http\ServerRequest('GET', '/'))->getBody();
         $this->expectOutputString('hello world');
+    }
+
+    public function testResourceCollection()
+    {
+        $collection = new \FastD\Routing\RouteCollection();
+        $collection->resource('/', Resource::class);
     }
 }
