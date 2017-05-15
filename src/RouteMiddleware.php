@@ -48,7 +48,7 @@ class RouteMiddleware extends Middleware
                 list($class, $method) = explode('@', $callback);
             } else {
                 $class = $callback;
-                $method = 'handle';
+                $method = 'process';
             }
             $response = call_user_func_array([new $class, $method], [$request, $next]);
         } else if (is_callable($callback)) {

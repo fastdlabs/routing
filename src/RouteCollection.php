@@ -154,21 +154,6 @@ class RouteCollection
     }
 
     /**
-     * @param $path
-     * @param $handle
-     * @param array $middleware
-     * @return Route[]
-     */
-    public function resource($path, $handle, $middleware = [])
-    {
-        $routes = [];
-        foreach (['GET', 'POST', 'PATCH', 'DELETE'] as $method) {
-            $routes[] = $this->addRoute($method, $path, $handle)->withAddMiddleware($middleware);
-        }
-        return $routes;
-    }
-
-    /**
      * @return Route
      */
     public function getActiveRoute()

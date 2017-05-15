@@ -13,7 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * @see      http://www.fast-d.cn/
  */
 
-class Resource extends ResourceInterface
+class Resource extends \FastD\Routing\Resource\AbstractCreateResource
 {
     /**
      * @param ServerRequestInterface $request
@@ -23,14 +23,6 @@ class Resource extends ResourceInterface
     public function handle(ServerRequestInterface $request, DelegateInterface $next)
     {
         return new \FastD\Http\Response('hello world');
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     */
-    public function data(ServerRequestInterface $request)
-    {
-        // TODO: Implement data() method.
     }
 }
 
@@ -42,13 +34,9 @@ class ResourceRouteTest extends PHPUnit_Framework_TestCase
         $middleware = new RouteMiddleware($route);
         $dispatcher = new \FastD\Middleware\Dispatcher();
         $dispatcher->after($middleware);
-        echo $dispatcher->dispatch(new \FastD\Http\ServerRequest('GET', '/'))->getBody();
+        $response = $dispatcher->dispatch(new \FastD\Http\ServerRequest('GET', '/'));
+        echo $response->getBody();
         $this->expectOutputString('hello world');
-    }
-
-    public function testResourceCollection()
-    {
-        $collection = new \FastD\Routing\RouteCollection();
-        $collection->resource('/', Resource::class);
+        $this->assertEquals(201, $response->getStatusCode());
     }
 }

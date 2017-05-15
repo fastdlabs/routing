@@ -15,8 +15,8 @@ use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractCreateResource extends ResourceInterface
 {
-    public function handle(ServerRequestInterface $request, DelegateInterface $next)
+    public function process(ServerRequestInterface $request, DelegateInterface $next)
     {
-        return parent::handle($request, $next)->withStatus(201);
+        return parent::process($request, $next)->withStatus(201);
     }
 }
