@@ -19,9 +19,9 @@ class RouteRegex
 {
     const VARIABLE_REGEX = <<<'REGEX'
 \{
-    \s* ([a-zA-Z][a-zA-Z0-9_]*) \s*
+    ([a-zA-Z0-9_?*]*)
     (?:
-        : \s* ([^{}]*(?:\{(?-1)\}[^{}]*)*)
+        :([^{}]*(?:\{(?-1)\}[^{}]*)*)
     )?
 \}
 REGEX;
@@ -50,27 +50,26 @@ REGEX;
     protected $path;
 
     /**
+     * @var bool
+     */
+    protected $isStatic = true;
+
+    /**
      * RouteRegex constructor.
      *
-     * @param null $path
+     * @param string $path
      */
-    public function __construct($path = null)
+    public function __construct($path)
     {
-        $this->path = $path;
-
-        $this->parseRoute();
+        $this->parseRoute($path);
     }
 
     /**
      * @return bool
      */
-    public function isStaticRoute()
+    public function isStatic()
     {
-        if ('*' === substr($this->path, -1)) {
-            return false;
-        }
-
-        return false === strpos($this->path, '{');
+        return $this->isStatic;
     }
 
     /**
@@ -106,44 +105,46 @@ REGEX;
     }
 
     /**
-     * @return mixed|string
+     * @param string $path
+     * @return string
      */
-    protected function parseRoute()
+    protected function parseRoute($path)
     {
-        if ($this->isStaticRoute()) {
-            return $this->getPath();
+        if ('/' !== $path) {
+            $path = rtrim($path, '/');
+        }
+
+        $this->path = $path;
+
+        if ('*' !== substr($path, -1) && false === strpos($path, '{')) {
+            return $this->path;
         }
 
         if ('*' === substr($this->path, -1)) {
+            $this->isStatic = false;
             $requirement = '([\/_a-zA-Z0-9-]+){1,}';
             $this->regex = str_replace('/*', $requirement, $this->path);
             $this->variables = [
-                'fuzzy_path'
+                'path'
             ];
             $this->requirements = [
-                'fuzzy_path' => $requirement,
+                'path' => $requirement,
             ];
             unset($requirement);
             return $this->regex;
         }
 
-        $path = $this->getPath();
+        $this->isStatic = false;
 
-        preg_match_all('~' . self::VARIABLE_REGEX . '~x', $this->path, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $match) {
-            $path = str_replace($match[0], '(' . (isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX) . ')', $path);
-
-            $this->variables[] = $match[1];
-
-            $this->requirements[$match[1]] = isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX;
+        if (preg_match_all('~' . self::VARIABLE_REGEX . '~x', $path, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $path = str_replace($match[0], '(' . (isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX) . ')', $path);
+                $this->variables[] = $match[1];
+                $this->requirements[$match[1]] = isset($match[2]) ? $match[2] : static::DEFAULT_DISPATCH_REGEX;
+            }
         }
 
-        $this->regex = str_replace(['[(', '+)]'], ['?(', '*)'], $path);
-
-        if ('/' === substr($this->regex, -1)) {
-            $this->regex .= '?';
-        }
+        $this->regex = str_replace(['[(', '+)]'], ['?(', '*)'], $path) . '/?';
 
         unset($matches, $path);
 

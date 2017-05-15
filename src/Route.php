@@ -28,19 +28,16 @@ class Route extends RouteRegex
     protected $method = 'GET';
 
     /**
-     * @var \Closure
+     * @var mixed
      */
     protected $callback;
 
     /**
-     * @var string
-     */
-    protected $name;
-
-    /**
      * @var array
      */
-    protected $middleware = [];
+    protected $middleware = [
+
+    ];
 
     /**
      * Route constructor.
@@ -48,36 +45,14 @@ class Route extends RouteRegex
      * @param string $method
      * @param $path
      * @param $callback
-     * @param array $defaults
      */
-    public function __construct($method, $path, $callback, array $defaults = [])
+    public function __construct($method, $path, $callback)
     {
         parent::__construct($path);
 
         $this->withMethod($method);
 
         $this->withCallback($callback);
-
-        $this->withParameters($defaults);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     * @return $this
-     */
-    public function withName($name)
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     /**

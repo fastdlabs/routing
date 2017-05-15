@@ -24,8 +24,11 @@ class RouteRegexTest extends PHPUnit_Framework_TestCase
 
     public function testMatchingLastCharset()
     {
-        $regex = new RouteRegex('/{name}/');
+        $regex = new RouteRegex('/[{name}]/');
+        $this->assertRegExp('~^' . $regex->getRegex() . '$~', '/foo');
+        $this->assertRegExp('~^' . $regex->getRegex() . '$~', '/foo');
 
+        $regex = new RouteRegex('/{name}');
         $this->assertRegExp('~^' . $regex->getRegex() . '$~', '/foo');
         $this->assertRegExp('~^' . $regex->getRegex() . '$~', '/foo/');
     }
@@ -33,15 +36,38 @@ class RouteRegexTest extends PHPUnit_Framework_TestCase
     public function testFuzzyMatchingRoute()
     {
         $regex = new RouteRegex('/*');
-
         $this->assertRegExp('~^' . $regex->getRegex() . '$~', '/test/18');
 
         $regex = new RouteRegex('/abc/*');
-
         $this->assertRegExp('~^' . $regex->getRegex() . '$~', '/abc/foo/bar');
 
         $regex = new RouteRegex('/foo/*');
-
         $this->assertRegExp('~^' . $regex->getRegex() . '$~', '/foo/foo/bar');
+    }
+
+    public function testRouteStaticOrDynamic()
+    {
+        $regex = new RouteRegex('/test/{name:\d+}/[{age}]');
+        $this->assertFalse($regex->isStatic());
+
+        $regex = new RouteRegex('/foo');
+        $this->assertTrue($regex->isStatic());
+    }
+
+    public function testRegexVariables()
+    {
+        $regex = new RouteRegex('/test/{name:\d+}/[{age}]');
+        $this->assertEquals([
+            'name', 'age'
+        ], $regex->getVariables());
+    }
+
+    public function testRegexRequirements()
+    {
+        $regex = new RouteRegex('/test/{name:\d+}/[{age}]');
+        $this->assertEquals([
+            'name' => '\d+',
+            'age' => '[^/]+'
+        ], $regex->getRequirements());
     }
 }
