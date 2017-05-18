@@ -101,4 +101,48 @@ hello world
 EOF
         );
     }
+
+    public function testMultipleDispatchWithGlobalMiddleware()
+    {
+        $routeCollection = new RouteCollection();
+        $routeCollection->group(['prefix' => '/demo', 'middleware' => 'default'], function (RouteCollection $routeCollection) {
+            $routeCollection->get('/man', function (ServerRequest $request, Delegate $delegate) {
+                echo "";
+            });
+            $routeCollection->get('/{name}', function (ServerRequest $request, Delegate $delegate) {
+                echo 'hello ' . $request->getAttribute('name') . PHP_EOL;
+            });
+        });
+        $dispatcher = new RouteDispatcher($routeCollection, ['default' => [
+            new BeforeMiddleware(),
+            new AfterMiddleware(),
+        ]]);
+        $dispatcher->before(new GlobalMiddleware());
+        $dispatcher->dispatch($this->createRequest('GET', '/demo/world'));
+        $this->expectOutputString(<<<EOF
+global
+before
+after
+hello world
+
+EOF
+        );
+
+
+        $dispatcher->dispatch($this->createRequest('GET', '/demo/world'));
+        $this->expectOutputString(<<<EOF
+global
+before
+after
+hello world
+global
+before
+after
+hello world
+
+EOF
+        );
+
+
+    }
 }
