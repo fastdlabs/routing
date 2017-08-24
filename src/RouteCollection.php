@@ -79,18 +79,22 @@ class RouteCollection
      */
     public function group($path, callable $callback)
     {
+        $middleware = [];
+
         if (is_array($path)) {
-            $this->middleware = isset($path['middleware']) ? $path['middleware'] : [];
-            $path = $path['prefix'];
+            if(isset($path['middleware'])) {
+                $middleware = is_array($path['middleware']) ? $path['middleware'] : [$path['middleware']];
+            }
+            $path = isset($path['prefix']) ? $path['prefix'] : '';
         }
 
         array_push($this->with, $path);
+        array_push($this->middleware, $middleware);
 
         $callback($this);
 
+        array_pop($this->middleware);
         array_pop($this->with);
-
-        $this->middleware = [];
 
         return $this;
     }
@@ -217,7 +221,13 @@ class RouteCollection
         }
 
         $route = $this->createRoute($method, $path, $callback, $defaults);
-        $route->withName($name)->withAddMiddleware($this->middleware);
+        $route->withName($name);
+
+        foreach($this->middleware as $middlewares) {
+            foreach($middlewares as $middleware) {
+                $route->withAddMiddleware($middleware);
+            }
+        }
 
         if ($route->isStaticRoute()) {
             $this->staticRoutes[$method][$path] = $route;
