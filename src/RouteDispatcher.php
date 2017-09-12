@@ -75,7 +75,7 @@ class RouteDispatcher extends Dispatcher
                 $this->before($middleware);
             } else if (is_string($middleware)) {
                 if (!isset($this->definition[$middleware])) {
-                    throw new \RuntimeException(sprintf('Middleware %s is not defined.'));
+                    throw new \RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
                 }
                 $definition = $this->definition[$middleware];
                 if (is_array($definition)) {
