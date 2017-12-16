@@ -45,7 +45,7 @@ class RouteMiddleware extends Middleware
     {
         if (is_string(($callback = $this->route->getCallback()))) {
             if (false !== strpos($callback, '@')) {
-                list($class, $mhandlhandlefffethod) = explode('@', $callback);
+                list($class, $method) = explode('@', $callback);
             } else {
                 $class = $callback;
                 $method = 'handle';
