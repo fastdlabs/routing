@@ -32,7 +32,7 @@ class RouteMiddlewareTest extends PHPUnit_Framework_TestCase
             return $this->response()->withContent('hello');
         }));
 
-        $response = $middleware->process(new ServerRequest('GET', '/'), new Delegate(function () {
+        $response = $middleware->handle(new ServerRequest('GET', '/'), new Delegate(function () {
 
         }));
 
