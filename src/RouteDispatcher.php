@@ -9,7 +9,6 @@
 
 namespace FastD\Routing;
 
-use SplStack;
 use Exception;
 use FastD\Middleware\Dispatcher;
 use FastD\Middleware\MiddlewareInterface;
@@ -22,8 +21,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RouteDispatcher extends Dispatcher
 {
-    public $route;
-
     /**
      * @var RouteCollection
      */
@@ -33,6 +30,11 @@ class RouteDispatcher extends Dispatcher
      * @var array
      */
     protected $definition = [];
+
+    /**
+     * @var array
+     */
+    protected $appendMiddleware = [];
 
     /**
      * RouteDispatcher constructor.
@@ -50,12 +52,79 @@ class RouteDispatcher extends Dispatcher
     }
 
     /**
+     * @param $name
+     * @param $middleware
+     * @return RouteDispatcher
+     */
+    public function addDefinition($name, $middleware)
+    {
+        if (isset($this->definition[$name])) {
+            if (is_array($this->definition[$name])) {
+                $this->definition[$name][] = $middleware;
+            } else {
+                $this->definition[$name] = [
+                    $this->definition[$name],
+                    $middleware,
+                ];
+            }
+        } else {
+            $this->definition[$name] = $middleware;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDefinition()
+    {
+        return $this->definition;
+    }
+
+    /**
+     * @return RouteCollection
+     */
+    public function getRouteCollection()
+    {
+        return $this->routeCollection;
+    }
+
+    /**
+     * Append match active route action.
+     *
+     * @param $middleware
+     * @return RouteDispatcher
+     */
+    public function pushActiveRouteMiddleware($middleware)
+    {
+        array_push($this->appendMiddleware, $middleware);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function popActiveRouteMiddleware()
+    {
+        array_pop($this->appendMiddleware);
+
+        return $this;
+    }
+
+    /**
      * @param ServerRequestInterface $request
      * @return \Psr\Http\Message\ResponseInterface
+     * @throws Exception
      */
     public function dispatch(ServerRequestInterface $request)
     {
         $route = $this->routeCollection->match($request);
+
+        foreach ($this->appendMiddleware as $middleware) {
+            $route->withAddMiddleware($middleware);
+        }
 
         return $this->callMiddleware($route, $request);
     }
@@ -74,16 +143,19 @@ class RouteDispatcher extends Dispatcher
             if ($middleware instanceof MiddlewareInterface) {
                 $this->before($middleware);
             } else if (is_string($middleware)) {
-                if (!isset($this->definition[$middleware])) {
-                    throw new \RuntimeException(sprintf('Middleware %s is not defined.'));
-                }
-                $definition = $this->definition[$middleware];
-                if (is_array($definition)) {
-                    foreach ($definition as $value) {
-                        $this->before(is_string($value) ? new $value : $value);
+                if (class_exists($middleware)) {
+                    $this->before(new $middleware);
+                } elseif (isset($this->definition[$middleware])) {
+                    $definition = $this->definition[$middleware];
+                    if (is_array($definition)) {
+                        foreach ($definition as $value) {
+                            $this->before(is_string($value) ? new $value : $value);
+                        }
+                    } else {
+                        $this->before(is_string($definition) ? new $definition : $definition);
                     }
                 } else {
-                    $this->before(is_string($definition) ? new $definition : $definition);
+                    throw new \RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
                 }
             } else {
                 throw new RouteException(sprintf('Don\'t support %s middleware', gettype($middleware)));

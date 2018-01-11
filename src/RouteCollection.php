@@ -10,7 +10,6 @@
 namespace FastD\Routing;
 
 
-use FastD\Http\ServerRequest;
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -73,26 +72,58 @@ class RouteCollection
     protected $regexes = [];
 
     /**
+     * @var string
+     */
+    protected $namespace;
+
+    /**
+     * RouteCollection constructor.
+     * @param null $namespace
+     */
+    public function __construct($namespace = null)
+    {
+        $this->namespace = $namespace;
+    }
+
+    /**
      * @param          $path
      * @param callable $callback
-     * @return $this
+     * @return RouteCollection
      */
     public function group($path, callable $callback)
     {
-        if (is_array($path)) {
-            $this->middleware = isset($path['middleware']) ? $path['middleware'] : [];
-            $path = $path['prefix'];
-        }
-
         array_push($this->with, $path);
 
         $callback($this);
 
         array_pop($this->with);
 
+        return $this;
+    }
+
+    /**
+     * @param $middleware
+     * @param callable $callback
+     * @return RouteCollection
+     */
+    public function middleware($middleware, callable $callback)
+    {
+        $this->middleware = $middleware;
+
+        $callback($this);
+
         $this->middleware = [];
 
         return $this;
+    }
+
+    /**
+     * @param $callback
+     * @return string
+     */
+    protected function concat($callback)
+    {
+        return !is_string($callback) ? $callback : $this->namespace.$callback;
     }
 
     /**
@@ -103,7 +134,7 @@ class RouteCollection
      */
     public function get($path, $callback, array $defaults = [])
     {
-        return $this->addRoute('GET', $path, $callback, $defaults);
+        return $this->addRoute('GET', $path, $this->concat($callback), $defaults);
     }
 
     /**
@@ -114,7 +145,7 @@ class RouteCollection
      */
     public function post($path, $callback, array $defaults = [])
     {
-        return $this->addRoute('POST', $path, $callback, $defaults);
+        return $this->addRoute('POST', $path, $this->concat($callback), $defaults);
     }
 
     /**
@@ -125,7 +156,7 @@ class RouteCollection
      */
     public function put($path, $callback, array $defaults = [])
     {
-        return $this->addRoute('PUT', $path, $callback, $defaults);
+        return $this->addRoute('PUT', $path, $this->concat($callback), $defaults);
     }
 
     /**
@@ -136,7 +167,7 @@ class RouteCollection
      */
     public function delete($path, $callback, array $defaults = [])
     {
-        return $this->addRoute('DELETE', $path, $callback, $defaults);
+        return $this->addRoute('DELETE', $path, $this->concat($callback), $defaults);
     }
 
     /**
@@ -147,7 +178,18 @@ class RouteCollection
      */
     public function head($path, $callback, array $defaults = [])
     {
-        return $this->addRoute('HEAD', $path, $callback, $defaults);
+        return $this->addRoute('HEAD', $path, $this->concat($callback), $defaults);
+    }
+
+    /**
+     * @param $path
+     * @param $callback
+     * @param array $defaults
+     * @return Route
+     */
+    public function options($path, $callback, array $defaults = [])
+    {
+        return $this->addRoute('OPTIONS', $path, $this->concat($callback), $defaults);
     }
 
     /**
@@ -158,7 +200,7 @@ class RouteCollection
      */
     public function patch($path, $callback, array $defaults = [])
     {
-        return $this->addRoute('PATCH', $path, $callback, $defaults);
+        return $this->addRoute('PATCH', $path, $this->concat($callback), $defaults);
     }
 
     /**
@@ -205,12 +247,7 @@ class RouteCollection
      */
     public function addRoute($method, $path, $callback, array $defaults = [])
     {
-        if (is_array($path)) {
-            $name = $path['name'];
-            $path = $path[0];
-        } else {
-            $name = $path = implode('/', $this->with) . $path;
-        }
+        $name = $path = implode('/', $this->with) . $path;
 
         if (isset($this->aliasMap[$method][$name])) {
             return $this->getRoute($name);
