@@ -37,6 +37,6 @@ class ResourceRouteTest extends PHPUnit_Framework_TestCase
         $response = $dispatcher->dispatch(new \FastD\Http\ServerRequest('GET', '/'));
         echo $response->getBody();
         $this->expectOutputString('hello world');
-        $this->assertEquals(201, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
     }
 }

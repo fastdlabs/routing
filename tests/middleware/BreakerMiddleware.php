@@ -1,4 +1,5 @@
 <?php
+
 use FastD\Http\Response;
 use FastD\Middleware\Middleware;
 
@@ -16,11 +17,14 @@ class BreakerMiddleware extends Middleware
      * @param \FastD\Middleware\DelegateInterface $delegate
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(\Psr\Http\Message\ServerRequestInterface $serverRequest, \FastD\Middleware\DelegateInterface $delegate)
-    {
+    public function handle(
+        \Psr\Http\Message\ServerRequestInterface $serverRequest,
+        \FastD\Middleware\DelegateInterface $delegate
+    ) {
         if ('break' == $serverRequest->getAttribute('name')) {
             return new Response('break');
         }
-        return $delegate($serverRequest);
+
+        return $delegate($serverRequest)->withHeader('hello', 'world');
     }
 }
