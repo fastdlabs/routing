@@ -51,16 +51,20 @@ class RouteMiddleware extends Middleware
                 $method = 'handle';
             }
             $response = call_user_func_array([new $class, $method], [$request, $next]);
-        } else if (is_callable($callback)) {
-            $response = call_user_func_array($callback, [$request, $next]);
-        } else if (is_array($callback)) {
-            $class = $callback[0];
-            if (is_string($class)) {
-                $class = new $class;
-            }
-            $response = call_user_func_array([$class, $callback[1]], [$request, $next]);
         } else {
-            $response = new Response('Don\'t support callback, Please setting callable function or class@method.');
+            if (is_callable($callback)) {
+                $response = call_user_func_array($callback, [$request, $next]);
+            } else {
+                if (is_array($callback)) {
+                    $class = $callback[0];
+                    if (is_string($class)) {
+                        $class = new $class;
+                    }
+                    $response = call_user_func_array([$class, $callback[1]], [$request, $next]);
+                } else {
+                    $response = new Response('Don\'t support callback, Please setting callable function or class@method.');
+                }
+            }
         }
         unset($callback);
 
