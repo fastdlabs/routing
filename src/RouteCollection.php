@@ -92,11 +92,17 @@ class RouteCollection
      */
     public function group($path, callable $callback)
     {
+        if (is_array($path)) {
+            $this->middleware = isset($path['middleware']) ? $path['middleware'] : [];
+            $path = $path['prefix'];
+        }
+
         array_push($this->with, $path);
 
         $callback($this);
 
         array_pop($this->with);
+        $this->middleware = [];
 
         return $this;
     }
