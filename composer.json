@@ -12,8 +12,8 @@
     ],
     "require": {
         "php": ">=5.6",
-        "fastd/middleware": "~1.0.0",
-        "fastd/http": "~3.0.0"
+        "fastd/middleware": "^1.0",
+        "fastd/http": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.0"
@@ -24,6 +24,9 @@
         }
     },
     "autoload-dev": {
+        "psr-4": {
+            "": "tests/middleware"
+        },
         "files": [
             "tests/TestCase.php"
         ]

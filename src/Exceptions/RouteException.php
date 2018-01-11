@@ -11,6 +11,10 @@ namespace FastD\Routing\Exceptions;
 
 use RuntimeException;
 
+/**
+ * Class RouteException
+ * @package FastD\Routing\Exceptions
+ */
 class RouteException extends RuntimeException
 {
 
