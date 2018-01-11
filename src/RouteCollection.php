@@ -108,11 +108,11 @@ class RouteCollection
      */
     public function middleware($middleware, callable $callback)
     {
-        $this->middleware = $middleware;
+        array_push($this->middleware, $middleware);
 
         $callback($this);
 
-        $this->middleware = [];
+        array_pop($this->middleware);
 
         return $this;
     }
@@ -123,7 +123,7 @@ class RouteCollection
      */
     protected function concat($callback)
     {
-        return !is_string($callback) ? $callback : $this->namespace.$callback;
+        return ! is_string($callback) ? $callback : $this->namespace.$callback;
     }
 
     /**
@@ -247,7 +247,7 @@ class RouteCollection
      */
     public function addRoute($method, $path, $callback, array $defaults = [])
     {
-        $name = $path = implode('/', $this->with) . $path;
+        $name = $path = implode('/', $this->with).$path;
 
         if (isset($this->aliasMap[$method][$name])) {
             return $this->getRoute($name);
@@ -261,9 +261,9 @@ class RouteCollection
         } else {
             $numVariables = count($route->getVariables());
             $numGroups = max($this->num, $numVariables);
-            $this->regexes[$method][] = $route->getRegex() . str_repeat('()', $numGroups - $numVariables);
+            $this->regexes[$method][] = $route->getRegex().str_repeat('()', $numGroups - $numVariables);
 
-            $this->dynamicRoutes[$method][$this->index]['regex'] = '~^(?|' . implode('|', $this->regexes[$method]) . ')$~';
+            $this->dynamicRoutes[$method][$this->index]['regex'] = '~^(?|'.implode('|', $this->regexes[$method]).')$~';
             $this->dynamicRoutes[$method][$this->index]['routes'][$numGroups + 1] = $route;
 
             ++$this->num;
@@ -307,7 +307,7 @@ class RouteCollection
         }
 
         if (
-            !isset($this->dynamicRoutes[$method])
+            ! isset($this->dynamicRoutes[$method])
             || false === $route = $this->matchDynamicRoute($serverRequest, $method, $path)
         ) {
             throw new RouteNotFoundException($path);
@@ -325,11 +325,11 @@ class RouteCollection
     protected function matchDynamicRoute(ServerRequestInterface $serverRequest, $method, $path)
     {
         foreach ($this->dynamicRoutes[$method] as $data) {
-            if (!preg_match($data['regex'], $path, $matches)) {
+            if ( ! preg_match($data['regex'], $path, $matches)) {
                 continue;
             }
             $route = $data['routes'][count($matches)];
-            preg_match('~^' . $route->getRegex() . '$~', $path, $match);
+            preg_match('~^'.$route->getRegex().'$~', $path, $match);
             $match = array_slice($match, 1, count($route->getVariables()));
             $attributes = array_combine($route->getVariables(), $match);
             $attributes = array_filter($attributes);
@@ -337,6 +337,7 @@ class RouteCollection
             foreach ($route->getParameters() as $key => $attribute) {
                 $serverRequest->withAttribute($key, $attribute);
             }
+
             return $route;
         }
 
@@ -356,28 +357,28 @@ class RouteCollection
             throw new RouteNotFoundException($name);
         }
 
-        if (!empty($format)) {
-            $format = '.' . $format;
+        if ( ! empty($format)) {
+            $format = '.'.$format;
         } else {
             $format = '';
         }
 
         if ($route->isStaticRoute()) {
-            return $route->getPath() . $format;
+            return $route->getPath().$format;
         }
 
         $parameters = array_merge($route->getParameters(), $parameters);
         $queryString = [];
 
         foreach ($parameters as $key => $parameter) {
-            if (!in_array($key, $route->getVariables())) {
+            if ( ! in_array($key, $route->getVariables())) {
                 $queryString[$key] = $parameter;
                 unset($parameters[$key]);
             }
         }
 
         $search = array_map(function ($v) {
-            return '{' . $v . '}';
+            return '{'.$v.'}';
         }, array_keys($parameters));
 
         $replace = $parameters;
@@ -389,6 +390,6 @@ class RouteCollection
             $path = rtrim(preg_replace('~(({.*?}))~', '', $path), '/');
         }
 
-        return $path . $format . ([] === $queryString ? '' : '?' . http_build_query($queryString));
+        return $path.$format.([] === $queryString ? '' : '?'.http_build_query($queryString));
     }
 }
