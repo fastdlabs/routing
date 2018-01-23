@@ -53,8 +53,6 @@ class RouteCollection
     public $aliasMap = [];
 
     /**
-     * 路由列表计数器
-     *
      * @var int
      */
     protected $num = 1;
@@ -92,8 +90,14 @@ class RouteCollection
      */
     public function group($path, callable $callback)
     {
+        $middleware = $this->middleware;
         if (is_array($path)) {
-            $this->middleware = isset($path['middleware']) ? $path['middleware'] : [];
+            $middlewareOptions = isset($path['middleware']) ? $path['middleware'] : [];
+            if (is_array($middlewareOptions)) {
+                $middleware = array_merge($middleware, $middlewareOptions);
+            }  else {
+                $middleware[] = $middlewareOptions;
+            }
             $path = $path['prefix'];
         }
 
@@ -102,7 +106,7 @@ class RouteCollection
         $callback($this);
 
         array_pop($this->with);
-        $this->middleware = [];
+        $this->middleware = $middleware;
 
         return $this;
     }

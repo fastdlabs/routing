@@ -35,9 +35,7 @@ class Route extends RouteRegex
     /**
      * @var array
      */
-    protected $middleware = [
-
-    ];
+    protected $middleware = [];
 
     /**
      * Route constructor.
