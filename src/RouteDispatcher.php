@@ -91,29 +91,6 @@ class RouteDispatcher extends Dispatcher
     }
 
     /**
-     * Append match active route action.
-     *
-     * @param $middleware
-     * @return RouteDispatcher
-     */
-    public function pushActiveRouteMiddleware($middleware)
-    {
-        array_push($this->appendMiddleware, $middleware);
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function popActiveRouteMiddleware()
-    {
-        array_pop($this->appendMiddleware);
-
-        return $this;
-    }
-
-    /**
      * @param ServerRequestInterface $request
      * @return \Psr\Http\Message\ResponseInterface
      * @throws Exception

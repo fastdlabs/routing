@@ -32,7 +32,6 @@ class RouteDispatcherTest extends PHPUnit_Framework_TestCase
         $routeCollection = new RouteCollection();
         $routeCollection->get('/', [$this, 'response']);
         $dispatcher = new RouteDispatcher($routeCollection);
-        $dispatcher->pushActiveRouteMiddleware(BreakerMiddleware::class);
         $response = $dispatcher->dispatch(new ServerRequest('GET', '/'));
         $this->assertEquals(200, (string)$response->getStatusCode());
         $this->assertEquals('hello world', (string)$response->getBody());
