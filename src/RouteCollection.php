@@ -94,11 +94,11 @@ class RouteCollection
         if (is_array($path)) {
             $middlewareOptions = isset($path['middleware']) ? $path['middleware'] : [];
             if (is_array($middlewareOptions)) {
-                $middleware = array_merge($middleware, $middlewareOptions);
+                $this->middleware = array_merge($this->middleware, $middlewareOptions);
             }  else {
-                $middleware[] = $middlewareOptions;
+                $this->middleware[] = $middlewareOptions;
             }
-            $path = $path['prefix'];
+            $path = isset($path['prefix']) ? $path['prefix'] : '';
         }
 
         array_push($this->with, $path);
@@ -260,7 +260,7 @@ class RouteCollection
         $name = $path = implode('/', $this->with).$path;
 
         if (isset($this->aliasMap[$method][$name])) {
-            return $this->getRoute($name);
+            return $this->aliasMap[$method][$name];
         }
 
         $route = $this->createRoute($method, $path, $callback, $defaults);
