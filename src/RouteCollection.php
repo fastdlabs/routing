@@ -240,30 +240,33 @@ class RouteCollection
      * @param $method
      * @param $path
      * @param $callback
-     * @param array $defaults
      * @return Route
      */
-    public function createRoute($method, $path, $callback, $defaults = [])
+    public function createRoute($method, $path, $callback)
     {
-        return new Route($method, $path, $callback, $defaults);
+        return new Route($method, $path, $callback);
     }
 
     /**
      * @param $method
      * @param $path
      * @param $callback
-     * @param array $defaults
      * @return Route
      */
-    public function addRoute($method, $path, $callback, array $defaults = [])
+    public function addRoute($method, $path, $callback)
     {
-        $name = $path = implode('/', $this->with).$path;
+        if (is_array($path)) {
+            $name = $path['name'];
+            $path = implode('/', $this->with).$path['path'];
+        } else {
+            $name = $path = implode('/', $this->with).$path;
+        }
 
         if (isset($this->aliasMap[$method][$name])) {
             return $this->aliasMap[$method][$name];
         }
 
-        $route = $this->createRoute($method, $path, $callback, $defaults);
+        $route = $this->createRoute($method, $path, $callback);
         $route->withAddMiddleware($this->middleware);
 
         if ($route->isStatic()) {

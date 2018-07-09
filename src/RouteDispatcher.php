@@ -10,6 +10,7 @@
 namespace FastD\Routing;
 
 use Exception;
+use FastD\Http\ServerRequest;
 use FastD\Middleware\Dispatcher;
 use FastD\Middleware\MiddlewareInterface;
 use FastD\Routing\Exceptions\RouteException;
@@ -102,6 +103,27 @@ class RouteDispatcher extends Dispatcher
         foreach ($this->appendMiddleware as $middleware) {
             $route->withAddMiddleware($middleware);
         }
+
+        return $this->callMiddleware($route, $request);
+    }
+
+    /**
+     * @param $name
+     * @param array $parameters
+     * @return \Psr\Http\Message\ResponseInterface
+     * @throws Exception
+     */
+    public function dispatchRoute($name, array $parameters = [])
+    {
+        $route = $this->routeCollection->getRoute($name);
+
+        foreach ($this->appendMiddleware as $middleware) {
+            $route->withAddMiddleware($middleware);
+        }
+
+        $request = new ServerRequest('GET', '');
+
+        $request->withParsedBody($parameters);
 
         return $this->callMiddleware($route, $request);
     }

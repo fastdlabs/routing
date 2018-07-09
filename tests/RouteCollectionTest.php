@@ -40,4 +40,16 @@ class RouteCollectionTest extends PHPUnit_Framework_TestCase
             $router->get('/', 'Demo@Demo')->withAddMiddleware('test');
         });
     }
+
+    public function testRouteName()
+    {
+        $collection = new RouteCollection();
+        $collection->get([
+            'name' => 'demo',
+            'path' => '/',
+        ], 'IndexController@welcome');
+
+        $route = $collection->getRoute('demo');
+        $this->assertEquals('/', $route->getPath());
+    }
 }
