@@ -108,32 +108,6 @@ class RouteDispatcher extends Dispatcher
     }
 
     /**
-     * @param $name
-     * @param array $parameters
-     * @return \Psr\Http\Message\ResponseInterface
-     * @throws Exception
-     */
-    public function dispatchRoute($name, array $parameters = [])
-    {
-        $route = $this->routeCollection->getRoute($name);
-
-        foreach ($this->appendMiddleware as $middleware) {
-            $route->withAddMiddleware($middleware);
-        }
-
-        $request = new ServerRequest('GET', '');
-
-        if (isset($parameters['attributes'])) {
-            $request->attributes = $parameters['attributes'];
-            $request->bodyParams = $parameters['parameters'];
-        } else {
-            $request->bodyParams = $parameters;
-        }
-
-        return $this->callMiddleware($route, $request);
-    }
-
-    /**
      * @param Route $route
      * @param ServerRequestInterface $request
      * @return \Psr\Http\Message\ResponseInterface
