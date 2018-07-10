@@ -123,7 +123,12 @@ class RouteDispatcher extends Dispatcher
 
         $request = new ServerRequest('GET', '');
 
-        $request->withParsedBody($parameters);
+        if (isset($parameters['attributes'])) {
+            $request->attributes = $parameters['attributes'];
+            $request->bodyParams = $parameters['parameters'];
+        } else {
+            $request->bodyParams = $parameters;
+        }
 
         return $this->callMiddleware($route, $request);
     }
