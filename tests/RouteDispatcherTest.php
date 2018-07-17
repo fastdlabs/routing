@@ -37,18 +37,6 @@ class RouteDispatcherTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('hello world', (string)$response->getBody());
     }
 
-    public function testDispatchRouteName()
-    {
-        $routeCollection = new RouteCollection();
-        $routeCollection->get([
-            'name' => 'demo',
-            'path' => '/',
-        ], [$this, 'response']);
-        $dispatcher = new RouteDispatcher($routeCollection);
-        $response = $dispatcher->dispatchRoute('demo');
-        $this->assertEquals('hello world', (string)$response->getBody());
-    }
-
     public function response()
     {
         return new Response('hello world');
