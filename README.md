@@ -1,189 +1,189 @@
 # FastD Routing
 
 [![Build Status](https://travis-ci.org/fastdlabs/routing.svg?branch=master)](https://travis-ci.org/fastdlabs/routing)
-[![Latest Stable Version](https://poser.pugx.org/fastd/routing/v/stable)](https://packagist.org/packages/fastd/routing) 
-[![Total Downloads](https://poser.pugx.org/fastd/routing/downloads)](https://packagist.org/packages/fastd/routing) 
-[![Latest Unstable Version](https://poser.pugx.org/fastd/routing/v/unstable)](https://packagist.org/packages/fastd/routing) 
+[![Latest Stable Version](https://poser.pugx.org/fastd/routing/v/stable)](https://packagist.org/packages/fastd/routing)
+[![Total Downloads](https://poser.pugx.org/fastd/routing/downloads)](https://packagist.org/packages/fastd/routing)
+[![Latest Unstable Version](https://poser.pugx.org/fastd/routing/v/unstable)](https://packagist.org/packages/fastd/routing)
 [![License](https://poser.pugx.org/fastd/routing/license)](https://packagist.org/packages/fastd/routing)
 
-简单的 PHP 路由器，支持路由嵌套，动态路由，模糊路由，中间件等。依赖于 [Http](https://github.com/JanHuang/http) 组件。
+Simple PHP router that supports routing nesting, dynamic routing, fuzzy routing, middleware, and more. Relies on the [Http](https://github.com/JanHuang/http) component.
 
-## 要求
+## Claim
 
 * PHP 7.2
 
 ## Composer
 
 ```
-composer require "fastd/routing"
+Composer require "fastd/routing"
 ```
 
-## 使用
+## Use
 
-可以通过 `RouteCollection` 对象设置路由，也可以通过路由列表创建路由. 详细文档: [fastd/routing](docs/zh_CN/readme.md)
+You can set the route through the `RouteCollection` object, or you can create a route through the route list. Detailed documentation: [fastd/routing](docs/zh_CN/readme.md)
 
-### 静态路由
+### Static routing
 
 ```php
-use FastD\Http\ServerRequest;
-use FastD\Routing\RouteCollection;
+Use FastD\Http\ServerRequest;
+Use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/', function () {
-    return 'hello world';
+    Return 'hello world';
 });
 
 $route = $collection->match(new ServerRequest('GET', '/')); // \FastD\Routing\Route
 
-echo call_user_func_array($route->getCallback(), []);
+Echo call_user_func_array($route->getCallback(), []);
 ```
 
-路由匹配并不会将路由的回调进行调用，但会返回整个 Route，方便回调处理，因此 `match` 仅返回匹配成功的路由对象
+Route matching does not call the callback of the route, but returns the entire Route for callback processing, so `match` only returns the matching route object.
 
-### 动态路由
+### Dynamic routing
 
 ```php
-use FastD\Http\ServerRequest;
-use FastD\Routing\RouteCollection;
+Use FastD\Http\ServerRequest;
+Use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/{name}', function ($name) {
-    return 'hello ' . $name;
+    Return 'hello ' . $name;
 });
 
 $route = $collection->match(new ServerRequest('GET', '/foo')); // \FastD\Routing\Route
 
-echo call_user_func_array($route->getCallback(), $route->getParameters());
+Echo call_user_func_array($route->getCallback(), $route->getParameters());
 ```
 
-在动态路由下，成功匹配的路由会将匹配成功的参数更新到 `getParameters` 中，通过 `getParameters` 获取成功匹配的参数信息。
+Under dynamic routing, the successfully matched route will update the matching parameters to `getParameters`, and get the matching parameter information through `getParameters`.
 
-### 同个路由, 多个方法
+### Same route, multiple methods
 
 ```php
 $collection = new FastD\Routing\RouteCollection();
 $collection->get('/', function () {
-    return 'hello GET';
+    Return 'hello GET';
 });
 $collection->post('/', function () {
-    return 'hello POST';
+    Return 'hello POST';
 });
 $response = $collection->dispatch('GET', '/'); // hello GET
 $response = $collection->dispatch('POST', '/'); // hello POST
 ```
 
-### 混合路由
+### Hybrid routing
 
-在很多情况下，我们路由可能只差一个参数，以下做个例子。
+In many cases, our route may only be one parameter difference. Here is an example.
 
 ```php
-use FastD\Http\ServerRequest;
-use FastD\Routing\RouteCollection;
+Use FastD\Http\ServerRequest;
+Use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/{name}', function () {
-    return 'get1';
+    Return 'get1';
 });
 
 $collection->addRoute('GET', '/', function () {
-    return 'get2';
+    Return 'get2';
 });
 
 $route = $collection->match(new ServerRequest('GET', '/abc')); // \FastD\Routing\Route
 $route2 = $collection->match(new ServerRequest('GET', '/')); // \FastD\Routing\Route
-echo call_user_func_array($route->getCallback(), $route->getParameters());
-echo call_user_func_array($route2->getCallback(), $route2->getParameters());
+Echo call_user_func_array($route->getCallback(), $route->getParameters());
+Echo call_user_func_array($route2->getCallback(), $route2->getParameters());
 ```
 
-### 路由组
+### Routing Group
 
-路由组会在你每个子路由钱添加自己的路由前缀，支持多层嵌套。
+The routing group will add its own routing prefix to each of your sub-routing dollars, supporting multiple levels of nesting.
 
 ```php
-use FastD\Http\ServerRequest;
-use FastD\Routing\RouteCollection;
+Use FastD\Http\ServerRequest;
+Use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->group('/v1', function (RouteCollection $collection) {
-    $collection->addRoute('GET', '/{name}', function () {
-        return 'get1';
-    });
+    $collection->addRoute('GET', '/{name}', function () {
+        Return 'get1';
+    });
 });
 
 $route = $collection->match(new ServerRequest('GET', '/v1/abc'));
 
-echo call_user_func_array($route->getCallback(), $route->getParameters());
+Echo call_user_func_array($route->getCallback(), $route->getParameters());
 ```
 
-### 模糊路由
+### Fuzzy routing
 
-模糊路由的灵感来自于 Swoole http server 的 onRequest 回调中，因为每个路由入口都经过 onRequest，那么自己造的时候，可能会有一些根据 pathinfo 进行处理的特殊路由，那么此时模糊路由就可以派上用场了。
+The inspiration for fuzzy routing comes from the onRequest callback of the Swoole http server. Because each route entry passes onRequest, when it is created, there may be some special routes processed according to pathinfo. Then the fuzzy route can be sent. It’s time to use.
 
 ```php
-use FastD\Http\ServerRequest;
-use FastD\Routing\RouteCollection;
+Use FastD\Http\ServerRequest;
+Use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/api/*', function ($path) {
-    return $path;
+    Return $path;
 });
 
 $route = $collection->match(new ServerRequest('GET', '/api/abc'));
-echo call_user_func_array($route->getCallback(), $route->getParameters()); // /abc
+Echo call_user_func_array($route->getCallback(), $route->getParameters()); // /abc
 
 $route = $collection->match(new ServerRequest('GET', '/api/cba'));
-echo call_user_func_array($route->getCallback(), $route->getParameters()); // /cba
+Echo call_user_func_array($route->getCallback(), $route->getParameters()); // /cba
 ```
 
-匹配凡是以 `/api` 开头的所有合法路由，然后进行回调
+Match all legal routes that start with `/api` and then callback
 
-### 路由中间件
+### Routing middleware
 
-路由组件实现了路由中间件，基于 [Http](https://github.com/JanHuang/http) 和 [HTTP Middlewares](https://github.com/JanHuang/middleware) 实现。
+The routing component implements routing middleware based on [Http] (https://github.com/JanHuang/http) and [HTTP Middlewares] (https://github.com/JanHuang/middleware).
 
-> 路由中间件回调会自动回调 `Psr\Http\Message\ServerRequestInterface` 和 `FastD\Middleware\DelegateInterface` 两个对象作为参数。
+> Routing middleware callbacks automatically call back `Psr\Http\Message\ServerRequestInterface` and `FastD\Middleware\DelegateInterface` as arguments.
 
-中间件调用完成后，会返回 `\Psr\Http\Message\ResponseInterface` 对象，用于程序最终处理输出。
+After the middleware call is completed, the `\Psr\Http\Message\ResponseInterface` object is returned for the program to process the output.
 
 ```php
-use FastD\Http\ServerRequest;
-use FastD\Routing\RouteCollection;
+Use FastD\Http\ServerRequest;
+Use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/api/*', function (ServerRequest $request) {
-    return 'hello';
+    Return 'hello';
 });
 
 $dispatcher = new \FastD\Routing\RouteDispatcher($collection);
 
 $response = $dispatcher->dispatch(new ServerRequest('GET', '/api/abc'));
 
-echo $response->getBody();
+Echo $response->getBody();
 ```
 
 ## Testing
 
 ```
-phpunit
+Phpunit
 ```
 
-### 贡献
+### Contribution
 
-非常欢迎感兴趣，愿意参与其中，共同打造更好PHP生态，Swoole生态的开发者。
+I am very pleased to be interested and willing to participate in the creation of a better PHP ecosystem, the developer of the Swoole Eco.
 
-如果你乐于此，却又不知如何开始，可以试试下面这些事情：
+If you are happy with this, but don't know how to get started, you can try the following things:
 
-* 在你的系统中使用，将遇到的问题 [反馈](https://github.com/JanHuang/fastD/issues)。
-* 有更好的建议？欢迎联系 [bboyjanhuang@gmail.com](mailto:bboyjanhuang@gmail.com) 或 [新浪微博:编码侠](http://weibo.com/ecbboyjan)。
+* Problems encountered in your system [Feedback] (https://github.com/JanHuang/fastD/issues).
+* Have better suggestions? Feel free to contact [bboyjanhuang@gmail.com] (mailto:bboyjanhuang@gmail.com) or [Sina Weibo: Coding Man] (http://weibo.com/ecbboyjan).
 
-### 联系
+### Contact
 
-如果你在使用中遇到问题，请联系: [bboyjanhuang@gmail.com](mailto:bboyjanhuang@gmail.com). 微博: [编码侠](http://weibo.com/ecbboyjan)
+If you encounter problems during use, please contact: [bboyjanhuang@gmail.com](mailto:bboyjanhuang@gmail.com). Weibo: [Coding Man] (http://weibo.com/ecbboyjan)
 
 ## License MIT
