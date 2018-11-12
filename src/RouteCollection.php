@@ -140,77 +140,84 @@ class RouteCollection
      * @param $path
      * @param $callback
      * @param array $defaults
+     * @param $host
      * @return Route
      */
-    public function get($path, $callback, array $defaults = [])
+    public function get($path, $callback, array $defaults = [], $host = null)
     {
-        return $this->addRoute('GET', $path, $this->concat($callback), $defaults);
+        return $this->addRoute('GET', $path, $this->concat($callback), $host);
     }
 
     /**
      * @param $path
      * @param $callback
      * @param array $defaults
+     * @param $host
      * @return Route
      */
-    public function post($path, $callback, array $defaults = [])
+    public function post($path, $callback, array $defaults = [], $host = null)
     {
-        return $this->addRoute('POST', $path, $this->concat($callback), $defaults);
+        return $this->addRoute('POST', $path, $this->concat($callback), $host);
     }
 
     /**
      * @param $path
      * @param $callback
      * @param array $defaults
+     * @param $host
      * @return Route
      */
-    public function put($path, $callback, array $defaults = [])
+    public function put($path, $callback, array $defaults = [], $host = null)
     {
-        return $this->addRoute('PUT', $path, $this->concat($callback), $defaults);
+        return $this->addRoute('PUT', $path, $this->concat($callback), $host);
     }
 
     /**
      * @param $path
      * @param $callback
      * @param array $defaults
+     * @param $host
      * @return Route
      */
-    public function delete($path, $callback, array $defaults = [])
+    public function delete($path, $callback, array $defaults = [], $host = null)
     {
-        return $this->addRoute('DELETE', $path, $this->concat($callback), $defaults);
+        return $this->addRoute('DELETE', $path, $this->concat($callback), $host);
     }
 
     /**
      * @param $path
      * @param $callback
      * @param array $defaults
+     * @param $host
      * @return Route
      */
-    public function head($path, $callback, array $defaults = [])
+    public function head($path, $callback, array $defaults = [], $host = null)
     {
-        return $this->addRoute('HEAD', $path, $this->concat($callback), $defaults);
+        return $this->addRoute('HEAD', $path, $this->concat($callback), $host);
     }
 
     /**
      * @param $path
      * @param $callback
      * @param array $defaults
+     * @param $host
      * @return Route
      */
-    public function options($path, $callback, array $defaults = [])
+    public function options($path, $callback, array $defaults = [], $host = null)
     {
-        return $this->addRoute('OPTIONS', $path, $this->concat($callback), $defaults);
+        return $this->addRoute('OPTIONS', $path, $this->concat($callback), $host);
     }
 
     /**
      * @param $path
      * @param $callback
      * @param array $defaults
+     * @param $host
      * @return Route
      */
-    public function patch($path, $callback, array $defaults = [])
+    public function patch($path, $callback, array $defaults = [], $host = null)
     {
-        return $this->addRoute('PATCH', $path, $this->concat($callback), $defaults);
+        return $this->addRoute('PATCH', $path, $this->concat($callback), $host);
     }
 
     /**
@@ -240,20 +247,22 @@ class RouteCollection
      * @param $method
      * @param $path
      * @param $callback
+     * @param $host
      * @return Route
      */
-    public function createRoute($method, $path, $callback)
+    public function createRoute($method, $path, $callback, $host)
     {
-        return new Route($method, $path, $callback);
+        return new Route($method, $path, $callback, $host);
     }
 
     /**
      * @param $method
      * @param $path
      * @param $callback
+     * @param $host
      * @return Route
      */
-    public function addRoute($method, $path, $callback)
+    public function addRoute($method, $path, $callback, $host)
     {
         if (is_array($path)) {
             $name = $path['name'];
@@ -266,7 +275,7 @@ class RouteCollection
             return $this->aliasMap[$method][$name];
         }
 
-        $route = $this->createRoute($method, $path, $callback);
+        $route = $this->createRoute($method, $path, $callback, $host);
         $route->withAddMiddleware($this->middleware);
 
         if ($route->isStatic()) {
@@ -303,8 +312,9 @@ class RouteCollection
     {
         $method = $serverRequest->getMethod();
         $path = $serverRequest->getUri()->getPath();
+        $host = $serverRequest->getUri()->getHost();
 
-        if (isset($this->staticRoutes[$method][$path])) {
+        if ($host === $this->staticRoutes[$method][$path]->getHost() && isset($this->staticRoutes[$method][$path])) {
             return $this->activeRoute = $this->staticRoutes[$method][$path];
         } else {
             $possiblePath = $path;
@@ -321,7 +331,7 @@ class RouteCollection
 
         if (
             ! isset($this->dynamicRoutes[$method])
-            || false === $route = $this->matchDynamicRoute($serverRequest, $method, $path)
+            || false === $route = $this->matchDynamicRoute($serverRequest, $method, $path, $host)
         ) {
             throw new RouteNotFoundException($path);
         }
@@ -333,9 +343,10 @@ class RouteCollection
      * @param ServerRequestInterface $serverRequest
      * @param string $method
      * @param string $path
+     * @param string $host
      * @return bool|Route
      */
-    protected function matchDynamicRoute(ServerRequestInterface $serverRequest, $method, $path)
+    protected function matchDynamicRoute(ServerRequestInterface $serverRequest, $method, $path, $host)
     {
         foreach ($this->dynamicRoutes[$method] as $data) {
             if ( ! preg_match($data['regex'], $path, $matches)) {

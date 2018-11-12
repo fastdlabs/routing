@@ -33,6 +33,11 @@ class Route extends RouteRegex
     protected $callback;
 
     /**
+     * @var mixed
+     */
+    protected $host;
+
+    /**
      * @var array
      */
     protected $middleware = [];
@@ -43,14 +48,20 @@ class Route extends RouteRegex
      * @param string $method
      * @param $path
      * @param $callback
+     * @param $host
      */
-    public function __construct($method, $path, $callback)
+    public function __construct($method, $path, $callback, $host)
     {
         parent::__construct($path);
 
         $this->withMethod($method);
 
         $this->withCallback($callback);
+
+        if(!empty($host)) {
+            var_dump($host);
+        }
+        $this->withHost($host);
     }
 
     /**
@@ -70,6 +81,25 @@ class Route extends RouteRegex
     public function getMethod()
     {
         return $this->method;
+    }
+
+    /**
+     * @param array|string $host
+     * @return $this
+     */
+    public function withHost($host)
+    {
+        $this->host = $host;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
     }
 
     /**
