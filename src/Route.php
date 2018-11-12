@@ -58,9 +58,6 @@ class Route extends RouteRegex
 
         $this->withCallback($callback);
 
-        if(!empty($host)) {
-            var_dump($host);
-        }
         $this->withHost($host);
     }
 
