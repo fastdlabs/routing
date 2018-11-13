@@ -316,8 +316,10 @@ class RouteCollection
         $path = $serverRequest->getUri()->getPath();
         $host = $serverRequest->getUri()->getHost();
 
-        if ($host === $this->staticRoutes[$method][$host.$path]->getHost() && isset($this->staticRoutes[$method][$host.$path])) {
-            return $this->activeRoute = $this->staticRoutes[$method][$host.$path];
+        if (isset($this->staticRoutes[$method][$host.$path])) {
+            if($host === $this->staticRoutes[$method][$host.$path]->getHost()) {
+                return $this->activeRoute = $this->staticRoutes[$method][$host . $path];
+            }
         } else {
             $possiblePath = $path;
             if ('/' === substr($possiblePath, -1)) {
