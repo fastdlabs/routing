@@ -271,17 +271,19 @@ class RouteCollection
             $name = $path = implode('/', $this->with).$path;
         }
 
-        $name = $host . $name;
-
         if (isset($this->aliasMap[$method][$name])) {
-            return $this->aliasMap[$method][$name];
+            foreach ($this->aliasMap[$method][$name] as $route) {
+                if($route->getHost() === $host){
+                    return $route;
+                }
+            }
         }
 
         $route = $this->createRoute($method, $path, $callback, $host);
         $route->withAddMiddleware($this->middleware);
 
         if ($route->isStatic()) {
-            $this->staticRoutes[$method][$host.$path] = $route;
+            $this->staticRoutes[$method][$path][] = $route;
         } else {
             $numVariables = count($route->getVariables());
             $numGroups = max($this->num, $numVariables);
@@ -300,7 +302,7 @@ class RouteCollection
             unset($numGroups, $numVariables);
         }
 
-        $this->aliasMap[$method][$name] = $route;
+        $this->aliasMap[$method][$name][] = $route;
 
         return $route;
     }
@@ -316,9 +318,15 @@ class RouteCollection
         $path = $serverRequest->getUri()->getPath();
         $host = $serverRequest->getUri()->getHost();
 
-        if (isset($this->staticRoutes[$method][$host.$path])) {
-            if($host === $this->staticRoutes[$method][$host.$path]->getHost()) {
-                return $this->activeRoute = $this->staticRoutes[$method][$host . $path];
+
+        if (isset($this->staticRoutes[$method][$path])) {
+            foreach ($this->staticRoutes[$method][$path] as $route) {
+                if(
+                    is_null($route->getHost())
+                    || $host === $route->getHost()
+                ) {
+                    return $this->activeRoute = $route;
+                }
             }
         } else {
             $possiblePath = $path;
@@ -328,7 +336,14 @@ class RouteCollection
                 $possiblePath .= '/';
             }
             if (isset($this->staticRoutes[$method][$possiblePath])) {
-                return $this->activeRoute = $this->staticRoutes[$method][$possiblePath];
+                foreach ($this->staticRoutes[$method][$possiblePath] as $route) {
+                    if(
+                        is_null($route->getHost())
+                        || $host === $route->getHost()
+                    ) {
+                        return $this->activeRoute = $route;
+                    }
+                }
             }
             unset($possiblePath);
         }

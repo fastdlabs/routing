@@ -50,7 +50,7 @@ class Route extends RouteRegex
      * @param $callback
      * @param $host
      */
-    public function __construct($method, $path, $callback, $host)
+    public function __construct($method, $path, $callback, $host = null)
     {
         parent::__construct($path);
 
@@ -58,7 +58,9 @@ class Route extends RouteRegex
 
         $this->withCallback($callback);
 
-        $this->withHost($host);
+        if(!is_null($host)){
+            $this->withHost($host);
+        }
     }
 
     /**
