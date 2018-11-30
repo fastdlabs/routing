@@ -318,13 +318,14 @@ class RouteCollection
         $path = $serverRequest->getUri()->getPath();
         $host = $serverRequest->getUri()->getHost();
 
-
         if (isset($this->staticRoutes[$method][$path])) {
             foreach ($this->staticRoutes[$method][$path] as $route) {
-                if(
-                    is_null($route->getHost())
-                    || $host === $route->getHost()
-                ) {
+                if($host === $route->getHost()) {
+                    return $this->activeRoute = $route;
+                }
+            }
+            foreach ($this->staticRoutes[$method][$path] as $route) {
+                if(is_null($route->getHost())){
                     return $this->activeRoute = $route;
                 }
             }
