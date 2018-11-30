@@ -6,7 +6,7 @@
 [![Latest Unstable Version](https://poser.pugx.org/fastd/routing/v/unstable)](https://packagist.org/packages/fastd/routing)
 [![License](https://poser.pugx.org/fastd/routing/license)](https://packagist.org/packages/fastd/routing)
 
-Simple PHP router that supports routing nesting, dynamic routing, fuzzy routing, middleware, and more. Relies on the [Http](https://github.com/JanHuang/http) component.
+Simple PHP router that supports routing nesting, dynamic routing, fuzzy routing, middleware, and more. Relies on the [http](https://github.com/JanHuang/http) component.
 
 ## Claim
 
@@ -25,18 +25,18 @@ You can set the route through the `RouteCollection` object, or you can create a 
 ### Static routing
 
 ```php
-Use FastD\Http\ServerRequest;
-Use FastD\Routing\RouteCollection;
+use FastD\Http\ServerRequest;
+use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/', function () {
-    Return 'hello world';
+    return 'hello world';
 });
 
 $route = $collection->match(new ServerRequest('GET', '/')); // \FastD\Routing\Route
 
-Echo call_user_func_array($route->getCallback(), []);
+echo call_user_func_array($route->getCallback(), []);
 ```
 
 Route matching does not call the callback of the route, but returns the entire Route for callback processing, so `match` only returns the matching route object.
@@ -44,18 +44,18 @@ Route matching does not call the callback of the route, but returns the entire R
 ### Dynamic routing
 
 ```php
-Use FastD\Http\ServerRequest;
-Use FastD\Routing\RouteCollection;
+use FastD\Http\ServerRequest;
+use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/{name}', function ($name) {
-    Return 'hello ' . $name;
+    return 'hello ' . $name;
 });
 
 $route = $collection->match(new ServerRequest('GET', '/foo')); // \FastD\Routing\Route
 
-Echo call_user_func_array($route->getCallback(), $route->getParameters());
+echo call_user_func_array($route->getCallback(), $route->getParameters());
 ```
 
 Under dynamic routing, the successfully matched route will update the matching parameters to `getParameters`, and get the matching parameter information through `getParameters`.
@@ -65,10 +65,10 @@ Under dynamic routing, the successfully matched route will update the matching p
 ```php
 $collection = new FastD\Routing\RouteCollection();
 $collection->get('/', function () {
-    Return 'hello GET';
+    return 'hello GET';
 });
 $collection->post('/', function () {
-    Return 'hello POST';
+    return 'hello POST';
 });
 $response = $collection->dispatch('GET', '/'); // hello GET
 $response = $collection->dispatch('POST', '/'); // hello POST
@@ -79,23 +79,23 @@ $response = $collection->dispatch('POST', '/'); // hello POST
 In many cases, our route may only be one parameter difference. Here is an example.
 
 ```php
-Use FastD\Http\ServerRequest;
-Use FastD\Routing\RouteCollection;
+use FastD\Http\ServerRequest;
+use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/{name}', function () {
-    Return 'get1';
+    return 'get1';
 });
 
 $collection->addRoute('GET', '/', function () {
-    Return 'get2';
+    return 'get2';
 });
 
 $route = $collection->match(new ServerRequest('GET', '/abc')); // \FastD\Routing\Route
 $route2 = $collection->match(new ServerRequest('GET', '/')); // \FastD\Routing\Route
-Echo call_user_func_array($route->getCallback(), $route->getParameters());
-Echo call_user_func_array($route2->getCallback(), $route2->getParameters());
+echo call_user_func_array($route->getCallback(), $route->getParameters());
+echo call_user_func_array($route2->getCallback(), $route2->getParameters());
 ```
 
 ### Routing Group
@@ -103,20 +103,20 @@ Echo call_user_func_array($route2->getCallback(), $route2->getParameters());
 The routing group will add its own routing prefix to each of your sub-routing dollars, supporting multiple levels of nesting.
 
 ```php
-Use FastD\Http\ServerRequest;
-Use FastD\Routing\RouteCollection;
+use FastD\Http\ServerRequest;
+use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->group('/v1', function (RouteCollection $collection) {
     $collection->addRoute('GET', '/{name}', function () {
-        Return 'get1';
+        return 'get1';
     });
 });
 
 $route = $collection->match(new ServerRequest('GET', '/v1/abc'));
 
-Echo call_user_func_array($route->getCallback(), $route->getParameters());
+echo call_user_func_array($route->getCallback(), $route->getParameters());
 ```
 
 ### Fuzzy routing
@@ -124,20 +124,20 @@ Echo call_user_func_array($route->getCallback(), $route->getParameters());
 The inspiration for fuzzy routing comes from the onRequest callback of the Swoole http server. Because each route entry passes onRequest, when it is created, there may be some special routes processed according to pathinfo. Then the fuzzy route can be sent. It’s time to use.
 
 ```php
-Use FastD\Http\ServerRequest;
-Use FastD\Routing\RouteCollection;
+use FastD\Http\ServerRequest;
+use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/api/*', function ($path) {
-    Return $path;
+    return $path;
 });
 
 $route = $collection->match(new ServerRequest('GET', '/api/abc'));
-Echo call_user_func_array($route->getCallback(), $route->getParameters()); // /abc
+echo call_user_func_array($route->getCallback(), $route->getParameters()); // /abc
 
 $route = $collection->match(new ServerRequest('GET', '/api/cba'));
-Echo call_user_func_array($route->getCallback(), $route->getParameters()); // /cba
+echo call_user_func_array($route->getCallback(), $route->getParameters()); // /cba
 ```
 
 Match all legal routes that start with `/api` and then callback
@@ -151,26 +151,26 @@ The routing component implements routing middleware based on [Http] (https://git
 After the middleware call is completed, the `\Psr\Http\Message\ResponseInterface` object is returned for the program to process the output.
 
 ```php
-Use FastD\Http\ServerRequest;
-Use FastD\Routing\RouteCollection;
+use FastD\Http\ServerRequest;
+use FastD\Routing\RouteCollection;
 
 $collection = new RouteCollection();
 
 $collection->addRoute('GET', '/api/*', function (ServerRequest $request) {
-    Return 'hello';
+    return 'hello';
 });
 
 $dispatcher = new \FastD\Routing\RouteDispatcher($collection);
 
 $response = $dispatcher->dispatch(new ServerRequest('GET', '/api/abc'));
 
-Echo $response->getBody();
+echo $response->getBody();
 ```
 
 ## Testing
 
 ```
-Phpunit
+phpunit
 ```
 
 ### Contribution
