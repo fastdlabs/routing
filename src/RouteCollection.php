@@ -329,7 +329,6 @@ class RouteCollection
                     return $this->activeRoute = $route;
                 }
             }
-            
         } else {
             $possiblePath = $path;
             if ('/' === substr($possiblePath, -1)) {
