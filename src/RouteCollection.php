@@ -33,7 +33,7 @@ class RouteCollection
     protected $middleware = [];
 
     /**
-     * @var Route
+     * @var ?Route
      */
     protected $activeRoute;
 
@@ -72,34 +72,25 @@ class RouteCollection
     /**
      * @var string
      */
-    protected $namespace;
+    protected $namespace = '';
 
     /**
      * RouteCollection constructor.
-     * @param null $namespace
+     * @param string $namespace
      */
-    public function __construct($namespace = null)
+    public function __construct(string $namespace = '')
     {
         $this->namespace = $namespace;
     }
 
     /**
-     * @param          $path
+     * @param string $path
      * @param callable $callback
      * @return RouteCollection
      */
-    public function group($path, callable $callback)
+    public function group(string $path, callable $callback)
     {
         $middleware = $this->middleware;
-        if (is_array($path)) {
-            $middlewareOptions = isset($path['middleware']) ? $path['middleware'] : [];
-            if (is_array($middlewareOptions)) {
-                $this->middleware = array_merge($this->middleware, $middlewareOptions);
-            }  else {
-                $this->middleware[] = $middlewareOptions;
-            }
-            $path = isset($path['prefix']) ? $path['prefix'] : '';
-        }
 
         array_push($this->with, $path);
 
@@ -137,136 +128,37 @@ class RouteCollection
     }
 
     /**
-     * @param $path
-     * @param $callback
-     * @param array $defaults
-     * @return Route
-     */
-    public function get($path, $callback, array $defaults = [])
-    {
-        return $this->addRoute('GET', $path, $this->concat($callback), $defaults);
-    }
-
-    /**
-     * @param $path
-     * @param $callback
-     * @param array $defaults
-     * @return Route
-     */
-    public function post($path, $callback, array $defaults = [])
-    {
-        return $this->addRoute('POST', $path, $this->concat($callback), $defaults);
-    }
-
-    /**
-     * @param $path
-     * @param $callback
-     * @param array $defaults
-     * @return Route
-     */
-    public function put($path, $callback, array $defaults = [])
-    {
-        return $this->addRoute('PUT', $path, $this->concat($callback), $defaults);
-    }
-
-    /**
-     * @param $path
-     * @param $callback
-     * @param array $defaults
-     * @return Route
-     */
-    public function delete($path, $callback, array $defaults = [])
-    {
-        return $this->addRoute('DELETE', $path, $this->concat($callback), $defaults);
-    }
-
-    /**
-     * @param $path
-     * @param $callback
-     * @param array $defaults
-     * @return Route
-     */
-    public function head($path, $callback, array $defaults = [])
-    {
-        return $this->addRoute('HEAD', $path, $this->concat($callback), $defaults);
-    }
-
-    /**
-     * @param $path
-     * @param $callback
-     * @param array $defaults
-     * @return Route
-     */
-    public function options($path, $callback, array $defaults = [])
-    {
-        return $this->addRoute('OPTIONS', $path, $this->concat($callback), $defaults);
-    }
-
-    /**
-     * @param $path
-     * @param $callback
-     * @param array $defaults
-     * @return Route
-     */
-    public function patch($path, $callback, array $defaults = [])
-    {
-        return $this->addRoute('PATCH', $path, $this->concat($callback), $defaults);
-    }
-
-    /**
      * @param $name
-     * @return bool|Route
+     * @return null|Route
      */
-    public function getRoute($name)
+    public function getRoute($name): ?Route
     {
-        foreach ($this->aliasMap as $method => $routes) {
-            if (isset($routes[$name])) {
-                return $routes[$name];
-            }
-        }
-
-        return false;
+        return $this->aliasMap[$name] ?? null;
     }
 
     /**
      * @return Route
      */
-    public function getActiveRoute()
+    public function getActiveRoute(): Route
     {
         return $this->activeRoute;
     }
 
     /**
-     * @param $method
-     * @param $path
-     * @param $callback
+     * @param string $name
+     * @param Route $route
      * @return Route
      */
-    public function createRoute($method, $path, $callback)
+    public function addRoute(string $name, Route $route): Route
     {
-        return new Route($method, $path, $callback);
-    }
+        $path = implode('/', $this->with).$route->getPath();
 
-    /**
-     * @param $method
-     * @param $path
-     * @param $callback
-     * @return Route
-     */
-    public function addRoute($method, $path, $callback)
-    {
-        if (is_array($path)) {
-            $name = $path['name'];
-            $path = implode('/', $this->with).$path['path'];
-        } else {
-            $name = $path = implode('/', $this->with).$path;
+        $method = $route->getMethod();
+
+        if (isset($this->aliasMap[$name])) {
+            return $this->aliasMap[$name];
         }
 
-        if (isset($this->aliasMap[$method][$name])) {
-            return $this->aliasMap[$method][$name];
-        }
-
-        $route = $this->createRoute($method, $path, $callback);
         $route->withAddMiddleware($this->middleware);
 
         if ($route->isStatic()) {
@@ -289,7 +181,7 @@ class RouteCollection
             unset($numGroups, $numVariables);
         }
 
-        $this->aliasMap[$method][$name] = $route;
+        $this->aliasMap[$name] = $route;
 
         return $route;
     }
@@ -355,54 +247,5 @@ class RouteCollection
         }
 
         return false;
-    }
-
-    /**
-     * @param $name
-     * @param array $parameters
-     * @param string $format
-     * @return string
-     * @throws \Exception
-     */
-    public function generateUrl($name, array $parameters = [], $format = '')
-    {
-        if (false === ($route = $this->getRoute($name))) {
-            throw new RouteNotFoundException($name);
-        }
-
-        if ( ! empty($format)) {
-            $format = '.'.$format;
-        } else {
-            $format = '';
-        }
-
-        if ($route->isStaticRoute()) {
-            return $route->getPath().$format;
-        }
-
-        $parameters = array_merge($route->getParameters(), $parameters);
-        $queryString = [];
-
-        foreach ($parameters as $key => $parameter) {
-            if ( ! in_array($key, $route->getVariables())) {
-                $queryString[$key] = $parameter;
-                unset($parameters[$key]);
-            }
-        }
-
-        $search = array_map(function ($v) {
-            return '{'.$v.'}';
-        }, array_keys($parameters));
-
-        $replace = $parameters;
-
-        $path = str_replace($search, $replace, $route->getPath());
-
-        if (false !== strpos($path, '[')) {
-            $path = str_replace(['[', ']'], '', $path);
-            $path = rtrim(preg_replace('~(({.*?}))~', '', $path), '/');
-        }
-
-        return $path.$format.([] === $queryString ? '' : '?'.http_build_query($queryString));
     }
 }

@@ -12,8 +12,10 @@ namespace FastD\Routing;
 use Exception;
 use FastD\Http\ServerRequest;
 use FastD\Middleware\Dispatcher;
+use FastD\Middleware\Middleware;
 use FastD\Middleware\MiddlewareInterface;
 use FastD\Routing\Exceptions\RouteException;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -43,7 +45,7 @@ class RouteDispatcher extends Dispatcher
      * @param RouteCollection $routeCollection
      * @param $definition
      */
-    public function __construct(RouteCollection $routeCollection, $definition = [])
+    public function __construct(RouteCollection $routeCollection, array $definition = [])
     {
         $this->routeCollection = $routeCollection;
 
@@ -53,11 +55,11 @@ class RouteDispatcher extends Dispatcher
     }
 
     /**
-     * @param $name
-     * @param $middleware
+     * @param string $name
+     * @param string $middleware
      * @return RouteDispatcher
      */
-    public function addDefinition($name, $middleware)
+    public function addDefinition(string $name, string $middleware): RouteDispatcher
     {
         if (isset($this->definition[$name])) {
             if (is_array($this->definition[$name])) {
@@ -78,7 +80,7 @@ class RouteDispatcher extends Dispatcher
     /**
      * @return array
      */
-    public function getDefinition()
+    public function getDefinition(): array
     {
         return $this->definition;
     }
@@ -86,7 +88,7 @@ class RouteDispatcher extends Dispatcher
     /**
      * @return RouteCollection
      */
-    public function getRouteCollection()
+    public function getRouteCollection(): RouteCollection
     {
         return $this->routeCollection;
     }
@@ -96,7 +98,7 @@ class RouteDispatcher extends Dispatcher
      * @return \Psr\Http\Message\ResponseInterface
      * @throws Exception
      */
-    public function dispatch(ServerRequestInterface $request)
+    public function dispatch(ServerRequestInterface $request): ResponseInterface
     {
         $route = $this->routeCollection->match($request);
 
@@ -113,7 +115,7 @@ class RouteDispatcher extends Dispatcher
      * @return \Psr\Http\Message\ResponseInterface
      * @throws Exception
      */
-    public function callMiddleware(Route $route, ServerRequestInterface $request)
+    public function callMiddleware(Route $route, ServerRequestInterface $request): ResponseInterface
     {
         $prototypeStack = clone $this->stack;
 

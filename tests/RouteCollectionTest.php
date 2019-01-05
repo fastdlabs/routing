@@ -1,55 +1,46 @@
 <?php
-
-use FastD\Routing\RouteCollection;
-
 /**
  * @author    jan huang <bboyjanhuang@gmail.com>
- * @copyright 2016
+ * @copyright 2019
  *
- * @link      https://www.github.com/janhuang
- * @link      http://www.fast-d.cn/
+ * @see      https://www.github.com/fastdlabs
+ * @see      http://www.fastdlabs.com/
  */
-class RouteCollectionTest extends PHPUnit_Framework_TestCase
+
+use FastD\Http\ServerRequest;
+use FastD\Routing\Route;
+use FastD\Routing\RouteCollection;
+use PHPUnit\Framework\TestCase;
+
+class RouteCollectionTest extends TestCase
 {
-    public function testNamespace()
+    /**
+     * @var RouteCollection
+     */
+    protected $routeCollection;
+
+    public function setUp()
     {
-        $collection = new RouteCollection('\\Controller\\');
-        $collection->get('/', 'IndexController@welcome');
-        $route = $collection->getRoute('/');
-        $this->assertEquals('\\Controller\\IndexController@welcome', $route->getCallback());
+        $this->routeCollection = new RouteCollection();
     }
 
-    public function testMiddleware()
+    public function testAddRoute()
     {
-        $collection = new RouteCollection();
-        $collection->middleware('cors', function (RouteCollection $router) {
-            $router->get('/', 'IndexController@welcome');
-        });
-        $this->assertEquals(['cors'], $collection->getRoute('/')->getMiddleware());
-
-        $collection->get('/welcome', 'IndexController@welcome');
-        $this->assertEmpty($collection->getRoute('/welcome')->getMiddleware());
+        $route = new Route('GET', '/', null);
+        $this->routeCollection->addRoute('demo', $route);
+        $route = $this->routeCollection->getRoute('demo');
+        $this->assertInstanceOf(Route::class, $route);
     }
 
-    public function testGroup()
+    public function testMatchRoute()
     {
-        $collection = new RouteCollection();
-        $collection->group([
-            'middleware' => 'test1',
-        ], function ($router) {
-            $router->get('/', 'Demo@Demo')->withAddMiddleware('test');
-        });
-    }
-
-    public function testRouteName()
-    {
-        $collection = new RouteCollection();
-        $collection->get([
-            'name' => 'demo',
-            'path' => '/',
-        ], 'IndexController@welcome');
-
-        $route = $collection->getRoute('demo');
-        $this->assertEquals('/', $route->getPath());
+        $route = new Route('GET', '/', null);
+        $this->routeCollection->addRoute('demo.get', $route);
+        $route = new Route('POST', '/', null);
+        $this->routeCollection->addRoute('demo.post', $route);
+        $route = $this->routeCollection->match(new ServerRequest('GET', '/'));
+        $this->assertEquals('GET', $route->getMethod());
+        $route = $this->routeCollection->match(new ServerRequest('POST', '/'));
+        $this->assertEquals('POST', $route->getMethod());
     }
 }

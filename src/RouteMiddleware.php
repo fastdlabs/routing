@@ -41,7 +41,7 @@ class RouteMiddleware extends Middleware
      * @param DelegateInterface $next
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request, DelegateInterface $next = null)
+    public function handle(ServerRequestInterface $request, DelegateInterface $next = null): ResponseInterface
     {
         if (is_string(($callback = $this->route->getCallback()))) {
             if (false !== strpos($callback, '@')) {
