@@ -25,7 +25,7 @@ class RouteCollection
     /**
      * @var array
      */
-    protected $with = [];
+    protected $prefix = [];
 
     /**
      * @var array
@@ -85,18 +85,28 @@ class RouteCollection
 
     /**
      * @param string $path
+     * @return RouteCollection
+     */
+    public function prefix(string $path): RouteCollection
+    {
+        array_push($this->prefix, $path);
+
+        return $this;
+    }
+
+    /**
      * @param callable $callback
      * @return RouteCollection
      */
-    public function group(string $path, callable $callback)
+    public function group(callable $callback)
     {
         $middleware = $this->middleware;
 
-        array_push($this->with, $path);
+        array_push($this->prefix, $path);
 
         $callback($this);
 
-        array_pop($this->with);
+        array_pop($this->prefix);
         $this->middleware = $middleware;
 
         return $this;
@@ -107,7 +117,7 @@ class RouteCollection
      * @param callable $callback
      * @return RouteCollection
      */
-    public function middleware($middleware, callable $callback)
+    public function middleware($middleware)
     {
         array_push($this->middleware, $middleware);
 
@@ -151,7 +161,10 @@ class RouteCollection
      */
     public function addRoute(string $name, Route $route): Route
     {
-        $path = implode('/', $this->with).$route->getPath();
+        $route->setName($name);
+
+        $path = implode('/', $this->prefix).$route->getPath();
+
 
         $method = $route->getMethod();
 
@@ -159,7 +172,7 @@ class RouteCollection
             return $this->aliasMap[$name];
         }
 
-        $route->withAddMiddleware($this->middleware);
+        $route->addMiddleware($this->middleware);
 
         if ($route->isStatic()) {
             $this->staticRoutes[$method][$path] = $route;

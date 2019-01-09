@@ -19,9 +19,15 @@ class RouteCollectionTest extends TestCase
      */
     protected $routeCollection;
 
+    /**
+     * @var Route
+     */
+    protected $route;
+
     public function setUp()
     {
         $this->routeCollection = new RouteCollection();
+        $this->route = new Route('GET', '/', null);
     }
 
     public function testAddRoute()
@@ -30,6 +36,15 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->addRoute('demo', $route);
         $route = $this->routeCollection->getRoute('demo');
         $this->assertInstanceOf(Route::class, $route);
+    }
+
+    public function testPrefixAddRoute()
+    {
+        $this->routeCollection->prefix('/api')->addRoute('demo', $this->route);
+
+        $route = $this->routeCollection->getRoute('demo');
+
+        print_r($route);
     }
 
     public function testMatchRoute()
