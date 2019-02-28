@@ -13,7 +13,7 @@ include __DIR__ . '/vendor/autoload.php';
 $request = new \FastD\Http\ServerRequest('GET', '/g/30000');
 
 for ($n = 0; $n < 100; $n++) {
-    $nRoutes = 1000;
+    $nRoutes = 10000;
     $nMatches = 300;
 
     $router = new \FastD\Routing\RouteCollection();
