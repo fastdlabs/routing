@@ -19,10 +19,11 @@ class RouteNotFoundException extends RouteException
     /**
      * RouteNotFoundException constructor.
      *
+     * @param string $method
      * @param string $path
      */
-    public function __construct(string $path)
+    public function __construct(string $method, string $path)
     {
-        parent::__construct(sprintf('Route "%s" is not found.', $path), 404, null);
+        parent::__construct(sprintf('Not found Route "%s" with "%s"', $path, $method), 404, null);
     }
 }

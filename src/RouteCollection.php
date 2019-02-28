@@ -38,21 +38,6 @@ class RouteCollection
     protected $activeRoute;
 
     /**
-     * @var Route[]
-     */
-    public $staticRoutes = [];
-
-    /**
-     * @var Route[]
-     */
-    public $dynamicRoutes = [];
-
-    /**
-     * @var array
-     */
-    public $aliasMap = [];
-
-    /**
      * @var int
      */
     protected $num = 1;
@@ -75,6 +60,21 @@ class RouteCollection
     protected $namespace = '';
 
     /**
+     * @var Route[]
+     */
+    public $staticRoutes = [];
+
+    /**
+     * @var Route[]
+     */
+    public $dynamicRoutes = [];
+
+    /**
+     * @var array
+     */
+    public $aliasMap = [];
+
+    /**
      * RouteCollection constructor.
      * @param string $namespace
      */
@@ -95,35 +95,30 @@ class RouteCollection
     }
 
     /**
-     * @param callable $callback
+     * @param mixed $middleware
      * @return RouteCollection
      */
-    public function group(callable $callback)
+    public function middleware($middleware): RouteCollection
     {
-        $middleware = $this->middleware;
-
-        array_push($this->prefix, $path);
-
-        $callback($this);
-
-        array_pop($this->prefix);
-        $this->middleware = $middleware;
+        array_push($this->middleware, $middleware);
 
         return $this;
     }
 
     /**
-     * @param $middleware
-     * @param callable $callback
+     * @param mixed ...$args
      * @return RouteCollection
      */
-    public function middleware($middleware)
+    public function group(...$args): RouteCollection
     {
-        array_push($this->middleware, $middleware);
+        $callable = array_pop($args);
 
-        $callback($this);
+        count($args) == 2 && $this->prefix($args[0]);
 
-        array_pop($this->middleware);
+        $callable($this);
+
+        $this->restorePrefix();
+        $this->restoreMiddleware();
 
         return $this;
     }
@@ -132,18 +127,9 @@ class RouteCollection
      * @param $callback
      * @return string
      */
-    protected function concat($callback)
+    protected function concat($callback): string
     {
-        return ! is_string($callback) ? $callback : $this->namespace.$callback;
-    }
-
-    /**
-     * @param $name
-     * @return null|Route
-     */
-    public function getRoute($name): ?Route
-    {
-        return $this->aliasMap[$name] ?? null;
+        return !is_string($callback) ? $callback : $this->namespace.$callback;
     }
 
     /**
@@ -155,21 +141,21 @@ class RouteCollection
     }
 
     /**
-     * @param string $name
-     * @param Route $route
+     * @param string $method
+     * @param string $path
+     * @param $callback
      * @return Route
      */
-    public function addRoute(string $name, Route $route): Route
+    public function addRoute(string $method, string $path, $callback): Route
     {
-        $route->setName($name);
+        $path = implode('/', $this->prefix).$path;
 
-        $path = implode('/', $this->prefix).$route->getPath();
-
+        $route = new Route($method, $path, $callback);
 
         $method = $route->getMethod();
 
-        if (isset($this->aliasMap[$name])) {
-            return $this->aliasMap[$name];
+        if (isset($this->aliasMap[$method][$path])) {
+            return $this->aliasMap[$method][$path];
         }
 
         $route->addMiddleware($this->middleware);
@@ -194,7 +180,7 @@ class RouteCollection
             unset($numGroups, $numVariables);
         }
 
-        $this->aliasMap[$name] = $route;
+        $this->aliasMap[$method][$path] = $route;
 
         return $route;
     }
@@ -204,7 +190,7 @@ class RouteCollection
      * @return Route
      * @throws RouteNotFoundException
      */
-    public function match(ServerRequestInterface $serverRequest)
+    public function match(ServerRequestInterface $serverRequest): Route
     {
         $method = $serverRequest->getMethod();
         $path = $serverRequest->getUri()->getPath();
@@ -228,7 +214,7 @@ class RouteCollection
             ! isset($this->dynamicRoutes[$method])
             || false === $route = $this->matchDynamicRoute($serverRequest, $method, $path)
         ) {
-            throw new RouteNotFoundException($path);
+            throw new RouteNotFoundException($method, $path);
         }
 
         return $this->activeRoute = $route;
@@ -236,14 +222,14 @@ class RouteCollection
 
     /**
      * @param ServerRequestInterface $serverRequest
-     * @param string $method
-     * @param string $path
-     * @return bool|Route
+     * @param $method
+     * @param $path
+     * @return Route
      */
-    protected function matchDynamicRoute(ServerRequestInterface $serverRequest, $method, $path)
+    protected function matchDynamicRoute(ServerRequestInterface $serverRequest, $method, $path): Route
     {
         foreach ($this->dynamicRoutes[$method] as $data) {
-            if ( ! preg_match($data['regex'], $path, $matches)) {
+            if (!preg_match($data['regex'], $path, $matches)) {
                 continue;
             }
             $route = $data['routes'][count($matches)];
@@ -259,6 +245,26 @@ class RouteCollection
             return $route;
         }
 
-        return false;
+        throw new RouteNotFoundException($method, $path);
+    }
+
+    /**
+     * @return RouteCollection
+     */
+    protected function restoreMiddleware(): RouteCollection
+    {
+        array_pop($this->middleware);
+
+        return $this;
+    }
+
+    /**
+     * @return RouteCollection
+     */
+    protected function restorePrefix(): RouteCollection
+    {
+        array_pop($this->prefix);
+
+        return $this;
     }
 }

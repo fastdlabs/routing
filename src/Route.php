@@ -49,7 +49,7 @@ class Route extends RouteRegex
      *
      * @param string $method
      * @param $path
-     * @param $callback Support array, string, callable, function
+     * @param $callback support array, string, callable, function
      */
     public function __construct(string $method, string $path, $callback)
     {
