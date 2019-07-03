@@ -327,7 +327,7 @@ class RouteCollection
                 }
             }
             foreach ($this->staticRoutes[$method][$path] as $route) {
-                if (!empty($route->getHosts())) {
+                if (empty($route->getHosts())) {
                     return $this->activeRoute = $route;
                 }
             }
