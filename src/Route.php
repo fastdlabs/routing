@@ -35,7 +35,7 @@ class Route extends RouteRegex
     /**
      * @var mixed
      */
-    protected $host;
+    protected $hosts;
 
     /**
      * @var array
@@ -48,9 +48,9 @@ class Route extends RouteRegex
      * @param string $method
      * @param $path
      * @param $callback
-     * @param $host
+     * @param array $hosts
      */
-    public function __construct($method, $path, $callback, $host = null)
+    public function __construct($method, $path, $callback, $hosts = [])
     {
         parent::__construct($path);
 
@@ -58,8 +58,8 @@ class Route extends RouteRegex
 
         $this->withCallback($callback);
 
-        if(!is_null($host)){
-            $this->withHost($host);
+        if(!empty($hosts)){
+            $this->withHosts($hosts);
         }
     }
 
@@ -83,12 +83,12 @@ class Route extends RouteRegex
     }
 
     /**
-     * @param array|string $host
+     * @param array|string $hosts
      * @return $this
      */
-    public function withHost($host)
+    public function withHosts($hosts)
     {
-        $this->host = $host;
+        $this->hosts = $hosts;
 
         return $this;
     }
@@ -96,9 +96,9 @@ class Route extends RouteRegex
     /**
      * @return string
      */
-    public function getHost()
+    public function getHosts()
     {
-        return $this->host;
+        return $this->hosts;
     }
 
     /**
