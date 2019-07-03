@@ -275,7 +275,7 @@ class RouteCollection
 
         if (isset($this->aliasMap[$method][$name])) {
             foreach ($this->aliasMap[$method][$name] as $route) {
-                if (in_array($route->getHost(), $hostsList)) {
+                if (in_array($route->getHosts(), $hostsList)) {
                     return $route;
                 }
             }
@@ -343,7 +343,7 @@ class RouteCollection
                 foreach ($this->staticRoutes[$method][$possiblePath] as $route) {
                     if (
                         empty($route->getHosts())
-                        || in_array($host, $route->getHost())
+                        || in_array($host, $route->getHosts())
                     ) {
                         return $this->activeRoute = $route;
                     }
