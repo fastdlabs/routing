@@ -104,6 +104,10 @@ class RouteDispatcher extends Dispatcher
             $route->withAddMiddleware($middleware);
         }
 
+        foreach ($route->getParameters() as $name => $val) {
+            $request->withAttribute($name, $val);
+        }
+
         return $this->callMiddleware($route, $request);
     }
 
