@@ -74,6 +74,8 @@ class RouteCollection
      */
     public $aliasMap = [];
 
+    use Resources;
+
     /**
      * RouteCollection constructor.
      * @param string $namespace
