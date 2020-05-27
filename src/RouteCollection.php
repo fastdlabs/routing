@@ -287,21 +287,7 @@ class RouteCollection
         if ($route->isStatic()) {
             $this->staticRoutes[$method][$path][] = $route;
         } else {
-            $numVariables = count($route->getVariables());
-            $numGroups = max($this->num, $numVariables);
-            $this->regexes[$method][] = $route->getRegex() . str_repeat('()', $numGroups - $numVariables);
-
-            $this->dynamicRoutes[$method][$this->index]['regex'] = '~^(?|' . implode('|', $this->regexes[$method]) . ')$~';
-            $this->dynamicRoutes[$method][$this->index]['routes'][$numGroups + 1] = $route;
-
-            ++$this->num;
-
-            if (count($this->regexes[$method]) >= static::ROUTES_CHUNK) {
-                ++$this->index;
-                $this->num = 1;
-                $this->regexes[$method] = [];
-            }
-            unset($numGroups, $numVariables);
+            $this->dynamicRoutes[$method][] = $route;
         }
 
         $this->aliasMap[$method][$name][] = $route;
@@ -371,13 +357,12 @@ class RouteCollection
      */
     protected function matchDynamicRoute(ServerRequestInterface $serverRequest, $method, $path, $host)
     {
-        foreach ($this->dynamicRoutes[$method] as $data) {
-            if (!preg_match($data['regex'], $path, $matches)) {
+        foreach ($this->dynamicRoutes[$method] as $route) {
+            if (!preg_match('~^' . $route->getRegex() . '$~', $path, $matches)) {
                 continue;
             }
-            $route = $data['routes'][count($matches)];
-            preg_match('~^' . $route->getRegex() . '$~', $path, $match);
-            $match = array_slice($match, 1, count($route->getVariables()));
+
+            $match = array_slice($matches, 1, count($route->getVariables()));
             $attributes = array_combine($route->getVariables(), $match);
             $attributes = array_filter($attributes);
             $route->mergeParameters($attributes);
