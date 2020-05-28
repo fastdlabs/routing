@@ -33,9 +33,9 @@ class Route extends RouteRegex
     protected $callback;
 
     /**
-     * @var mixed
+     * @var array
      */
-    protected $hosts;
+    protected $hosts = [];
 
     /**
      * @var array
