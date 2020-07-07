@@ -22,17 +22,17 @@ class Route extends RouteRegex
     /**
      * @var array
      */
-    protected $parameters = [];
+    protected array $parameters = [];
 
     /**
      * @var string
      */
-    protected $name = '';
+    protected string $name = '';
 
     /**
      * @var string
      */
-    protected $method = 'GET';
+    protected string $method = 'GET';
 
     /**
      * @var mixed
@@ -42,7 +42,7 @@ class Route extends RouteRegex
     /**
      * @var array
      */
-    protected $middleware = [];
+    protected array $middleware = [];
 
     /**
      * Route constructor.
@@ -110,9 +110,9 @@ class Route extends RouteRegex
     }
 
     /**
-     * @return Closure
+     * @return mixed
      */
-    public function getCallback(): ?Closure
+    public function getCallback()
     {
         return $this->callback;
     }
@@ -140,7 +140,7 @@ class Route extends RouteRegex
      * @param array $parameters
      * @return Route
      */
-    public function mergeParameters(array $parameters): Route
+    protected function mergeParameters(array $parameters): Route
     {
         $this->parameters = array_merge($this->parameters, array_filter($parameters));
 

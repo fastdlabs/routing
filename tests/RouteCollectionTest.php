@@ -17,12 +17,12 @@ class RouteCollectionTest extends TestCase
     /**
      * @var RouteCollection
      */
-    protected $routeCollection;
+    protected RouteCollection $routeCollection;
 
     /**
      * @var Route
      */
-    protected $route;
+    protected Route $route;
 
     public function setUp()
     {

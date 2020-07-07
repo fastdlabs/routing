@@ -25,54 +25,54 @@ class RouteCollection
     /**
      * @var array
      */
-    protected $prefix = [];
+    protected array $prefix = [];
 
     /**
      * @var array
      */
-    protected $middleware = [];
+    protected array $middleware = [];
 
     /**
-     * @var ?Route
+     * @var Route
      */
-    protected $activeRoute;
+    protected Route $activeRoute;
 
     /**
      * @var int
      */
-    protected $num = 1;
+    protected int $num = 1;
 
     /**
      * 路由分组计数器
      *
      * @var int
      */
-    protected $index = 0;
+    protected int $index = 0;
 
     /**
      * @var array
      */
-    protected $regexes = [];
+    protected array $regexes = [];
 
     /**
      * @var string
      */
-    protected $namespace = '';
+    protected string $namespace = '';
 
     /**
      * @var Route[]
      */
-    public $staticRoutes = [];
+    public array $staticRoutes = [];
 
     /**
      * @var Route[]
      */
-    public $dynamicRoutes = [];
+    public array $dynamicRoutes = [];
 
     /**
      * @var array
      */
-    public $aliasMap = [];
+    public array $aliasMap = [];
 
     use Resources;
 

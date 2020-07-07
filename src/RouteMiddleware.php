@@ -25,7 +25,7 @@ class RouteMiddleware extends Middleware
     /**
      * @var Route
      */
-    protected $route;
+    protected Route $route;
 
     /**
      * RouteMiddleware constructor.

@@ -32,27 +32,27 @@ REGEX;
     /**
      * @var array
      */
-    protected $variables = [];
+    protected array $variables = [];
 
     /**
      * @var array
      */
-    protected $requirements = [];
+    protected array $requirements = [];
 
     /**
      * @var string
      */
-    protected $regex;
+    protected string $regex;
 
     /**
      * @var string
      */
-    protected $path = '';
+    protected string $path = '';
 
     /**
      * @var bool
      */
-    protected $isStatic = true;
+    protected bool $isStatic = true;
 
     /**
      * RouteRegex constructor.

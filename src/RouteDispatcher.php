@@ -27,17 +27,17 @@ class RouteDispatcher extends Dispatcher
     /**
      * @var RouteCollection
      */
-    protected $routeCollection;
+    protected RouteCollection $routeCollection;
 
     /**
      * @var array
      */
-    protected $definition = [];
+    protected array $definition = [];
 
     /**
      * @var array
      */
-    protected $appendMiddleware = [];
+    protected array $appendMiddleware = [];
 
     /**
      * RouteDispatcher constructor.
