@@ -20,6 +20,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RouteCollection
 {
+    use Resources;
+
     const ROUTES_CHUNK = 10;
 
     /**
@@ -55,11 +57,6 @@ class RouteCollection
     protected array $regexes = [];
 
     /**
-     * @var string
-     */
-    protected string $namespace = '';
-
-    /**
      * @var Route[]
      */
     public array $staticRoutes = [];
@@ -74,17 +71,6 @@ class RouteCollection
      */
     public array $aliasMap = [];
 
-    use Resources;
-
-    /**
-     * RouteCollection constructor.
-     * @param string $namespace
-     */
-    public function __construct(string $namespace = '')
-    {
-        $this->namespace = $namespace;
-    }
-
     /**
      * @param string $path
      * @return RouteCollection
@@ -97,10 +83,10 @@ class RouteCollection
     }
 
     /**
-     * @param mixed $middleware
+     * @param string $middleware
      * @return RouteCollection
      */
-    public function middleware($middleware): RouteCollection
+    public function middleware(string $middleware): RouteCollection
     {
         array_push($this->middleware, $middleware);
 
@@ -108,30 +94,17 @@ class RouteCollection
     }
 
     /**
-     * @param mixed ...$args
+     * @param callable $callable
      * @return RouteCollection
      */
-    public function group(...$args): RouteCollection
+    public function group(callable $callable): RouteCollection
     {
-        $callable = array_pop($args);
-
-        count($args) == 2 && $this->prefix($args[0]);
-
         $callable($this);
 
         $this->restorePrefix();
         $this->restoreMiddleware();
 
         return $this;
-    }
-
-    /**
-     * @param $callback
-     * @return string
-     */
-    protected function concat($callback): string
-    {
-        return !is_string($callback) ? $callback : $this->namespace.$callback;
     }
 
     /**
@@ -160,7 +133,7 @@ class RouteCollection
             return $this->aliasMap[$method][$path];
         }
 
-        $route->addMiddleware($this->middleware);
+        $route->setMiddleware($this->middleware);
 
         if ($route->isStatic()) {
             $this->staticRoutes[$method][$path] = $route;

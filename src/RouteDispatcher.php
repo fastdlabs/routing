@@ -95,7 +95,7 @@ class RouteDispatcher extends Dispatcher
 
     /**
      * @param ServerRequestInterface $request
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      * @throws Exception
      */
     public function dispatch(ServerRequestInterface $request): ResponseInterface
@@ -112,7 +112,7 @@ class RouteDispatcher extends Dispatcher
     /**
      * @param Route $route
      * @param ServerRequestInterface $request
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      * @throws Exception
      */
     public function callMiddleware(Route $route, ServerRequestInterface $request): ResponseInterface

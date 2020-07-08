@@ -10,8 +10,6 @@
 namespace FastD\Routing;
 
 
-use Closure;
-
 /**
  * Class Route
  *
@@ -37,7 +35,7 @@ class Route extends RouteRegex
     /**
      * @var mixed
      */
-    protected $callback;
+    protected $handle;
 
     /**
      * @var array
@@ -49,15 +47,15 @@ class Route extends RouteRegex
      *
      * @param string $method
      * @param $path
-     * @param $callback support array, string, callable, function
+     * @param $handle support array, string, callable, function
      */
-    public function __construct(string $method, string $path, $callback)
+    public function __construct(string $method, string $path, $handle = null)
     {
         parent::__construct($path);
 
         $this->setMethod($method);
 
-        $this->setCallback($callback);
+        $this->sethandle($handle);
     }
 
     /**
@@ -99,12 +97,12 @@ class Route extends RouteRegex
     }
 
     /**
-     * @param mixed $callback
+     * @param $handle $handle
      * @return Route
      */
-    public function setCallback($callback): Route
+    public function setHandle($handle): Route
     {
-        $this->callback = $callback;
+        $this->handle = $handle;
 
         return $this;
     }
@@ -112,9 +110,9 @@ class Route extends RouteRegex
     /**
      * @return mixed
      */
-    public function getCallback()
+    public function getHandle()
     {
-        return $this->callback;
+        return $this->handle;
     }
 
     /**
@@ -137,12 +135,12 @@ class Route extends RouteRegex
     }
 
     /**
-     * @param array $parameters
+     * @param array $middleware
      * @return Route
      */
-    protected function mergeParameters(array $parameters): Route
+    public function setMiddleware(array $middleware): Route
     {
-        $this->parameters = array_merge($this->parameters, array_filter($parameters));
+        $this->middleware = $middleware;
 
         return $this;
     }
@@ -151,24 +149,9 @@ class Route extends RouteRegex
      * @param mixed $middleware
      * @return Route
      */
-    public function setMiddleware($middleware): Route
+    public function addMiddleware(string $middleware): Route
     {
-        $this->middleware = [$middleware];
-
-        return $this;
-    }
-
-    /**
-     * @param mixed $middleware
-     * @return Route
-     */
-    public function addMiddleware($middleware): Route
-    {
-        if (is_array($middleware)) {
-            $this->middleware = array_merge($this->middleware, $middleware);
-        } else {
-            $this->middleware[] = $middleware;
-        }
+        $this->middleware[] = $middleware;
 
         return $this;
     }

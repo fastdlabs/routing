@@ -43,7 +43,7 @@ class RouteMiddleware extends Middleware
      */
     public function handle(ServerRequestInterface $request, DelegateInterface $next = null): ResponseInterface
     {
-        if (is_string(($callback = $this->route->getCallback()))) {
+        if (is_string(($callback = $this->route->getHandle()))) {
             if (false !== strpos($callback, '@')) {
                 list($class, $method) = explode('@', $callback);
             } else {
@@ -54,17 +54,8 @@ class RouteMiddleware extends Middleware
         } else {
             if (is_callable($callback)) {
                 $response = call_user_func_array($callback, [$request, $next]);
-            } else {
-                if (is_array($callback)) {
-                    $class = $callback[0];
-                    if (is_string($class)) {
-                        $class = new $class;
-                    }
-                    $response = call_user_func_array([$class, $callback[1]], [$request, $next]);
-                } else {
-                    $response = new Response('Don\'t support callback, Please setting callable function or class@method.');
-                }
             }
+            $response = new Response('Don\'t support callback, Please setting callable function or class@method.');
         }
         unset($callback);
 

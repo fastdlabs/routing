@@ -27,57 +27,63 @@ class RouteCollectionTest extends TestCase
     public function setUp()
     {
         $this->routeCollection = new RouteCollection();
-        $this->route = new Route('GET', '/', null);
     }
 
-    public function testAddRouteAndMatchRoute()
+    public function testAddStaticRoute()
     {
-        $this->routeCollection->addRoute('GET', '/', 'test_api')
+        $this->routeCollection
+            ->addRoute('GET', '/', '')
             ->setName('test_api')
             ->setParameters(['foo' => 'bar'])
         ;
-        $route = $this->routeCollection->match(new ServerRequest('GET', '/'));
-        $this->assertEquals(['foo' => 'bar'], $route->getParameters());
-        $this->assertEquals('test_api', $route->getName());
+
+        $this->assertTrue(true);
     }
 
-    public function testRouteCollectionPrefix()
+    public function testMiddlewareRoute()
     {
-        /**
-         * 单独设置 prefix，middleware 会影响全局 prefix，因此如要单独设置的话，需要在下次设置的时候进行参数重置
-         * RouteCollection::restoreMiddleware() OR RouteCollection::restorePrefix()
-         */
-        $this->routeCollection->prefix('/api')->addRoute('GET', '/', 'test_api');
-        $this->routeCollection->addRoute('GET', '/foo', 'test_api');
-        $route = $this->routeCollection->match(new ServerRequest('GET', '/api/'));
-        $route2 = $this->routeCollection->match(new ServerRequest('GET', '/api'));
-        $route3 = $this->routeCollection->match(new ServerRequest('GET', '/api/foo'));
-        $this->assertEquals($route, $route2);
-        $this->assertEquals('/api/foo', $route3->getPath());
+        $this->routeCollection
+            ->middleware(DefaultMiddleware::class)
+            ->group(function (RouteCollection $routeCollection) {
+                $routeCollection->get('/', function () {});
+            })
+        ;
+        $this->routeCollection->post('/', function () {});
+
+        $route = $this->routeCollection->aliasMap['GET']['/'];
+
+        $this->assertEquals('/', $route->getPath());
+        $this->assertEquals([DefaultMiddleware::class], $route->getMiddleware());
+        $this->assertEmpty($this->routeCollection->aliasMap['POST']['/']->getMiddleware());
     }
 
-    public function testRouteCollectionGroup()
+    public function testPrefixRoute()
     {
-        $this->routeCollection->prefix('/api')->group(function (RouteCollection $routeCollection) {
-            $routeCollection->addRoute('GET', '/', 'test_api')->setName('test_api');
-            $routeCollection->addRoute('POST', '/', 'test_api');
-        });
-        $route = $this->routeCollection->match(new ServerRequest('GET', '/api/'));
-        $route2 = $this->routeCollection->match(new ServerRequest('POST', '/api'));
-        $this->assertEquals('test_api', $route->getName());
-        $this->assertEquals('POST', $route2->getMethod());
+        $this->routeCollection
+            ->prefix('/api')
+            ->group(function (RouteCollection $routeCollection) {
+                $routeCollection->get('/', function () {});
+            })
+        ;
+
+        $this->routeCollection->post('/', function () {});
+        $route = $this->routeCollection->aliasMap['GET']['/api/'];
+
+        $this->assertEquals('/api', $route->getPath());
+        $this->assertEquals('/', $this->routeCollection->aliasMap['POST']['/']->getPath());
     }
 
-    public function testRouteCollectionMiddleware()
+    public function testMatch()
     {
-        $this->routeCollection->middleware('foo')->group(function (RouteCollection $routeCollection) {
-            $routeCollection->addRoute('GET', '/', 'test_api')->setName('test_api');
-        });
+        $this->routeCollection
+            ->prefix('/api')
+            ->group(function (RouteCollection $routeCollection) {
+                $routeCollection->get('/', function () {});
+            })
+        ;
 
-        $this->routeCollection->addRoute('POST', '/', 'test_api')->setName('test_api');
-
-        $route = $this->routeCollection->match(new ServerRequest('POST', '/'));
-
-        $this->assertEquals('POST', $route->getMethod());
+        $this->routeCollection->post('/', function () {});
+        $route = $this->routeCollection->match(new ServerRequest("GET", "/api"));
+        $this->assertEquals('/api', $route->getPath());
     }
 }
