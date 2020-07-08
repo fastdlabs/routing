@@ -223,23 +223,13 @@ class RouteCollection
         throw new RouteNotFoundException($method, $path);
     }
 
-    /**
-     * @return RouteCollection
-     */
-    protected function restoreMiddleware(): RouteCollection
+    protected function restoreMiddleware(): void
     {
         array_pop($this->middleware);
-
-        return $this;
     }
 
-    /**
-     * @return RouteCollection
-     */
-    protected function restorePrefix(): RouteCollection
+    protected function restorePrefix(): void
     {
         array_pop($this->prefix);
-
-        return $this;
     }
 }
