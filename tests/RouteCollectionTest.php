@@ -85,5 +85,7 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection->post('/', function () {});
         $route = $this->routeCollection->match(new ServerRequest("GET", "/api"));
         $this->assertEquals('/api', $route->getPath());
+        $route = $this->routeCollection->getActiveRoute();
+        $this->assertEquals('/api', $route->getPath());
     }
 }
