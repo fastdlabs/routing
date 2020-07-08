@@ -10,9 +10,7 @@
 namespace FastD\Routing;
 
 use Exception;
-use FastD\Http\ServerRequest;
 use FastD\Middleware\Dispatcher;
-use FastD\Middleware\Middleware;
 use FastD\Middleware\MiddlewareInterface;
 use FastD\Routing\Exceptions\RouteException;
 use Psr\Http\Message\ResponseInterface;
@@ -61,18 +59,7 @@ class RouteDispatcher extends Dispatcher
      */
     public function addDefinition(string $name, string $middleware): RouteDispatcher
     {
-        if (isset($this->definition[$name])) {
-            if (is_array($this->definition[$name])) {
-                $this->definition[$name][] = $middleware;
-            } else {
-                $this->definition[$name] = [
-                    $this->definition[$name],
-                    $middleware,
-                ];
-            }
-        } else {
-            $this->definition[$name] = $middleware;
-        }
+        $this->definition[$name] = $middleware;
 
         return $this;
     }
@@ -103,7 +90,7 @@ class RouteDispatcher extends Dispatcher
         $route = $this->routeCollection->match($request);
 
         foreach ($this->appendMiddleware as $middleware) {
-            $route->withAddMiddleware($middleware);
+            $route->addMiddleware($middleware);
         }
 
         return $this->callMiddleware($route, $request);
