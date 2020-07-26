@@ -12,6 +12,7 @@ namespace FastD\Routing;
 
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
+use FastD\Routing\Traits\ResourcesTrait;
 
 /**
  * Class RouteCollection
@@ -20,7 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RouteCollection
 {
-    use Resources;
+    use ResourcesTrait;
 
     const ROUTES_CHUNK = 10;
 
@@ -118,14 +119,13 @@ class RouteCollection
     /**
      * @param string $method
      * @param string $path
-     * @param $callback
      * @return Route
      */
-    public function addRoute(string $method, string $path, $callback): Route
+    public function addRoute(string $method, string $path): Route
     {
         $path = implode('/', $this->prefix).$path;
 
-        $route = new Route($method, $path, $callback);
+        $route = new Route($method, $path);
 
         $method = $route->getMethod();
 

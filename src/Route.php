@@ -10,6 +10,8 @@
 namespace FastD\Routing;
 
 
+use FastD\Routing\Handle\RouteHandleInterface;
+
 /**
  * Class Route
  *
@@ -33,9 +35,9 @@ class Route extends RouteRegex
     protected string $method = 'GET';
 
     /**
-     * @var mixed
+     * @var string
      */
-    protected $handle;
+    protected string $handle;
 
     /**
      * @var array
@@ -47,15 +49,12 @@ class Route extends RouteRegex
      *
      * @param string $method
      * @param $path
-     * @param $handle support array, string, callable, function
      */
-    public function __construct(string $method, string $path, $handle = null)
+    public function __construct(string $method, string $path)
     {
         parent::__construct($path);
 
         $this->setMethod($method);
-
-        $this->sethandle($handle);
     }
 
     /**
@@ -100,7 +99,7 @@ class Route extends RouteRegex
      * @param $handle $handle
      * @return Route
      */
-    public function setHandle($handle): Route
+    public function handle(string $handle): Route
     {
         $this->handle = $handle;
 
@@ -108,11 +107,11 @@ class Route extends RouteRegex
     }
 
     /**
-     * @return mixed
+     * @return RouteHandleInterface
      */
-    public function getHandle()
+    public function getHandle(): RouteHandleInterface
     {
-        return $this->handle;
+        return new $this->handle;
     }
 
     /**
@@ -162,5 +161,6 @@ class Route extends RouteRegex
     public function getMiddleware(): array
     {
         return $this->middleware;
+
     }
 }

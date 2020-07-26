@@ -18,12 +18,19 @@ class RouteTest extends TestCase
         $this->assertEmpty($route->getName());
         $route->setName("root");
         $this->assertEquals("root", $route->getName());
-        $this->assertNull($route->getHandle());
     }
 
     public function testDynamicRoute()
     {
         $route = new Route('GET', '/{name}');
         $this->assertFalse($route->isStatic());
+    }
+
+    public function testHandle()
+    {
+        include __DIR__ . '/handle/hello.php';
+        $route = new Route('GET', '/');
+        $route->handle(hello::class);
+        print_r($route);
     }
 }
