@@ -27,17 +27,17 @@ class Route extends RouteRegex
     /**
      * @var string
      */
-    protected string $name = '';
-
-    /**
-     * @var string
-     */
     protected string $method = 'GET';
 
     /**
      * @var string
      */
     protected string $handle;
+
+    /**
+     * @var RouteHandleInterface
+     */
+    protected RouteHandleInterface $callback;
 
     /**
      * @var array
@@ -55,25 +55,6 @@ class Route extends RouteRegex
         parent::__construct($path);
 
         $this->setMethod($method);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     * @return Route
-     */
-    public function setName(string $name): Route
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     /**
@@ -111,7 +92,13 @@ class Route extends RouteRegex
      */
     public function getHandle(): RouteHandleInterface
     {
-        return new $this->handle;
+        $handle = new $this->handle;
+
+        if (!($handle instanceof RouteHandleInterface)) {
+            throw new \RuntimeException(sprintf('Route handle must be implement %s', RouteHandleInterface::class));
+        }
+
+        return $handle;
     }
 
     /**
@@ -161,6 +148,5 @@ class Route extends RouteRegex
     public function getMiddleware(): array
     {
         return $this->middleware;
-
     }
 }
