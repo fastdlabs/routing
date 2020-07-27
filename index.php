@@ -12,7 +12,7 @@ require_once __DIR__ . '/tests/middleware/BeforeMiddleware.php';
 
 $collections = new RouteCollection();
 
-$collections->get('/')->handle(hello::class)->after(BeforeMiddleware::class);
+$collections->get('/')->handle(hello::class)->before(BeforeMiddleware::class);
 
 $dispatcher = new RouteDispatcher($collections);
 

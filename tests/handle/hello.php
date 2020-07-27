@@ -10,6 +10,6 @@ class hello implements RouteHandleInterface
 {
     public function handle(ServerRequest $request, DelegateInterface $delegate): ResponseInterface
     {
-        return $delegate->handle($request);
+        return new Response("hello");
     }
 }
