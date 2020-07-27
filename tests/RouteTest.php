@@ -15,9 +15,7 @@ class RouteTest extends TestCase
     public function testBaseRoute()
     {
         $route = new Route('GET', '/');
-        $this->assertEmpty($route->getName());
-        $route->setName("root");
-        $this->assertEquals("root", $route->getName());
+        $this->assertEquals($route->getMethod(), 'GET');
     }
 
     public function testDynamicRoute()
@@ -28,9 +26,9 @@ class RouteTest extends TestCase
 
     public function testHandle()
     {
-        include __DIR__ . '/handle/hello.php';
+        include_once __DIR__ . '/handle/hello.php';
         $route = new Route('GET', '/');
         $route->handle(hello::class);
-        print_r($route);
+        $this->assertInstanceOf(\FastD\Routing\Handle\RouteHandleInterface::class, $route->getHandle());
     }
 }

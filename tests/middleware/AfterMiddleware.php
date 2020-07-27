@@ -1,6 +1,9 @@
 <?php
 
+use FastD\Middleware\DelegateInterface;
+use FastD\Middleware\Middleware;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @author    jan huang <bboyjanhuang@gmail.com>
@@ -9,14 +12,14 @@ use Psr\Http\Message\ResponseInterface;
  * @link      https://www.github.com/janhuang
  * @link      http://www.fast-d.cn/
  */
-class AfterMiddleware extends \FastD\Middleware\Middleware
+class AfterMiddleware extends Middleware
 {
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $serverRequest
-     * @param \FastD\Middleware\DelegateInterface $delegate
+     * @param ServerRequestInterface $serverRequest
+     * @param DelegateInterface $delegate
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(\Psr\Http\Message\ServerRequestInterface $serverRequest, \FastD\Middleware\DelegateInterface $delegate): ResponseInterface
+    public function handle(ServerRequestInterface $serverRequest, DelegateInterface $delegate): ResponseInterface
     {
         $str = 'after' . PHP_EOL;
         echo $str;

@@ -35,14 +35,12 @@ class Route extends RouteRegex
     protected string $handle;
 
     /**
-     * @var RouteHandleInterface
-     */
-    protected RouteHandleInterface $callback;
-
-    /**
      * @var array
      */
-    protected array $middleware = [];
+    protected array $middleware = [
+        'before'    => [],
+        'after'     => [],
+    ];
 
     /**
      * Route constructor.
@@ -77,8 +75,8 @@ class Route extends RouteRegex
     }
 
     /**
-     * @param $handle $handle
-     * @return Route
+     * @param string $handle
+     * @return $this
      */
     public function handle(string $handle): Route
     {
@@ -124,9 +122,9 @@ class Route extends RouteRegex
      * @param array $middleware
      * @return Route
      */
-    public function setMiddleware(array $middleware): Route
+    public function before(string $middleware): Route
     {
-        $this->middleware = $middleware;
+        $this->middleware['after'][] = $middleware;
 
         return $this;
     }
@@ -135,9 +133,9 @@ class Route extends RouteRegex
      * @param mixed $middleware
      * @return Route
      */
-    public function addMiddleware(string $middleware): Route
+    public function after(string $middleware): Route
     {
-        $this->middleware[] = $middleware;
+        $this->middleware['before'][] = $middleware;
 
         return $this;
     }

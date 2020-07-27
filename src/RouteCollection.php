@@ -133,7 +133,7 @@ class RouteCollection
             return $this->aliasMap[$method][$path];
         }
 
-        $route->setMiddleware($this->middleware);
+//        $route->before($this->middleware);
 
         if ($route->isStatic()) {
             $this->staticRoutes[$method][$path] = $route;

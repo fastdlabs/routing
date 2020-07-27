@@ -89,10 +89,6 @@ class RouteDispatcher extends Dispatcher
     {
         $route = $this->routeCollection->match($request);
 
-        foreach ($this->appendMiddleware as $middleware) {
-            $route->addMiddleware($middleware);
-        }
-
         return $this->callMiddleware($route, $request);
     }
 
@@ -105,34 +101,17 @@ class RouteDispatcher extends Dispatcher
     public function callMiddleware(Route $route, ServerRequestInterface $request): ResponseInterface
     {
         $prototypeStack = clone $this->stack;
-
-        foreach ($route->getMiddleware() as $middleware) {
-            if ($middleware instanceof MiddlewareInterface) {
-                $this->before($middleware);
-            } else {
-                if (is_string($middleware)) {
-                    if (class_exists($middleware)) {
-                        $this->before(new $middleware);
-                    } elseif (isset($this->definition[$middleware])) {
-                        $definition = $this->definition[$middleware];
-                        if (is_array($definition)) {
-                            foreach ($definition as $value) {
-                                $this->before(is_string($value) ? new $value : $value);
-                            }
-                        } else {
-                            $this->before(is_string($definition) ? new $definition : $definition);
-                        }
-                    } else {
-                        throw new \RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
-                    }
-                } else {
-                    throw new RouteException(sprintf('Don\'t support %s middleware', gettype($middleware)));
-                }
-            }
-        }
-
         // wrapper route middleware
         $this->before(new RouteMiddleware($route));
+
+        foreach ($route->getMiddleware() as $key => $stack) {
+            foreach ($stack as $middleware) {
+                if (!class_exists($middleware)) {
+                    throw new \RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
+                }
+                $this->$key(new $middleware);
+            }
+        }
 
         try {
             $response = parent::dispatch($request);

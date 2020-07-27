@@ -32,8 +32,7 @@ class RouteCollectionTest extends TestCase
     public function testAddStaticRoute()
     {
         $this->routeCollection
-            ->addRoute('GET', '/', '')
-            ->setName('test_api')
+            ->addRoute('GET', '/')
             ->setParameters(['foo' => 'bar'])
         ;
 
@@ -45,10 +44,10 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection
             ->middleware(DefaultMiddleware::class)
             ->group(function (RouteCollection $routeCollection) {
-                $routeCollection->get('/', function () {});
+                $routeCollection->get('/');
             })
         ;
-        $this->routeCollection->post('/', function () {});
+        $this->routeCollection->post('/');
 
         $route = $this->routeCollection->aliasMap['GET']['/'];
 
@@ -62,11 +61,11 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection
             ->prefix('/api')
             ->group(function (RouteCollection $routeCollection) {
-                $routeCollection->get('/', function () {});
+                $routeCollection->get('/');
             })
         ;
 
-        $this->routeCollection->post('/', function () {});
+        $this->routeCollection->post('/');
         $route = $this->routeCollection->aliasMap['GET']['/api/'];
 
         $this->assertEquals('/api', $route->getPath());
@@ -78,11 +77,11 @@ class RouteCollectionTest extends TestCase
         $this->routeCollection
             ->prefix('/api')
             ->group(function (RouteCollection $routeCollection) {
-                $routeCollection->get('/', function () {});
+                $routeCollection->get('/');
             })
         ;
 
-        $this->routeCollection->post('/', function () {});
+        $this->routeCollection->post('/');
         $route = $this->routeCollection->match(new ServerRequest("GET", "/api"));
         $this->assertEquals('/api', $route->getPath());
         $route = $this->routeCollection->getActiveRoute();
