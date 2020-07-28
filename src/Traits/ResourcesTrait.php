@@ -14,33 +14,70 @@ use FastD\Routing\Route;
 
 trait ResourcesTrait
 {
-    public function get($path): Route
+
+    /**
+     * Adds a GET route to the collection
+     * @param string $path
+     * @param $handler
+     * @return Route
+     */
+    public function get(string $path, $handler): Route
     {
-        return $this->addRoute('GET', $path);
+        return $this->addRoute('GET', $path, $handler);
     }
 
-    public function post($path): Route
+    /**
+     * Adds a POST route to the collection
+     * @param string $path
+     * @param $handler
+     * @return Route
+     */
+    public function post(string $path, $handler): Route
     {
-        return $this->addRoute('POST', $path);
+        return $this->addRoute('POST', $path, $handler);
     }
 
-    public function put($path): Route
+    /**
+     * Adds a PUT route to the collection
+     * @param string $path
+     * @param $handler
+     * @return Route
+     */
+    public function put(string $path, $handler): Route
     {
-        return $this->addRoute('PUT', $path);
+        return $this->addRoute('PUT', $path, $handler);
     }
 
-    public function patch($path): Route
+    /**
+     * Adds a PATCH route to the collection
+     * @param string $path
+     * @param $handler
+     * @return Route
+     */
+    public function patch(string $path, $handler): Route
     {
-        return $this->addRoute('PATCH', $path);
+        return $this->addRoute('PATCH', $path, $handler);
     }
 
-    public function delete($path): Route
+    /**
+     * Adds a DELETE route to the collection
+     * @param string $path
+     * @param $handler
+     * @return Route
+     */
+    public function delete(string $path, $handler): Route
     {
-        return $this->addRoute('DELETE', $path);
+        return $this->addRoute('DELETE', $path, $handler);
     }
 
-    public function options($path)
+    /**
+     * Adds a OPTIONS route to the collection
+     * @param string $path
+     * @param $handler
+     * @return mixed
+     */
+    public function options(string $path, $handler): Route
     {
-        return $this->addRoute('OPTIONS', $path);
+        return $this->addRoute('OPTIONS', $path, $handler);
     }
 }

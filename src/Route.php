@@ -10,6 +10,7 @@
 namespace FastD\Routing;
 
 
+use Closure;
 use FastD\Routing\Handle\RouteHandleInterface;
 
 /**
@@ -37,22 +38,21 @@ class Route extends RouteRegex
     /**
      * @var array
      */
-    protected array $middleware = [
-        'before'    => [],
-        'after'     => [],
-    ];
+    protected array $middleware = [];
 
     /**
      * Route constructor.
      *
      * @param string $method
-     * @param $path
+     * @param string $path
+     * @param $handler
      */
-    public function __construct(string $method, string $path)
+    public function __construct(string $method, string $path, $handler)
     {
         parent::__construct($path);
 
-        $this->setMethod($method);
+        $this->method = $method;
+        $this->handle = $handler;
     }
 
     /**
@@ -124,7 +124,7 @@ class Route extends RouteRegex
      */
     public function before(string $middleware): Route
     {
-        $this->middleware['after'][] = $middleware;
+        //$this->middleware['after'][] = $middleware;
 
         return $this;
     }
@@ -135,7 +135,31 @@ class Route extends RouteRegex
      */
     public function after(string $middleware): Route
     {
-        $this->middleware['before'][] = $middleware;
+        //$this->middleware['before'][] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * @param string $middleware
+     * @return $this
+     */
+    public function addMiddleware(string $middleware): Route
+    {
+        $this->middleware[] = $middleware;
+
+        return $this;
+    }
+
+    /**
+     * @param array $middlewares
+     * @return Route
+     */
+    public function addMiddlewares(array $middlewares): Route
+    {
+        foreach ($middlewares as $middleware) {
+            $this->middleware[] = $middleware;
+        }
 
         return $this;
     }

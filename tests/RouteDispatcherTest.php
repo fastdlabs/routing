@@ -27,7 +27,7 @@ class RouteDispatcherTest extends TestCase
     {
         $collections = new RouteCollection();
 
-        $collections->get('/')->handle(hello::class);
+        $collections->get('/', hello::class);
 
         $dispatcher = new RouteDispatcher($collections);
 
@@ -38,11 +38,26 @@ class RouteDispatcherTest extends TestCase
         $this->assertEquals('hello', $content);
     }
 
+    public function testMiddlewareDispatch()
+    {
+        $collections = new RouteCollection();
+
+        $collections->get('/', hello::class)->addMiddleware(DefaultMiddleware::class);
+
+        $dispatcher = new RouteDispatcher($collections);
+
+        $response = $dispatcher->dispatch(new ServerRequest('GET', '/'));
+
+        $content = $response->getBody();
+
+        echo $content;
+    }
+
     public function testAfterMiddlewareDispatch()
     {
         $collections = new RouteCollection();
 
-        $collections->get('/')->handle(hello::class)->addMiddleware(AfterMiddleware::class);
+        $collections->get('/', hello::class)->addMiddleware(AfterMiddleware::class);
 
         $dispatcher = new RouteDispatcher($collections);
 

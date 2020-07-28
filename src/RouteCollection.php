@@ -58,6 +58,11 @@ class RouteCollection
     protected array $regexes = [];
 
     /**
+     * @var string
+     */
+    protected string $currentGroupPrefix = '';
+
+    /**
      * @var Route[]
      */
     public array $staticRoutes = [];
@@ -95,15 +100,16 @@ class RouteCollection
     }
 
     /**
+     * @param string $prefix
      * @param callable $callable
      * @return RouteCollection
      */
-    public function group(callable $callable): RouteCollection
+    public function group(string $prefix, callable $callable): RouteCollection
     {
+        $previousGroupPrefix = $this->currentGroupPrefix;
+        $this->currentGroupPrefix = $previousGroupPrefix . $prefix;
         $callable($this);
-
-        $this->restorePrefix();
-        $this->restoreMiddleware();
+        $this->currentGroupPrefix = $previousGroupPrefix;
 
         return $this;
     }
@@ -119,40 +125,23 @@ class RouteCollection
     /**
      * @param string $method
      * @param string $path
+     * @param $handler
      * @return Route
      */
-    public function addRoute(string $method, string $path): Route
+    public function addRoute(string $method, string $path, $handler): Route
     {
-        $path = implode('/', $this->prefix).$path;
-
-        $route = new Route($method, $path);
-
-        $method = $route->getMethod();
-
+        $path = $this->currentGroupPrefix . $path;
         if (isset($this->aliasMap[$method][$path])) {
             return $this->aliasMap[$method][$path];
         }
 
-//        $route->before($this->middleware);
+        $route = new Route($method, $path, $handler);
+        //$route->withAddMiddleware($this->middleware);
 
         if ($route->isStatic()) {
             $this->staticRoutes[$method][$path] = $route;
         } else {
-            $numVariables = count($route->getVariables());
-            $numGroups = max($this->num, $numVariables);
-            $this->regexes[$method][] = $route->getRegex().str_repeat('()', $numGroups - $numVariables);
-
-            $this->dynamicRoutes[$method][$this->index]['regex'] = '~^(?|'.implode('|', $this->regexes[$method]).')$~';
-            $this->dynamicRoutes[$method][$this->index]['routes'][$numGroups + 1] = $route;
-
-            ++$this->num;
-
-            if (count($this->regexes[$method]) >= static::ROUTES_CHUNK) {
-                ++$this->index;
-                $this->num = 1;
-                $this->regexes[$method] = [];
-            }
-            unset($numGroups, $numVariables);
+            $this->dynamicRoutes[$method][] = $route;
         }
 
         $this->aliasMap[$method][$path] = $route;
