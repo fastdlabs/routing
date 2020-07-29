@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class RouteDispatcherTest extends TestCase
 {
-    public function testDispatch()
+    public function testDispatchStaticRoute()
     {
         $collections = new RouteCollection();
         $d = new RouteDispatcher($collections);
@@ -25,8 +25,22 @@ class RouteDispatcherTest extends TestCase
         $this->expectOutputString("test handle");
     }
 
+    public function testDispatchDynamicRoute()
+    {
+        $collections = new RouteCollection();
+        $d = new RouteDispatcher($collections);
+        $collections->addRoute("GET", "/{name}", "RouteDispatcherTest@routeDyHandle");
+        $response = $d->dispatch(new ServerRequest("GET", '/foo'));
+        echo $response->getBody();
+    }
+
     public function routeHandle()
     {
         return new Response("test handle");
+    }
+
+    public function routeDyHandle(ServerRequest $request)
+    {
+        return new Response("hello {$request->getAttribute('name')}");
     }
 }

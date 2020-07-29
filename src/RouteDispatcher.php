@@ -28,10 +28,6 @@ class RouteDispatcher extends Dispatcher
      */
     protected RouteCollection $routeCollection;
 
-    /**
-     * @var array
-     */
-    protected array $definition = [];
 
     protected Route $activeRoute;
 
@@ -39,7 +35,6 @@ class RouteDispatcher extends Dispatcher
      * RouteDispatcher constructor.
      *
      * @param RouteCollection $routeCollection
-     * @param $definition
      */
     public function __construct(RouteCollection $routeCollection)
     {
@@ -56,6 +51,9 @@ class RouteDispatcher extends Dispatcher
         return $this->routeCollection;
     }
 
+    /**
+     * @return Route
+     */
     public function getActiveRoute() :Route
     {
         return $this->activeRoute;
@@ -72,36 +70,42 @@ class RouteDispatcher extends Dispatcher
         $path = $request->getUri()->getPath();
         [$staticRouteMap, $variableRoutes] = $this->routeCollection->routeMaps->getRoutes();
 
+        $route = null;
+        $vars = [];
+
         if (isset($staticRouteMap[$method][$path])) {
             $route = $staticRouteMap[$method][$path];
-            return $this->dispatchMiddleware($route, $request);
         }
 
         if (isset($variableRoutes[$method])) {
             $result = $this->dispatchVariableRoute($variableRoutes[$method], $path);
             if (!is_null($result[0])) {
                 [$route, $vars] = $result;
-                $route->setParameters($vars);
-                return $this->dispatchMiddleware($route, $request);
             }
         }
 
         // If nothing else matches, try fallback routes
         if (isset($staticRouteMap['*'][$path])) {
             $route = $staticRouteMap['*'][$path];
-            return $this->dispatchMiddleware($route, $request);
         }
 
         if (isset($variableRoutes['*'])) {
             $result = $this->dispatchVariableRoute($variableRoutes['*'], $path);
             if (!is_null($result[0])) {
                 [$route, $vars] = $result;
-                $route->setParameters($vars);
-                return $this->dispatchMiddleware($route, $request);
             }
         }
 
-        throw new RouteNotFoundException($request->getMethod(), $request->getUri()->getPath());
+        if (null === $route) {
+            throw new RouteNotFoundException($request->getMethod(), $request->getUri()->getPath());
+        }
+
+        $route->setParameters($vars);
+        foreach ($vars as $key => $var) {
+            $request->withAttribute($key, $var);
+        }
+        
+        return $this->dispatchMiddleware($route, $request);
     }
 
     /**
@@ -136,7 +140,7 @@ class RouteDispatcher extends Dispatcher
      * @return ResponseInterface
      * @throws Exception
      */
-    public function dispatchMiddleware(Route $route, ServerRequestInterface $request): ResponseInterface
+    protected function dispatchMiddleware(Route $route, ServerRequestInterface $request): ResponseInterface
     {
         $this->activeRoute = $route;
         $prototypeStack = clone $this->stack;
