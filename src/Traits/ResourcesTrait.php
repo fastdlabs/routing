@@ -9,38 +9,79 @@
 
 namespace FastD\Routing\Traits;
 
-
-use FastD\Routing\Route;
-
 trait ResourcesTrait
 {
-    public function get($path): Route
+
+    /**
+     * Adds a GET route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function get(string $path, $handler, array $middleware = [], array $parameters = [])
     {
-        return $this->addRoute('GET', $path);
+        $this->addRoute('GET', $path, $handler, $middleware, $parameters);
     }
 
-    public function post($path): Route
+    /**
+     * Adds a POST route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function post(string $path, $handler, array $middleware = [], array $parameters = [])
     {
-        return $this->addRoute('POST', $path);
+        $this->addRoute('POST', $path, $handler, $middleware, $parameters);
     }
 
-    public function put($path): Route
+    /**
+     * Adds a PUT route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function put(string $path, $handler, array $middleware = [], array $parameters = [])
     {
-        return $this->addRoute('PUT', $path);
+        $this->addRoute('PUT', $path, $handler, $middleware, $parameters);
     }
 
-    public function patch($path): Route
+    /**
+     * Adds a PATCH route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function patch(string $path, $handler, array $middleware = [], array $parameters = [])
     {
-        return $this->addRoute('PATCH', $path);
+        $this->addRoute('PATCH', $path, $handler, $middleware, $parameters);
     }
 
-    public function delete($path): Route
+    /**
+     * Adds a DELETE route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function delete(string $path, $handler, array $middleware = [], array $parameters = [])
     {
-        return $this->addRoute('DELETE', $path);
+        $this->addRoute('DELETE', $path, $handler, $middleware, $parameters);
     }
 
-    public function options($path)
+    /**
+     * Adds a OPTIONS route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     * @return mixed
+     */
+    public function options(string $path, $handler, array $middleware = [], array $parameters = [])
     {
-        return $this->addRoute('OPTIONS', $path);
+        $this->addRoute('OPTIONS', $path, $handler, $middleware, $parameters);
     }
 }

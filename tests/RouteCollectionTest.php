@@ -32,8 +32,7 @@ class RouteCollectionTest extends TestCase
     public function testAddStaticRoute()
     {
         $this->routeCollection
-            ->addRoute('GET', '/')
-            ->setParameters(['foo' => 'bar'])
+            ->addRoute('GET', '/', hello::class, [], ['foo' => 'bar'])
         ;
 
         $this->assertTrue(true);
