@@ -52,10 +52,11 @@ class Route
     public array $variables;
 
     /**
+     * Route constructor.
      * @param string $method
-     * @param mixed $handler
+     * @param string $handler
      * @param string $regex
-     * @param mixed[] $variables
+     * @param array $variables
      * @param array $middlewares
      * @param array $parameters
      */
@@ -135,16 +136,17 @@ class Route
     public function getHandler(): array
     {
         if (false === strstr($this->handler, '@')) {
+            if (function_exists($this->handler)) {
+                return [$this->handler];
+            }
             $handler = new $this->handler;
             if (!($handler instanceof RouteHandleInterface)) {
                 throw new CallbackException(sprintf('Route callback must be instance of %s', RouteHandleInterface::class));
             }
-
             return [$handler, 'handle'];
         }
 
         [$handler, $callback] = explode('@', $this->handler);
-
         return [new $handler, $callback];
     }
 }

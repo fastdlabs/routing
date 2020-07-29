@@ -48,9 +48,10 @@ class RouteDispatcherTest extends TestCase
     public function testDispatchMiddleware()
     {
         include_once __DIR__ . '/middleware/AfterMiddleware.php';
+        include_once __DIR__ . '/middleware/BeforeMiddleware.php';
         $collections = new RouteCollection();
         $d = new RouteDispatcher($collections);
-        $collections->addRoute("GET", "/{name}", "RouteDispatcherTest@routeDyHandle", [AfterMiddleware::class]);
+        $collections->addRoute("GET", "/{name}", "RouteDispatcherTest@routeDyHandle", [AfterMiddleware::class, BeforeMiddleware::class,]);
         $response = $d->dispatch(new ServerRequest("GET", '/foo'));
         echo $response->getBody();
     }
