@@ -23,15 +23,30 @@ class RouteDispatcherTest extends TestCase
         require_once __DIR__ . '/middleware/BeforeMiddleware.php';
     }
 
-    public function testBaseDispatch()
+    public function testStaticRouteDispatch()
     {
         $collections = new RouteCollection();
 
-        $collections->get('/', hello::class);
+        $collections->get('/hello', hello::class);
 
         $dispatcher = new RouteDispatcher($collections);
 
-        $response = $dispatcher->dispatch(new ServerRequest('GET', '/'));
+        $response = $dispatcher->dispatch(new ServerRequest('GET', '/hello'));
+
+        $content = $response->getBody();
+
+        $this->assertEquals('hello', $content);
+    }
+
+    public function testRegexRouteDispatch()
+    {
+        $collections = new RouteCollection();
+
+        $collections->get('/hello/{name}[/{id}]', hello::class);
+
+        $dispatcher = new RouteDispatcher($collections);
+
+        $response = $dispatcher->dispatch(new ServerRequest('GET', '/hello/fastd/1'));
 
         $content = $response->getBody();
 

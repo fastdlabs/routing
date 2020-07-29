@@ -9,7 +9,6 @@
 
 namespace FastD\Routing;
 
-
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 use FastD\Routing\Traits\ResourcesTrait;
@@ -22,8 +21,6 @@ use FastD\Routing\Traits\ResourcesTrait;
 class RouteCollection
 {
     use ResourcesTrait;
-
-    const ROUTES_CHUNK = 10;
 
     /**
      * @var array
@@ -53,14 +50,14 @@ class RouteCollection
     protected int $index = 0;
 
     /**
-     * @var array
-     */
-    protected array $regexes = [];
-
-    /**
      * @var string
      */
     protected string $currentGroupPrefix = '';
+
+    /**
+     * @var array
+     */
+    protected array $currentGroupMiddleware = [];
 
     /**
      * @var Route[]
@@ -78,12 +75,31 @@ class RouteCollection
     public array $aliasMap = [];
 
     /**
+     * @var RouteParser
+     */
+    public RouteParser $routeParser;
+
+    /**
+     * @var RouteHandle
+     */
+    public RouteHandle $routeHandle;
+
+    /**
+     * RouteCollection constructor.
+     */
+    public function __construct()
+    {
+        $this->routeParser = new RouteParser;
+        $this->routeHandle = new RouteHandle();
+    }
+
+    /**
      * @param string $path
      * @return RouteCollection
      */
     public function prefix(string $path): RouteCollection
     {
-        array_push($this->prefix, $path);
+        $this->currentGroupPrefix = $path;
 
         return $this;
     }
@@ -102,14 +118,18 @@ class RouteCollection
     /**
      * @param string $prefix
      * @param callable $callable
+     * @param array $middleware
      * @return RouteCollection
      */
-    public function group(string $prefix, callable $callable): RouteCollection
+    public function group(string $prefix, callable $callable, $middleware = []): RouteCollection
     {
         $previousGroupPrefix = $this->currentGroupPrefix;
+        $previousGroupMiddleware = $this->currentGroupMiddleware;
         $this->currentGroupPrefix = $previousGroupPrefix . $prefix;
+        $this->currentGroupMiddleware = $previousGroupMiddleware + $middleware;
         $callable($this);
         $this->currentGroupPrefix = $previousGroupPrefix;
+        $this->currentGroupMiddleware = $previousGroupMiddleware;
 
         return $this;
     }
@@ -126,27 +146,19 @@ class RouteCollection
      * @param string $method
      * @param string $path
      * @param $handler
-     * @return Route
+     * @param array $middleware
+     * @param array $parameters
      */
-    public function addRoute(string $method, string $path, $handler): Route
+    public function addRoute($method, string $path, $handler, $middleware = [], $parameters = [])
     {
         $path = $this->currentGroupPrefix . $path;
-        if (isset($this->aliasMap[$method][$path])) {
-            return $this->aliasMap[$method][$path];
+        $middleware = $this->currentGroupMiddleware + $middleware;
+        $routeDatas = $this->routeParser->parse($path);
+        foreach ((array) $method as $value) {
+            foreach ($routeDatas as $routeData) {
+                $this->routeHandle->addRoute($value, $routeData, $handler, (array) $middleware, (array) $parameters);
+            }
         }
-
-        $route = new Route($method, $path, $handler);
-        //$route->withAddMiddleware($this->middleware);
-
-        if ($route->isStatic()) {
-            $this->staticRoutes[$method][$path] = $route;
-        } else {
-            $this->dynamicRoutes[$method][] = $route;
-        }
-
-        $this->aliasMap[$method][$path] = $route;
-
-        return $route;
     }
 
     /**

@@ -87,9 +87,64 @@ class RouteDispatcher extends Dispatcher
      */
     public function dispatch(ServerRequestInterface $request): ResponseInterface
     {
-        $route = $this->routeCollection->match($request);
+        $vars = [];
+        $method = $request->getMethod();
+        $path = $request->getUri()->getPath();
+        [$staticRouteMap, $variableRoutes] = $this->routeCollection->routeHandle->getRoutes();
 
-        return $this->callMiddleware($route, $request);
+        if (isset($staticRouteMap[$method][$path])) {
+            $route = $staticRouteMap[$method][$path];
+        }
+
+        if (isset($variableRoutes[$method])) {
+            $result = $this->dispatchVariableRoute($variableRoutes[$method], $path);
+            if (!is_null($result[0])) {
+                [$route, $vars] = $result;
+            }
+        }
+
+        // If nothing else matches, try fallback routes
+        if (isset($staticRouteMap['*'][$path])) {
+            $route = $staticRouteMap['*'][$path];
+        }
+
+        if (isset($variableRoutes['*'])) {
+            $result = $this->dispatchVariableRoute($variableRoutes['*'], $path);
+            if (!is_null($result[0])) {
+                [$route, $vars] = $result;
+            }
+        }
+
+
+//        $route = $this->routeCollection->match($request);
+//
+//        return $this->callMiddleware($route, $request);
+    }
+
+    /**
+     * @param array $routeData
+     * @param string $uri
+     * @return array
+     */
+    protected function dispatchVariableRoute(array $routeData, string $uri): array
+    {
+        foreach ($routeData as $data) {
+            if (!preg_match($data['regex'], $uri, $matches)) {
+                continue;
+            }
+
+            $route = $data['routeMap'][$matches['MARK']];
+
+            $vars = [];
+            $i = 0;
+            foreach ($route->variables as $varName) {
+                $vars[$varName] = $matches[++$i];
+            }
+
+            return [$route, $vars];
+        }
+
+        return [null];
     }
 
     /**

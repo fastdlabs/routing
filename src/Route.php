@@ -9,94 +9,74 @@
 
 namespace FastD\Routing;
 
-
 use Closure;
-use FastD\Routing\Handle\RouteHandleInterface;
 
 /**
  * Class Route
  *
  * @package FastD\Routing
  */
-class Route extends RouteRegex
+class Route
 {
     /**
      * @var array
      */
-    protected array $parameters = [];
+    public array $parameters = [];
 
     /**
      * @var string
      */
-    protected string $method = 'GET';
+    public string $method = 'GET';
 
     /**
-     * @var string
+     * @var string|Closure
      */
-    protected string $handle;
+    public $handler;
 
     /**
      * @var array
      */
-    protected array $middleware = [];
+    public array $middleware = [];
 
     /**
-     * Route constructor.
-     *
-     * @param string $method
-     * @param string $path
-     * @param $handler
+     * @var string
      */
-    public function __construct(string $method, string $path, $handler)
-    {
-        parent::__construct($path);
+    public string $regex;
 
-        $this->method = $method;
-        $this->handle = $handler;
-    }
+    /**
+     * @var array
+     */
+    public array $variables;
+
 
     /**
      * @param string $method
-     * @return Route
+     * @param mixed $handler
+     * @param string $regex
+     * @param mixed[] $variables
+     * @param array $middleware
+     * @param array $parameters
      */
-    public function setMethod(string $method): Route
+    public function __construct(string $method, $handler, string $regex, array $variables, array $middleware = [], array $parameters = [])
     {
         $this->method = $method;
-
-        return $this;
+        $this->handler = $handler;
+        $this->regex = $regex;
+        $this->variables = $variables;
+        $this->middleware = $middleware;
+        $this->parameters = $parameters;
     }
 
     /**
-     * @return string
+     * Tests whether this route matches the given string.
+     * @param string $str
+     * @return bool
      */
-    public function getMethod(): string
+    public function matches(string $str): bool
     {
-        return $this->method;
-    }
+        $regex = '~^' . $this->regex . '$~';
 
-    /**
-     * @param string $handle
-     * @return $this
-     */
-    public function handle(string $handle): Route
-    {
-        $this->handle = $handle;
-
-        return $this;
-    }
-
-    /**
-     * @return RouteHandleInterface
-     */
-    public function getHandle(): RouteHandleInterface
-    {
-        $handle = new $this->handle;
-
-        if (!($handle instanceof RouteHandleInterface)) {
-            throw new \RuntimeException(sprintf('Route handle must be implement %s', RouteHandleInterface::class));
-        }
-
-        return $handle;
+        return (bool) preg_match($regex, $str);
     }
 
     /**
@@ -114,28 +94,6 @@ class Route extends RouteRegex
     public function setParameters(array $parameters): Route
     {
         $this->parameters = $parameters;
-
-        return $this;
-    }
-
-    /**
-     * @param array $middleware
-     * @return Route
-     */
-    public function before(string $middleware): Route
-    {
-        //$this->middleware['after'][] = $middleware;
-
-        return $this;
-    }
-
-    /**
-     * @param mixed $middleware
-     * @return Route
-     */
-    public function after(string $middleware): Route
-    {
-        //$this->middleware['before'][] = $middleware;
 
         return $this;
     }
@@ -164,11 +122,4 @@ class Route extends RouteRegex
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getMiddleware(): array
-    {
-        return $this->middleware;
-    }
 }
