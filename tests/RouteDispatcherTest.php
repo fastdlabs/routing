@@ -32,6 +32,27 @@ class RouteDispatcherTest extends TestCase
         $collections->addRoute("GET", "/{name}", "RouteDispatcherTest@routeDyHandle");
         $response = $d->dispatch(new ServerRequest("GET", '/foo'));
         echo $response->getBody();
+        $this->expectOutputString("hello foo");
+    }
+
+    public function testDispatchPresetParameters()
+    {
+        $collections = new RouteCollection();
+        $d = new RouteDispatcher($collections);
+        $collections->addRoute("GET", "/[name]", "RouteDispatcherTest@routeDyHandle", [], ['name' => 'preset']);
+        $response = $d->dispatch(new ServerRequest("GET", '/'));
+        echo $response->getBody();
+        $this->expectOutputString("hello preset");
+    }
+
+    public function testDispatchMiddleware()
+    {
+        include_once __DIR__ . '/middleware/AfterMiddleware.php';
+        $collections = new RouteCollection();
+        $d = new RouteDispatcher($collections);
+        $collections->addRoute("GET", "/{name}", "RouteDispatcherTest@routeDyHandle", [AfterMiddleware::class]);
+        $response = $d->dispatch(new ServerRequest("GET", '/foo'));
+        echo $response->getBody();
     }
 
     public function routeHandle()

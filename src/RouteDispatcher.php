@@ -100,11 +100,12 @@ class RouteDispatcher extends Dispatcher
             throw new RouteNotFoundException($request->getMethod(), $request->getUri()->getPath());
         }
 
+        $vars = array_merge($route->getParameters(), $vars);
         $route->setParameters($vars);
         foreach ($vars as $key => $var) {
             $request->withAttribute($key, $var);
         }
-        
+
         return $this->dispatchMiddleware($route, $request);
     }
 
@@ -145,13 +146,11 @@ class RouteDispatcher extends Dispatcher
         $this->activeRoute = $route;
         $prototypeStack = clone $this->stack;
         // wrapper route middleware
-        foreach ($route->getMiddlewares() as $key => $stack) {
-            foreach ($stack as $middleware) {
-                if (!class_exists($middleware)) {
-                    throw new \RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
-                }
-                $this->before(new $middleware);
+        foreach ($route->getMiddlewares() as $key => $middleware) {
+            if (!class_exists($middleware)) {
+                throw new \RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
             }
+            $this->before(new $middleware);
         }
 
         $this->before(new RouteMiddleware($route));
