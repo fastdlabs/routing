@@ -33,39 +33,19 @@ class RouteDispatcher extends Dispatcher
      */
     protected array $definition = [];
 
+    protected Route $activeRoute;
+
     /**
      * RouteDispatcher constructor.
      *
      * @param RouteCollection $routeCollection
      * @param $definition
      */
-    public function __construct(RouteCollection $routeCollection, array $definition = [])
+    public function __construct(RouteCollection $routeCollection)
     {
         $this->routeCollection = $routeCollection;
 
-        $this->definition = $definition;
-
         parent::__construct([]);
-    }
-
-    /**
-     * @param string $name
-     * @param string $middleware
-     * @return RouteDispatcher
-     */
-    public function addDefinition(string $name, string $middleware): RouteDispatcher
-    {
-        $this->definition[$name] = $middleware;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefinition(): array
-    {
-        return $this->definition;
     }
 
     /**
@@ -74,6 +54,11 @@ class RouteDispatcher extends Dispatcher
     public function getRouteCollection(): RouteCollection
     {
         return $this->routeCollection;
+    }
+
+    public function getActiveRoute() :Route
+    {
+        return $this->activeRoute;
     }
 
     /**
@@ -153,9 +138,9 @@ class RouteDispatcher extends Dispatcher
      */
     public function dispatchMiddleware(Route $route, ServerRequestInterface $request): ResponseInterface
     {
+        $this->activeRoute = $route;
         $prototypeStack = clone $this->stack;
         // wrapper route middleware
-
         foreach ($route->getMiddlewares() as $key => $stack) {
             foreach ($stack as $middleware) {
                 if (!class_exists($middleware)) {

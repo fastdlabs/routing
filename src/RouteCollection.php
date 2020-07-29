@@ -11,8 +11,6 @@ declare(strict_types=1);
 namespace FastD\Routing;
 
 
-use FastD\Routing\Exceptions\RouteNotFoundException;
-use Psr\Http\Message\ServerRequestInterface;
 use FastD\Routing\Traits\ResourcesTrait;
 
 /**
@@ -25,28 +23,6 @@ class RouteCollection
     use ResourcesTrait;
 
     /**
-     * @var array
-     */
-    protected array $prefix = [];
-
-    /**
-     * @var array
-     */
-    protected array $middleware = [];
-
-    /**
-     * @var Route
-     */
-    protected Route $activeRoute;
-
-    /**
-     * 路由分组计数器
-     *
-     * @var int
-     */
-    protected int $index = 0;
-
-    /**
      * @var string
      */
     protected string $currentGroupPrefix = '';
@@ -55,21 +31,6 @@ class RouteCollection
      * @var array
      */
     protected array $currentGroupMiddleware = [];
-
-    /**
-     * @var Route[]
-     */
-    public array $staticRoutes = [];
-
-    /**
-     * @var Route[]
-     */
-    public array $dynamicRoutes = [];
-
-    /**
-     * @var array
-     */
-    public array $aliasMap = [];
 
     /**
      * @var RouteParser
@@ -88,28 +49,6 @@ class RouteCollection
     {
         $this->routeParser = new RouteParser;
         $this->routeMaps = new RouteMaps();
-    }
-
-    /**
-     * @param string $path
-     * @return RouteCollection
-     */
-    public function prefix(string $path): RouteCollection
-    {
-        $this->currentGroupPrefix = $path;
-
-        return $this;
-    }
-
-    /**
-     * @param string $middleware
-     * @return RouteCollection
-     */
-    public function middleware(string $middleware): RouteCollection
-    {
-        array_push($this->middleware, $middleware);
-
-        return $this;
     }
 
     /**
@@ -132,14 +71,6 @@ class RouteCollection
     }
 
     /**
-     * @return Route
-     */
-    public function getActiveRoute(): Route
-    {
-        return $this->activeRoute;
-    }
-
-    /**
      * @param string $method
      * @param string $path
      * @param $handler
@@ -156,78 +87,5 @@ class RouteCollection
                 $this->routeMaps->addRoute($value, $routeData, $handler, (array) $middleware, (array) $parameters);
             }
         }
-    }
-
-    /**
-     * @param ServerRequestInterface $serverRequest
-     * @return Route
-     * @throws RouteNotFoundException
-     */
-    public function match(ServerRequestInterface $serverRequest): Route
-    {
-        $method = $serverRequest->getMethod();
-        $path = $serverRequest->getUri()->getPath();
-
-        if (isset($this->staticRoutes[$method][$path])) {
-            return $this->activeRoute = $this->staticRoutes[$method][$path];
-        } else {
-            $possiblePath = $path;
-            if ('/' === substr($possiblePath, -1)) {
-                $possiblePath = rtrim($possiblePath, '/');
-            } else {
-                $possiblePath .= '/';
-            }
-            if (isset($this->staticRoutes[$method][$possiblePath])) {
-                return $this->activeRoute = $this->staticRoutes[$method][$possiblePath];
-            }
-            unset($possiblePath);
-        }
-
-        if (
-            ! isset($this->dynamicRoutes[$method])
-            || false === $route = $this->matchDynamicRoute($serverRequest, $method, $path)
-        ) {
-            throw new RouteNotFoundException($method, $path);
-        }
-
-        return $this->activeRoute = $route;
-    }
-
-    /**
-     * @param ServerRequestInterface $serverRequest
-     * @param $method
-     * @param $path
-     * @return Route
-     */
-    protected function matchDynamicRoute(ServerRequestInterface $serverRequest, $method, $path): Route
-    {
-        foreach ($this->dynamicRoutes[$method] as $data) {
-            if (!preg_match($data['regex'], $path, $matches)) {
-                continue;
-            }
-            $route = $data['routes'][count($matches)];
-            preg_match('~^'.$route->getRegex().'$~', $path, $match);
-            $match = array_slice($match, 1, count($route->getVariables()));
-            $attributes = array_combine($route->getVariables(), $match);
-            $attributes = array_filter($attributes);
-            $route->mergeParameters($attributes);
-            foreach ($route->getParameters() as $key => $attribute) {
-                $serverRequest->withAttribute($key, $attribute);
-            }
-
-            return $route;
-        }
-
-        throw new RouteNotFoundException($method, $path);
-    }
-
-    protected function restoreMiddleware(): void
-    {
-        array_pop($this->middleware);
-    }
-
-    protected function restorePrefix(): void
-    {
-        array_pop($this->prefix);
     }
 }

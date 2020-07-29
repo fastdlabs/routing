@@ -22,8 +22,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class RouteMiddleware implements MiddlewareInterface
 {
-    const HANDLE = 'handle';
-
     /**
      * @var Route
      */
