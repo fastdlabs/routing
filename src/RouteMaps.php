@@ -4,9 +4,8 @@ namespace FastD\Routing;
 
 use FastD\Routing\Exceptions\RouteException;
 
-class RouteHandle
+class RouteMaps
 {
-
     private const ROUTES_CHUNK = 30;
 
     /**
@@ -26,7 +25,7 @@ class RouteHandle
      * @param array $middleware
      * @param array $parameters
      */
-    public function addRoute(string $method, array $routeData, $handler, array $middleware, array $parameters): void
+    public function addRoute(string $method, array $routeData, string $handler, array $middleware, array $parameters): void
     {
         if ($this->isStaticRoute($routeData)) {
             $this->addStaticRoute($method, $routeData, $handler, $middleware, $parameters);
@@ -105,7 +104,7 @@ class RouteHandle
      * @param array $middleware
      * @param array $parameters
      */
-    private function addVariableRoute(string $httpMethod, array $routeData, $handler, array $middleware, array $parameters): void
+    private function addVariableRoute(string $httpMethod, array $routeData, string $handler, array $middleware, array $parameters): void
     {
         [$regex, $variables] = $this->buildRegexForRoute($routeData);
 

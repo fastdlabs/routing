@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @author    jan huang <bboyjanhuang@gmail.com>
  * @copyright 2016
@@ -9,7 +10,6 @@
 
 namespace FastD\Routing;
 
-use Closure;
 
 /**
  * Class Route
@@ -29,14 +29,14 @@ class Route
     public string $method = 'GET';
 
     /**
-     * @var string|Closure
+     * @var string
      */
-    public $handler;
+    public string $handler;
 
     /**
      * @var array
      */
-    public array $middleware = [];
+    public array $middlewares = [];
 
     /**
      * @var string
@@ -48,22 +48,21 @@ class Route
      */
     public array $variables;
 
-
     /**
      * @param string $method
      * @param mixed $handler
      * @param string $regex
      * @param mixed[] $variables
-     * @param array $middleware
+     * @param array $middlewares
      * @param array $parameters
      */
-    public function __construct(string $method, $handler, string $regex, array $variables, array $middleware = [], array $parameters = [])
+    public function __construct(string $method, string $handler, string $regex = '', array $variables, array $middlewares = [], array $parameters = [])
     {
         $this->method = $method;
         $this->handler = $handler;
         $this->regex = $regex;
         $this->variables = $variables;
-        $this->middleware = $middleware;
+        $this->middlewares = $middlewares;
         $this->parameters = $parameters;
     }
 
@@ -104,7 +103,7 @@ class Route
      */
     public function addMiddleware(string $middleware): Route
     {
-        $this->middleware[] = $middleware;
+        $this->middlewares[] = $middleware;
 
         return $this;
     }
@@ -113,13 +112,17 @@ class Route
      * @param array $middlewares
      * @return Route
      */
-    public function addMiddlewares(array $middlewares): Route
+    public function setMiddlewares(array $middlewares): Route
     {
         foreach ($middlewares as $middleware) {
-            $this->middleware[] = $middleware;
+            $this->middlewares[] = $middleware;
         }
 
         return $this;
     }
 
+    public function getMiddlewares(): array
+    {
+        return $this->middlewares;
+    }
 }

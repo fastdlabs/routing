@@ -9,6 +9,7 @@
 
 namespace FastD\Routing;
 
+
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 use FastD\Routing\Traits\ResourcesTrait;
@@ -36,11 +37,6 @@ class RouteCollection
      * @var Route
      */
     protected Route $activeRoute;
-
-    /**
-     * @var int
-     */
-    protected int $num = 1;
 
     /**
      * 路由分组计数器
@@ -80,9 +76,9 @@ class RouteCollection
     public RouteParser $routeParser;
 
     /**
-     * @var RouteHandle
+     * @var RouteMaps
      */
-    public RouteHandle $routeHandle;
+    public RouteMaps $routeMaps;
 
     /**
      * RouteCollection constructor.
@@ -90,7 +86,7 @@ class RouteCollection
     public function __construct()
     {
         $this->routeParser = new RouteParser;
-        $this->routeHandle = new RouteHandle();
+        $this->routeMaps = new RouteMaps();
     }
 
     /**
@@ -149,14 +145,14 @@ class RouteCollection
      * @param array $middleware
      * @param array $parameters
      */
-    public function addRoute($method, string $path, $handler, $middleware = [], $parameters = [])
+    public function addRoute(string $method, string $path, string $handler, array $middleware = [], array $parameters = [])
     {
         $path = $this->currentGroupPrefix . $path;
         $middleware = $this->currentGroupMiddleware + $middleware;
         $routeDatas = $this->routeParser->parse($path);
         foreach ((array) $method as $value) {
             foreach ($routeDatas as $routeData) {
-                $this->routeHandle->addRoute($value, $routeData, $handler, (array) $middleware, (array) $parameters);
+                $this->routeMaps->addRoute($value, $routeData, $handler, (array) $middleware, (array) $parameters);
             }
         }
     }

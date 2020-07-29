@@ -6,7 +6,6 @@ use FastD\Routing\Exceptions\RouteException;
 
 class RouteParser
 {
-
     public const VARIABLE_REGEX = <<<'REGEX'
 \{
     \s* ([a-zA-Z_][a-zA-Z0-9_-]*) \s*
@@ -19,13 +18,13 @@ REGEX;
     public const DEFAULT_DISPATCH_REGEX = '[^/]+';
 
     /**
-     * @param string $route
+     * @param string $path
      * @return array
      */
-    public function parse(string $route): array
+    public function parse(string $path): array
     {
-        $routeWithoutClosingOptionals = rtrim($route, ']');
-        $numOptionals = strlen($route) - strlen($routeWithoutClosingOptionals);
+        $routeWithoutClosingOptionals = rtrim($path, ']');
+        $numOptionals = strlen($path) - strlen($routeWithoutClosingOptionals);
 
         // Split on [ while skipping placeholders
         $segments = preg_split('~' . self::VARIABLE_REGEX . '(*SKIP)(*F) | \[~x', $routeWithoutClosingOptionals);

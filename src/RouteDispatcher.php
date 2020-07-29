@@ -11,8 +11,6 @@ namespace FastD\Routing;
 
 use Exception;
 use FastD\Middleware\Dispatcher;
-use FastD\Middleware\MiddlewareInterface;
-use FastD\Routing\Exceptions\RouteException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -90,7 +88,7 @@ class RouteDispatcher extends Dispatcher
         $vars = [];
         $method = $request->getMethod();
         $path = $request->getUri()->getPath();
-        [$staticRouteMap, $variableRoutes] = $this->routeCollection->routeHandle->getRoutes();
+        [$staticRouteMap, $variableRoutes] = $this->routeCollection->routeMaps->getRoutes();
 
         if (isset($staticRouteMap[$method][$path])) {
             $route = $staticRouteMap[$method][$path];

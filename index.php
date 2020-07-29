@@ -12,10 +12,4 @@ require_once __DIR__ . '/tests/middleware/BeforeMiddleware.php';
 
 $collections = new RouteCollection();
 
-$collections->get('/')->handle(hello::class)->before(BeforeMiddleware::class);
-
-$dispatcher = new RouteDispatcher($collections);
-
-$response = $dispatcher->dispatch(ServerRequest::createServerRequestFromGlobals());
-
-$response->send();
+$collections->addRoute('GET', '/{name}', '');
