@@ -7,6 +7,7 @@
  * @see      http://www.fastdlabs.com/
  */
 
+use FastD\Http\Response;
 use FastD\Http\ServerRequest;
 use FastD\Routing\RouteCollection;
 use FastD\Routing\RouteDispatcher;
@@ -18,8 +19,14 @@ class RouteDispatcherTest extends TestCase
     {
         $collections = new RouteCollection();
         $d = new RouteDispatcher($collections);
-        $collections->addRoute("GET", "/", "");
+        $collections->addRoute("GET", "/", "RouteDispatcherTest@routeHandle");
         $response = $d->dispatch(new ServerRequest("GET", '/'));
-        print_r($response);
+        echo $response->getBody();
+        $this->expectOutputString("test handle");
+    }
+
+    public function routeHandle()
+    {
+        return new Response("test handle");
     }
 }

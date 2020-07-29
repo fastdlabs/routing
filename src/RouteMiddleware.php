@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @author    jan huang <bboyjanhuang@gmail.com>
  * @copyright 2016
@@ -44,6 +45,6 @@ class RouteMiddleware implements MiddlewareInterface
      */
     public function handle(ServerRequestInterface $request, DelegateInterface $next): ResponseInterface
     {
-        return call_user_func_array([$this->route->getHandle(), static::HANDLE], [$request, $next]);
+        return call_user_func_array($this->route->getHandler(), [$request, $next]);
     }
 }

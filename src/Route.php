@@ -11,6 +11,9 @@ declare(strict_types=1);
 namespace FastD\Routing;
 
 
+use FastD\Routing\Exceptions\CallbackException;
+use FastD\Routing\Handle\RouteHandleInterface;
+
 /**
  * Class Route
  *
@@ -124,5 +127,24 @@ class Route
     public function getMiddlewares(): array
     {
         return $this->middlewares;
+    }
+
+    /**
+     * @return array
+     */
+    public function getHandler(): array
+    {
+        if (false === strstr($this->handler, '@')) {
+            $handler = new $this->handler;
+            if (!($handler instanceof RouteHandleInterface)) {
+                throw new CallbackException(sprintf('Route callback must be instance of %s', RouteHandleInterface::class));
+            }
+
+            return [$handler, 'handle'];
+        }
+
+        [$handler, $callback] = explode('@', $this->handler);
+
+        return [new $handler, $callback];
     }
 }

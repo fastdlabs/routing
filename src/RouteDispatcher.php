@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @author    jan huang <bboyjanhuang@gmail.com>
  * @copyright 2016
@@ -9,8 +10,10 @@
 
 namespace FastD\Routing;
 
+
 use Exception;
 use FastD\Middleware\Dispatcher;
+use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -29,11 +32,6 @@ class RouteDispatcher extends Dispatcher
      * @var array
      */
     protected array $definition = [];
-
-    /**
-     * @var array
-     */
-    protected array $appendMiddleware = [];
 
     /**
      * RouteDispatcher constructor.
@@ -85,38 +83,40 @@ class RouteDispatcher extends Dispatcher
      */
     public function dispatch(ServerRequestInterface $request): ResponseInterface
     {
-        $vars = [];
         $method = $request->getMethod();
         $path = $request->getUri()->getPath();
         [$staticRouteMap, $variableRoutes] = $this->routeCollection->routeMaps->getRoutes();
 
         if (isset($staticRouteMap[$method][$path])) {
             $route = $staticRouteMap[$method][$path];
+            return $this->dispatchMiddleware($route, $request);
         }
 
         if (isset($variableRoutes[$method])) {
             $result = $this->dispatchVariableRoute($variableRoutes[$method], $path);
             if (!is_null($result[0])) {
                 [$route, $vars] = $result;
+                $route->setParameters($vars);
+                return $this->dispatchMiddleware($route, $request);
             }
         }
 
         // If nothing else matches, try fallback routes
         if (isset($staticRouteMap['*'][$path])) {
             $route = $staticRouteMap['*'][$path];
+            return $this->dispatchMiddleware($route, $request);
         }
 
         if (isset($variableRoutes['*'])) {
             $result = $this->dispatchVariableRoute($variableRoutes['*'], $path);
             if (!is_null($result[0])) {
                 [$route, $vars] = $result;
+                $route->setParameters($vars);
+                return $this->dispatchMiddleware($route, $request);
             }
         }
 
-
-//        $route = $this->routeCollection->match($request);
-//
-//        return $this->callMiddleware($route, $request);
+        throw new RouteNotFoundException($request->getMethod(), $request->getUri()->getPath());
     }
 
     /**
@@ -151,20 +151,21 @@ class RouteDispatcher extends Dispatcher
      * @return ResponseInterface
      * @throws Exception
      */
-    public function callMiddleware(Route $route, ServerRequestInterface $request): ResponseInterface
+    public function dispatchMiddleware(Route $route, ServerRequestInterface $request): ResponseInterface
     {
         $prototypeStack = clone $this->stack;
         // wrapper route middleware
-        $this->before(new RouteMiddleware($route));
 
-        foreach ($route->getMiddleware() as $key => $stack) {
+        foreach ($route->getMiddlewares() as $key => $stack) {
             foreach ($stack as $middleware) {
                 if (!class_exists($middleware)) {
                     throw new \RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
                 }
-                $this->$key(new $middleware);
+                $this->before(new $middleware);
             }
         }
+
+        $this->before(new RouteMiddleware($route));
 
         try {
             $response = parent::dispatch($request);
