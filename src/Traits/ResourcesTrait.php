@@ -20,7 +20,7 @@ trait ResourcesTrait
      * @param array $middleware
      * @param array $parameters
      */
-    public function get(string $path, $handler, array $middleware = [], array $parameters = [])
+    public function get(string $path, string $handler, array $middleware = [], array $parameters = [])
     {
         $this->addRoute('GET', $path, $handler, $middleware, $parameters);
     }
@@ -32,7 +32,7 @@ trait ResourcesTrait
      * @param array $middleware
      * @param array $parameters
      */
-    public function post(string $path, $handler, array $middleware = [], array $parameters = [])
+    public function post(string $path, string $handler, array $middleware = [], array $parameters = [])
     {
         $this->addRoute('POST', $path, $handler, $middleware, $parameters);
     }
@@ -44,7 +44,7 @@ trait ResourcesTrait
      * @param array $middleware
      * @param array $parameters
      */
-    public function put(string $path, $handler, array $middleware = [], array $parameters = [])
+    public function put(string $path, string $handler, array $middleware = [], array $parameters = [])
     {
         $this->addRoute('PUT', $path, $handler, $middleware, $parameters);
     }
@@ -56,7 +56,7 @@ trait ResourcesTrait
      * @param array $middleware
      * @param array $parameters
      */
-    public function patch(string $path, $handler, array $middleware = [], array $parameters = [])
+    public function patch(string $path, string $handler, array $middleware = [], array $parameters = [])
     {
         $this->addRoute('PATCH', $path, $handler, $middleware, $parameters);
     }
@@ -68,7 +68,7 @@ trait ResourcesTrait
      * @param array $middleware
      * @param array $parameters
      */
-    public function delete(string $path, $handler, array $middleware = [], array $parameters = [])
+    public function delete(string $path, string $handler, array $middleware = [], array $parameters = [])
     {
         $this->addRoute('DELETE', $path, $handler, $middleware, $parameters);
     }
@@ -81,7 +81,7 @@ trait ResourcesTrait
      * @param array $parameters
      * @return mixed
      */
-    public function options(string $path, $handler, array $middleware = [], array $parameters = [])
+    public function options(string $path, string $handler, array $middleware = [], array $parameters = [])
     {
         $this->addRoute('OPTIONS', $path, $handler, $middleware, $parameters);
     }
