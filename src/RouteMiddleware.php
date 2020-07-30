@@ -43,6 +43,10 @@ class RouteMiddleware implements MiddlewareInterface
      */
     public function handle(ServerRequestInterface $request, DelegateInterface $next): ResponseInterface
     {
-        return call_user_func_array($this->route->getHandler(), [$request, $next]);
+        $handler = $this->route->getHandler();
+        if (count($handler) == 1) {
+            $handler = $handler[0];
+        }
+        return call_user_func_array($handler, [$request, $next]);
     }
 }
