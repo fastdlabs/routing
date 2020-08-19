@@ -60,7 +60,7 @@ class Route
      * @param array $middlewares
      * @param array $parameters
      */
-    public function __construct(string $method, string $handler, string $regex = '', array $variables, array $middlewares = [], array $parameters = [])
+    public function __construct(string $method, string $handler, string $regex, array $variables, array $middlewares = [], array $parameters = [])
     {
         $this->method = $method;
         $this->handler = $handler;
