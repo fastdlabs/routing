@@ -149,7 +149,7 @@ class RouteDispatcher extends Dispatcher
             $response = parent::dispatch($request);
             $this->stack = $prototypeStack;
             unset($prototypeStack);
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
             $this->stack = $prototypeStack;
             unset($prototypeStack);
             throw $exception;
