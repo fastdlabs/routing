@@ -11,6 +11,7 @@ namespace FastD\Routing;
 
 use Exception;
 use FastD\Http\ServerRequest;
+use FastD\Middleware\Delegate;
 use FastD\Middleware\Dispatcher;
 use FastD\Middleware\MiddlewareInterface;
 use FastD\Routing\Exceptions\RouteException;
@@ -119,19 +120,19 @@ class RouteDispatcher extends Dispatcher
 
         foreach ($route->getMiddleware() as $middleware) {
             if ($middleware instanceof MiddlewareInterface) {
-                $this->before($middleware);
+                $prototypeStack->push($middleware);
             } else {
                 if (is_string($middleware)) {
                     if (class_exists($middleware)) {
-                        $this->before(new $middleware);
+                        $prototypeStack->push(new $middleware);
                     } elseif (isset($this->definition[$middleware])) {
                         $definition = $this->definition[$middleware];
                         if (is_array($definition)) {
                             foreach ($definition as $value) {
-                                $this->before(is_string($value) ? new $value : $value);
+                                $prototypeStack->push(is_string($value) ? new $value : $value);
                             }
                         } else {
-                            $this->before(is_string($definition) ? new $definition : $definition);
+                            $prototypeStack->push(is_string($definition) ? new $definition : $definition);
                         }
                     } else {
                         throw new \RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
@@ -143,18 +144,37 @@ class RouteDispatcher extends Dispatcher
         }
 
         // wrapper route middleware
-        $this->before(new RouteMiddleware($route));
+        $prototypeStack->push(new RouteMiddleware($route));
 
         try {
-            $response = parent::dispatch($request);
-            $this->stack = $prototypeStack;
+            $response = $this->PrototypeDispatch($prototypeStack, $request);
             unset($prototypeStack);
         } catch (\Throwable $exception) {
-            $this->stack = $prototypeStack;
             unset($prototypeStack);
             throw $exception;
         }
 
         return $response;
     }
+
+    private function PrototypeDispatch(\SplStack $stack, $request) {
+        $response = $this->PrototypeResolve($stack)->process($request);
+
+        return $response;
+    }
+
+    private function PrototypeResolve(\SplStack $stack) {
+        return $stack->isEmpty() ?
+            new Delegate(
+                function () {
+                    throw new LogicException('unresolved request: middleware stack exhausted with no result');
+                }
+            ) :
+            new Delegate(
+                function (ServerRequestInterface $request) use ($stack) {
+                    return $stack->shift()->handle($request, $this->PrototypeResolve($stack));
+                }
+            );
+    }
+
 }
