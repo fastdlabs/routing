@@ -8,15 +8,23 @@
  * @link      http://www.fast-d.cn/
  */
 
+use FastD\Http\Response;
+use FastD\Http\ServerRequest;
+use FastD\Middleware\Middleware;
+use FastD\Routing\RouteCollection;
+use FastD\Routing\RouteDispatcher;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
 include __DIR__ . '/vendor/autoload.php';
 
-$request = new \FastD\Http\ServerRequest('GET', '/g/30000');
+$request = new ServerRequest('GET', '/g/30000');
 
-class DemoHandler extends \FastD\Middleware\Middleware
+class DemoHandler extends Middleware
 {
-    public function process(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Server\RequestHandlerInterface $handler): \Psr\Http\Message\ResponseInterface
+    public function process(ServerRequestInterface $request, \Psr\Http\Server\RequestHandlerInterface $handler): ResponseInterface
     {
-        return new \FastD\Http\Response('hello');
+        return new Response('hello');
     }
 }
 
@@ -24,13 +32,13 @@ for ($n = 0; $n < 100; $n++) {
     $nRoutes = 10000;
     $nMatches = 300;
 
-    $routeCollection = new \FastD\Routing\RouteCollection();
+    $routeCollection = new RouteCollection();
 
     $startTime = microtime(true);
     for ($i = 0, $str = 'a'; $i < $nRoutes; $i++, $str++) {
         $routeCollection->addRoute('GET', '/' . $str . '/{arg}', DemoHandler::class);
     }
-    $router = new \FastD\Routing\RouteDispatcher($routeCollection);
+    $router = new RouteDispatcher($routeCollection);
     for ($i = 0; $i < $nMatches; $i++) {
         $res = $router->dispatch($request);
     }

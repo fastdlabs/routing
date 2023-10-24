@@ -16,6 +16,6 @@ class DefaultMiddleware extends \FastD\Middleware\Middleware
      */
     public function process(\Psr\Http\Message\ServerRequestInterface $serverRequest, \Psr\Http\Server\RequestHandlerInterface $delegate): \Psr\Http\Message\ResponseInterface
     {
-        echo 'default';
+         return new \FastD\Http\Response('default');
     }
 }
