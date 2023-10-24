@@ -13,13 +13,14 @@ namespace FastD\Routing;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Class RouteMiddleware
  * @package FastD\Routing
  */
-class RouteMiddleware implements \Psr\Http\Server\MiddlewareInterface
+class RouteMiddleware implements MiddlewareInterface
 {
     /**
      * @var Route
