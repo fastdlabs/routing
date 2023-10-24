@@ -17,14 +17,12 @@ class BreakerMiddleware extends Middleware
      * @param \FastD\Middleware\DelegateInterface $delegate
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(
-        \Psr\Http\Message\ServerRequestInterface $serverRequest,
-        \FastD\Middleware\DelegateInterface $delegate
-    ) {
+    public function process(\Psr\Http\Message\ServerRequestInterface $serverRequest, \Psr\Http\Server\RequestHandlerInterface $delegate): \Psr\Http\Message\ResponseInterface
+    {
         if ('break' == $serverRequest->getAttribute('name')) {
             return new Response('break');
         }
 
-        return $delegate($serverRequest)->withHeader('hello', 'world');
+        return $delegate->handle($serverRequest)->withHeader('hello', 'world');
     }
 }

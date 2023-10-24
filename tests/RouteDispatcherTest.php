@@ -53,7 +53,9 @@ class RouteDispatcherTest extends TestCase
         $d = new RouteDispatcher($collections);
         $collections->addRoute("GET", "/{name}", "RouteDispatcherTest@routeDyHandle", [AfterMiddleware::class, BeforeMiddleware::class,]);
         $response = $d->dispatch(new ServerRequest("GET", '/foo'));
-        echo $response->getBody();
+        $this->expectOutputString('after' . PHP_EOL . 'before' . PHP_EOL);
+        $this->assertEquals('hello foo', (string)$response->getBody());
+
     }
 
     public function routeHandle()

@@ -64,10 +64,10 @@ class RouteDispatcher extends Dispatcher
      * @return ResponseInterface
      * @throws Exception
      */
-    public function dispatch(ServerRequestInterface $request): ResponseInterface
+    public function dispatch(ServerRequestInterface $requestHandler): ResponseInterface
     {
-        $method = $request->getMethod();
-        $path = $request->getUri()->getPath();
+        $method = $requestHandler->getMethod();
+        $path = $requestHandler->getUri()->getPath();
         [$staticRouteMap, $variableRoutes] = $this->routeCollection->routeMaps->getRoutes();
 
         $route = null;
@@ -97,16 +97,16 @@ class RouteDispatcher extends Dispatcher
         }
 
         if (null === $route) {
-            throw new RouteNotFoundException($request->getMethod(), $request->getUri()->getPath());
+            throw new RouteNotFoundException($requestHandler->getMethod(), $requestHandler->getUri()->getPath());
         }
 
         $vars = array_merge($route->getParameters(), $vars);
         $route->setParameters($vars);
         foreach ($vars as $key => $var) {
-            $request->withAttribute($key, $var);
+            $requestHandler->withAttribute($key, $var);
         }
 
-        return $this->dispatchMiddleware($route, $request);
+        return $this->dispatchMiddleware($route, $requestHandler);
     }
 
     /**
@@ -141,7 +141,7 @@ class RouteDispatcher extends Dispatcher
      * @return ResponseInterface
      * @throws Exception
      */
-    protected function dispatchMiddleware(Route $route, ServerRequestInterface $request): ResponseInterface
+    protected function dispatchMiddleware(Route $route, ServerRequestInterface $requestHandler): ResponseInterface
     {
         $this->activeRoute = $route;
         $prototypeStack = clone $this->stack;
@@ -150,13 +150,13 @@ class RouteDispatcher extends Dispatcher
             if (!class_exists($middleware)) {
                 throw new \RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
             }
-            $this->before(new $middleware);
+            $this->push(new $middleware);
         }
 
-        $this->before(new RouteMiddleware($route));
+        $this->push(new RouteMiddleware($route));
 
         try {
-            $response = parent::dispatch($request);
+            $response = parent::dispatch($requestHandler);
             $this->stack = $prototypeStack;
             unset($prototypeStack);
         } catch (Exception $exception) {

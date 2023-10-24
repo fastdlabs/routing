@@ -11,16 +11,15 @@ declare(strict_types=1);
 namespace FastD\Routing;
 
 
-use FastD\Middleware\DelegateInterface;
-use FastD\Middleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Class RouteMiddleware
  * @package FastD\Routing
  */
-class RouteMiddleware implements MiddlewareInterface
+class RouteMiddleware implements \Psr\Http\Server\MiddlewareInterface
 {
     /**
      * @var Route
@@ -38,15 +37,15 @@ class RouteMiddleware implements MiddlewareInterface
 
     /**
      * @param ServerRequestInterface $request
-     * @param DelegateInterface $next
+     * @param RequestHandlerInterface $requestHandler
      * @return ResponseInterface
      */
-    public function handle(ServerRequestInterface $request, DelegateInterface $next): ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $requestHandler): ResponseInterface
     {
         $handler = $this->route->getHandler();
         if (count($handler) == 1) {
             $handler = $handler[0];
         }
-        return call_user_func_array($handler, [$request, $next]);
+        return call_user_func_array($handler, [$request, $requestHandler]);
     }
 }

@@ -12,10 +12,10 @@ class GlobalMiddleware extends \FastD\Middleware\Middleware
      * @param \FastD\Middleware\DelegateInterface $delegate
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(\Psr\Http\Message\ServerRequestInterface $serverRequest, \FastD\Middleware\DelegateInterface $delegate)
+    public function process(\Psr\Http\Message\ServerRequestInterface $serverRequest, \Psr\Http\Server\RequestHandlerInterface $delegate): \Psr\Http\Message\ResponseInterface
     {
         echo 'global' . PHP_EOL;
 
-        return $delegate($serverRequest);
+        return $delegate->handle($serverRequest);
     }
 }

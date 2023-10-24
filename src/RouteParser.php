@@ -9,9 +9,9 @@ class RouteParser
 {
     public const VARIABLE_REGEX = <<<'REGEX'
 \{
-    \s* ([a-zA-Z_][a-zA-Z0-9_-]*) \s*
+    ([a-zA-Z0-9_?*]*)
     (?:
-        : \s* ([^{}]*(?:\{(?-1)\}[^{}]*)*)
+        :([^{}]*(?:\{(?-1)\}[^{}]*)*)
     )?
 \}
 REGEX;

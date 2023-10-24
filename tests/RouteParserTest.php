@@ -17,5 +17,20 @@ class RouteParserTest extends TestCase
         $parser = new RouteParser();
 
         $parsed = $parser->parse("/{name}/{age}");
+
+        $this->assertEquals([
+            [
+                '/',
+                [
+                    'name',
+                    '[^/]+'
+                ],
+                '/',
+                [
+                    'age',
+                    '[^/]+'
+                ]
+            ]
+        ], $parsed);
     }
 }

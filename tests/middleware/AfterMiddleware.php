@@ -1,6 +1,5 @@
 <?php
 
-use FastD\Middleware\DelegateInterface;
 use FastD\Middleware\Middleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,10 +15,9 @@ class AfterMiddleware extends Middleware
 {
     /**
      * @param ServerRequestInterface $serverRequest
-     * @param DelegateInterface $delegate
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(ServerRequestInterface $serverRequest, DelegateInterface $delegate): ResponseInterface
+    public function process(ServerRequestInterface $serverRequest, \Psr\Http\Server\RequestHandlerInterface $delegate): ResponseInterface
     {
         $str = 'after' . PHP_EOL;
         echo $str;

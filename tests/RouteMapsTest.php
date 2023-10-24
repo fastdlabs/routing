@@ -19,11 +19,16 @@ class RouteMapsTest extends TestCase
         $parser = new RouteParser();
 
         $routeDatas = $parser->parse("/{name}/{age}");
-
+        [$static, $dynamic] = $mapper->getRoutes();
+        $this->assertEmpty($static);
+        $this->assertEmpty($dynamic);
         foreach (["GET"] as $value) {
             foreach ($routeDatas as $routeData) {
                 $mapper->addRoute($value, $routeData, '', [], []);
             }
         }
+        [$static, $dynamic] = $mapper->getRoutes();
+        $this->assertEmpty($static);
+        $this->assertNotEmpty($dynamic);
     }
 }

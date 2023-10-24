@@ -9,14 +9,13 @@ use Psr\Http\Message\ResponseInterface;
  * @link      https://www.github.com/janhuang
  * @link      http://www.fast-d.cn/
  */
-class BeforeMiddleware extends \FastD\Middleware\Middleware
+class BeforeMiddleware implements \Psr\Http\Server\MiddlewareInterface
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $serverRequest
-     * @param \FastD\Middleware\DelegateInterface $delegate
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function handle(\Psr\Http\Message\ServerRequestInterface $serverRequest, \FastD\Middleware\DelegateInterface $delegate): ResponseInterface
+    public function process(\Psr\Http\Message\ServerRequestInterface $serverRequest, \Psr\Http\Server\RequestHandlerInterface $delegate): ResponseInterface
     {
         $str = 'before' . PHP_EOL;
         echo $str;

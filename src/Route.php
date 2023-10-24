@@ -12,7 +12,7 @@ namespace FastD\Routing;
 
 
 use FastD\Routing\Exceptions\CallbackException;
-use FastD\Routing\Handle\RouteHandleInterface;
+use Psr\Http\Server\MiddlewareInterface;
 
 /**
  * Class Route
@@ -140,10 +140,10 @@ class Route
                 return [$this->handler];
             }
             $handler = new $this->handler;
-            if (!($handler instanceof RouteHandleInterface)) {
-                throw new CallbackException(sprintf('Route callback must be instance of %s', RouteHandleInterface::class));
+            if (!($handler instanceof MiddlewareInterface)) {
+                throw new CallbackException(sprintf('Route callback must be instance of %s', MiddlewareInterface::class));
             }
-            return [$handler, 'handle'];
+            return [$handler, 'process'];
         }
 
         [$handler, $callback] = explode('@', $this->handler);

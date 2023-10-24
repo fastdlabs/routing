@@ -11,8 +11,6 @@ declare(strict_types=1);
 namespace FastD\Routing;
 
 
-use FastD\Routing\Traits\ResourcesTrait;
-
 /**
  * Class RouteCollection
  *
@@ -20,8 +18,6 @@ use FastD\Routing\Traits\ResourcesTrait;
  */
 class RouteCollection
 {
-    use ResourcesTrait;
-
     /**
      * @var string
      */
@@ -52,12 +48,31 @@ class RouteCollection
     }
 
     /**
+     * @param string $method
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function addRoute(string $method, string $path, string $handler, array $middleware = [], array $parameters = []): void
+    {
+        $path = $this->currentGroupPrefix . $path;
+        $middleware = $this->currentGroupMiddleware + $middleware;
+        $routeDatas = $this->routeParser->parse($path);
+        foreach ((array) $method as $value) {
+            foreach ($routeDatas as $routeData) {
+                $this->routeMaps->addRoute($value, $routeData, $handler, $middleware, $parameters);
+            }
+        }
+    }
+
+    /**
      * @param string $prefix
      * @param callable $callable
      * @param array $middleware
      * @return RouteCollection
      */
-    public function group(string $prefix, callable $callable, $middleware = []): RouteCollection
+    public function group(string $prefix, callable $callable, array $middleware = []): RouteCollection
     {
         $previousGroupPrefix = $this->currentGroupPrefix;
         $previousGroupMiddleware = $this->currentGroupMiddleware;
@@ -71,21 +86,75 @@ class RouteCollection
     }
 
     /**
-     * @param string $method
+     * Adds a GET route to the collection
      * @param string $path
      * @param $handler
      * @param array $middleware
      * @param array $parameters
      */
-    public function addRoute(string $method, string $path, string $handler, array $middleware = [], array $parameters = [])
+    public function get(string $path, string $handler, array $middleware = [], array $parameters = []): void
     {
-        $path = $this->currentGroupPrefix . $path;
-        $middleware = $this->currentGroupMiddleware + $middleware;
-        $routeDatas = $this->routeParser->parse($path);
-        foreach ((array) $method as $value) {
-            foreach ($routeDatas as $routeData) {
-                $this->routeMaps->addRoute($value, $routeData, $handler, (array) $middleware, (array) $parameters);
-            }
-        }
+        $this->addRoute('GET', $path, $handler, $middleware, $parameters);
+    }
+
+    /**
+     * Adds a POST route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function post(string $path, string $handler, array $middleware = [], array $parameters = []): void
+    {
+        $this->addRoute('POST', $path, $handler, $middleware, $parameters);
+    }
+
+    /**
+     * Adds a PUT route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function put(string $path, string $handler, array $middleware = [], array $parameters = []): void
+    {
+        $this->addRoute('PUT', $path, $handler, $middleware, $parameters);
+    }
+
+    /**
+     * Adds a PATCH route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function patch(string $path, string $handler, array $middleware = [], array $parameters = []): void
+    {
+        $this->addRoute('PATCH', $path, $handler, $middleware, $parameters);
+    }
+
+    /**
+     * Adds a DELETE route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     */
+    public function delete(string $path, string $handler, array $middleware = [], array $parameters = []): void
+    {
+        $this->addRoute('DELETE', $path, $handler, $middleware, $parameters);
+    }
+
+    /**
+     * Adds a OPTIONS route to the collection
+     * @param string $path
+     * @param $handler
+     * @param array $middleware
+     * @param array $parameters
+     * @return mixed
+     */
+    public function options(string $path, string $handler, array $middleware = [], array $parameters = []): void
+    {
+        $this->addRoute('OPTIONS', $path, $handler, $middleware, $parameters);
     }
 }
