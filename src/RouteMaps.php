@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
-namespace FastD\Routing;
 
+namespace FastD\Routing;
 
 use FastD\Routing\Exceptions\RouteException;
 
@@ -9,23 +9,10 @@ class RouteMaps
 {
     private const ROUTES_CHUNK = 30;
 
-    /**
-     * @var array
-     */
     protected array $staticRoutes = [];
 
-    /**
-     * @var Route[][]
-     */
     protected array $methodToRegexToRoutesMap = [];
 
-    /**
-     * @param string $method
-     * @param array $routeData
-     * @param $handler
-     * @param array $middleware
-     * @param array $parameters
-     */
     public function addRoute(string $method, array $routeData, string $handler, array $middleware, array $parameters): void
     {
         if ($this->isStaticRoute($routeData)) {
@@ -35,9 +22,6 @@ class RouteMaps
         }
     }
 
-    /**
-     * @return array
-     */
     public function getRoutes(): array
     {
         if ($this->methodToRegexToRoutesMap === []) {
@@ -47,22 +31,11 @@ class RouteMaps
         return [$this->staticRoutes, $this->generateVariableRoutes()];
     }
 
-    /**
-     * @param array $routeData
-     * @return bool
-     */
     private function isStaticRoute(array $routeData): bool
     {
         return count($routeData) === 1 && is_string($routeData[0]);
     }
 
-    /**
-     * @param string $method
-     * @param array<int, mixed> $routeData
-     * @param mixed $handler
-     * @param array $middleware
-     * @param array $parameters
-     */
     private function addStaticRoute(string $method, array $routeData, $handler, array $middleware, array $parameters): void
     {
         $routeStr = $routeData[0];
@@ -98,13 +71,6 @@ class RouteMaps
         );
     }
 
-    /**
-     * @param string $httpMethod
-     * @param array<int, mixed> $routeData
-     * @param mixed $handler
-     * @param array $middleware
-     * @param array $parameters
-     */
     private function addVariableRoute(string $httpMethod, array $routeData, string $handler, array $middleware, array $parameters): void
     {
         [$regex, $variables] = $this->buildRegexForRoute($routeData);
@@ -127,11 +93,6 @@ class RouteMaps
         );
     }
 
-    /**
-     * @param mixed[] $routeData
-     *
-     * @return mixed[]
-     */
     private function buildRegexForRoute(array $routeData): array
     {
         $regex = '';
@@ -166,10 +127,6 @@ class RouteMaps
         return [$regex, $variables];
     }
 
-    /**
-     * @param string $regex
-     * @return bool
-     */
     private function regexHasCapturingGroups(string $regex): bool
     {
         if (strpos($regex, '(') === false) {
@@ -182,7 +139,7 @@ class RouteMaps
             '~
                 (?:
                     \(\?\(
-                  | \[ [^\]\\\\]* (?: \\\\ . [^\]\\\\]* )* \]
+                  | \[ [^]\\\\]* (?: \\\\ . [^]\\\\]* )* ]
                   | \\\\ .
                 ) (*SKIP)(*FAIL) |
                 \(
@@ -195,9 +152,6 @@ class RouteMaps
         );
     }
 
-    /**
-     * @return array
-     */
     private function generateVariableRoutes(): array
     {
         $data = [];
@@ -210,10 +164,6 @@ class RouteMaps
         return $data;
     }
 
-    /**
-     * @param int $count
-     * @return int
-     */
     private function computeChunkSize(int $count): int
     {
         $numParts = max(1, round($count / self::ROUTES_CHUNK));
@@ -221,10 +171,6 @@ class RouteMaps
         return (int) ceil($count / $numParts);
     }
 
-    /**
-     * @param array $regexToRoutesMap
-     * @return array
-     */
     protected function processChunk(array $regexToRoutesMap): array
     {
         $routeMap = [];

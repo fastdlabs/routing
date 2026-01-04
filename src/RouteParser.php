@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace FastD\Routing;
@@ -11,17 +12,13 @@ class RouteParser
 \{
     ([a-zA-Z0-9_?*]*)
     (?:
-        :([^{}]*(?:\{(?-1)\}[^{}]*)*)
+        :([^{}]*(?:\{(?-1)}[^{}]*)*)
     )?
-\}
+}
 REGEX;
 
     public const DEFAULT_DISPATCH_REGEX = '[^/]+';
 
-    /**
-     * @param string $path
-     * @return array
-     */
     public function parse(string $path): array
     {
         $routeWithoutClosingOptionals = rtrim($path, ']');
@@ -32,7 +29,7 @@ REGEX;
 
         if ($numOptionals !== count($segments) - 1) {
             // If there are any ] in the middle of the route, throw a more specific error message
-            if (preg_match('~' . self::VARIABLE_REGEX . '(*SKIP)(*F) | \]~x', $routeWithoutClosingOptionals)) {
+            if (preg_match('~' . self::VARIABLE_REGEX . '(*SKIP)(*F) | ]~x', $routeWithoutClosingOptionals)) {
                 throw new RouteException('Optional segments can only occur at the end of a route');
             }
 
@@ -54,11 +51,6 @@ REGEX;
         return $routeDatas;
     }
 
-    /**
-     * Parses a route string that does not contain optional segments.
-     * @param string $route
-     * @return array
-     */
     private function parsePlaceholders(string $route): array
     {
         if (! preg_match_all('~' . self::VARIABLE_REGEX . '~x', $route, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
