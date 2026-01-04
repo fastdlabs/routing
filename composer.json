@@ -3,7 +3,6 @@
     "description": "FastD routing component",
     "type": "library",
     "license": "MIT",
-    "minimum-stability": "dev",
     "keywords": [
         "routing"
     ],
@@ -18,16 +17,6 @@
         "fastd/middleware": "dev-develop",
         "fastd/http": "dev-develop"
     },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "/Users/janhuang/PhpstormProjects/fastd/http/"
-        },
-        {
-            "type": "path",
-            "url": "/Users/janhuang/PhpstormProjects/fastd/middleware/"
-        }
-    ],
     "require-dev": {
         "phpunit/phpunit": "^9.0"
     },
