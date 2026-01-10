@@ -3,6 +3,7 @@
     "description": "FastD routing component",
     "type": "library",
     "license": "MIT",
+    "minimum-stability": "dev",
     "keywords": [
         "routing"
     ],
