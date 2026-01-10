@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace collection;
+
 use FastD\Routing\Collection\RouteMaps;
 use FastD\Routing\Collection\RouteParser;
 use FastD\Routing\Exceptions\RouteException;
@@ -22,13 +24,13 @@ class RouteMapsTest extends TestCase
     {
         $routeData = ['/users'];
         $this->routeMaps->addRoute('GET', $routeData, 'UserController@index', [], []);
-        
+
         [$staticRoutes, $variableRoutes] = $this->routeMaps->getRoutes();
-        
+
         $this->assertArrayHasKey('GET', $staticRoutes);
         $this->assertArrayHasKey('/users', $staticRoutes['GET']);
         $this->assertEmpty($variableRoutes);
-        
+
         $route = $staticRoutes['GET']['/users'];
         $this->assertInstanceOf('FastD\Routing\Collection\Route', $route);
     }
@@ -37,12 +39,12 @@ class RouteMapsTest extends TestCase
     {
         $routeData = ['/', ['id', '[0-9]+']];
         $this->routeMaps->addRoute('GET', $routeData, 'UserController@show', [], []);
-        
+
         [$staticRoutes, $variableRoutes] = $this->routeMaps->getRoutes();
-        
+
         $this->assertEmpty($staticRoutes);
         $this->assertArrayHasKey('GET', $variableRoutes);
-        
+
         $routesChunk = $variableRoutes['GET'][0];
         $this->assertArrayHasKey('regex', $routesChunk);
         $this->assertArrayHasKey('routeMap', $routesChunk);

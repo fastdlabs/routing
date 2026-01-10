@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FastD\Routing;
+namespace FastD\Routing\Collection;
 
 use FastD\Routing\Exceptions\RouteException;
 
@@ -14,7 +14,7 @@ class RouteMaps
 
     protected array $methodToRegexToRoutesMap = [];
 
-    public function addRoute(string $method, array $routeData, string $handler, array $middleware, array $parameters): void
+    public function addRoute(string $method, array $routeData, $handler, array $middleware, array $parameters): void
     {
         if ($this->isStaticRoute($routeData)) {
             $this->addStaticRoute($method, $routeData, $handler, $middleware, $parameters);
@@ -51,11 +51,11 @@ class RouteMaps
 
         if (isset($this->methodToRegexToRoutesMap[$method])) {
             foreach ($this->methodToRegexToRoutesMap[$method] as $route) {
-                if ($route->matches($routeStr)) {
+                if ($route->match($routeStr)) {
                     throw new RouteException(sprintf(
                         'Static route "%s" is shadowed by previously defined variable route "%s" for method "%s"',
                         $routeStr,
-                        $route->regex,
+                        $route->getRegex(),
                         $method
                     ));
                 }
@@ -72,7 +72,7 @@ class RouteMaps
         );
     }
 
-    private function addVariableRoute(string $httpMethod, array $routeData, string $handler, array $middleware, array $parameters): void
+    private function addVariableRoute(string $httpMethod, array $routeData, $handler, array $middleware, array $parameters): void
     {
         [$regex, $variables] = $this->buildRegexForRoute($routeData);
 

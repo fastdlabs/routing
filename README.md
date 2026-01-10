@@ -6,182 +6,256 @@
 [![Latest Unstable Version](https://poser.pugx.org/fastd/routing/v/unstable)](https://packagist.org/packages/fastd/routing) 
 [![License](https://poser.pugx.org/fastd/routing/license)](https://packagist.org/packages/fastd/routing)
 
-简单的 PHP 路由器，支持路由嵌套，动态路由，模糊路由，中间件等。依赖于 [Http](https://github.com/JanHuang/http) 组件。
+FastD Routing 是一个简单而强大的 PHP 路由器，支持路由嵌套、动态路由、模糊路由、中间件等功能。它依赖于 [Http](https://github.com/JanHuang/http) 组件，遵循 PSR-7 和 PSR-15 标准。
 
-## 要求
+## 环境依赖
 
-* PHP 7.4+
+* PHP 8.2+
+* [fastd/http](https://github.com/JanHuang/http)
+* [psr/http-message](https://github.com/php-fig/http-message)
+* [psr/http-server-handler](https://github.com/php-fig/http-server-handler)
+* [psr/http-server-middleware](https://github.com/php-fig/http-server-middleware)
 
-## Composer
+## 安装
+
+通过 Composer 安装:
 
 ```
 composer require "fastd/routing"
 ```
 
-## 使用
+## 基础使用
 
 ### 静态路由
 
 ```php
 use FastD\Http\ServerRequest;
 use FastD\Routing\RouteCollection;
+use Zend\Diactoros\Response;
 
 $collection = new RouteCollection();
 
-$collection->addRoute('GET', '/', function () {
-    return 'hello world';
+$collection->addRoute('GET', '/', function (ServerRequest $request, $handler) {
+    return new Response(200, [], 'hello world');
 });
 
 $route = $collection->match(new ServerRequest('GET', '/')); // \FastD\Routing\Route
 
-echo call_user_func_array($route->getCallback(), []);
+// 执行路由回调
+$response = call_user_func_array($route->getCallback(), [$request, $handler]);
+echo $response->getBody();
 ```
-
-路由匹配并不会将路由的回调进行调用，但会返回整个 Route，方便回调处理，因此 `match` 仅返回匹配成功的路由对象
 
 ### 动态路由
 
 ```php
 use FastD\Http\ServerRequest;
 use FastD\Routing\RouteCollection;
+use Zend\Diactoros\Response;
 
 $collection = new RouteCollection();
 
-$collection->addRoute('GET', '/{name}', function ($name) {
-    return 'hello ' . $name;
+$collection->addRoute('GET', '/user/{name}', function (ServerRequest $request, $handler) {
+    $name = $request->getAttribute('name');
+    return new Response(200, [], 'hello ' . $name);
 });
 
-$route = $collection->match(new ServerRequest('GET', '/foo')); // \FastD\Routing\Route
+$route = $collection->match(new ServerRequest('GET', '/user/john'));
 
-echo call_user_func_array($route->getCallback(), $route->getParameters());
+// 获取匹配的参数
+$params = $route->getParameters(); // ['name' => 'john']
 ```
 
-在动态路由下，成功匹配的路由会将匹配成功的参数更新到 `getParameters` 中，通过 `getParameters` 获取成功匹配的参数信息。
-
-### 同个路由, 多个方法
-
-```php
-$collection = new FastD\Routing\RouteCollection();
-$collection->get('/', function () {
-    return 'hello GET';
-});
-$collection->post('/', function () {
-    return 'hello POST';
-});
-$response = $collection->dispatch('GET', '/'); // hello GET
-$response = $collection->dispatch('POST', '/'); // hello POST
-```
-
-### 混合路由
-
-在很多情况下，我们路由可能只差一个参数，以下做个例子。
+### 路由约束
 
 ```php
 use FastD\Http\ServerRequest;
 use FastD\Routing\RouteCollection;
+use Zend\Diactoros\Response;
 
 $collection = new RouteCollection();
 
-$collection->addRoute('GET', '/{name}', function () {
-    return 'get1';
+// 数字参数约束
+$collection->addRoute('GET', '/user/{id:[0-9]+}', function (ServerRequest $request, $handler) {
+    $id = $request->getAttribute('id');
+    return new Response(200, [], 'user id: ' . $id);
 });
 
-$collection->addRoute('GET', '/', function () {
-    return 'get2';
+// 字母参数约束
+$collection->addRoute('GET', '/profile/{name:[a-zA-Z]+}', function (ServerRequest $request, $handler) {
+    $name = $request->getAttribute('name');
+    return new Response(200, [], 'profile name: ' . $name);
 });
-
-$route = $collection->match(new ServerRequest('GET', '/abc')); // \FastD\Routing\Route
-$route2 = $collection->match(new ServerRequest('GET', '/')); // \FastD\Routing\Route
-echo call_user_func_array($route->getCallback(), $route->getParameters());
-echo call_user_func_array($route2->getCallback(), $route2->getParameters());
 ```
 
 ### 路由组
 
-路由组会在你每个子路由钱添加自己的路由前缀，支持多层嵌套。
-
 ```php
 use FastD\Http\ServerRequest;
 use FastD\Routing\RouteCollection;
+use Zend\Diactoros\Response;
 
 $collection = new RouteCollection();
 
-$collection->group('/v1', function (RouteCollection $collection) {
-    $collection->addRoute('GET', '/{name}', function () {
-        return 'get1';
+$collection->group('/api/v1', function (RouteCollection $collection) {
+    $collection->addRoute('GET', '/users', function (ServerRequest $request, $handler) {
+        return new Response(200, [], 'api v1 users');
+    });
+    
+    $collection->addRoute('GET', '/posts', function (ServerRequest $request, $handler) {
+        return new Response(200, [], 'api v1 posts');
     });
 });
 
-$route = $collection->match(new ServerRequest('GET', '/v1/abc'));
-
-echo call_user_func_array($route->getCallback(), $route->getParameters());
+$route = $collection->match(new ServerRequest('GET', '/api/v1/users'));
 ```
-
-### 模糊路由
-
-模糊路由的灵感来自于 Swoole http server 的 onRequest 回调中，因为每个路由入口都经过 onRequest，那么自己造的时候，可能会有一些根据 pathinfo 进行处理的特殊路由，那么此时模糊路由就可以派上用场了。
-
-```php
-use FastD\Http\ServerRequest;
-use FastD\Routing\RouteCollection;
-
-$collection = new RouteCollection();
-
-$collection->addRoute('GET', '/api/*', function ($path) {
-    return $path;
-});
-
-$route = $collection->match(new ServerRequest('GET', '/api/abc'));
-echo call_user_func_array($route->getCallback(), $route->getParameters()); // /abc
-
-$route = $collection->match(new ServerRequest('GET', '/api/cba'));
-echo call_user_func_array($route->getCallback(), $route->getParameters()); // /cba
-```
-
-匹配凡是以 `/api` 开头的所有合法路由，然后进行回调
 
 ### 路由中间件
 
-路由组件实现了路由中间件，基于 [Http](https://github.com/JanHuang/http) 和 [HTTP Middlewares](https://github.com/JanHuang/middleware) 实现。
+```php
+use FastD\Http\ServerRequest;
+use FastD\Routing\RouteCollection;
+use FastD\Routing\RouteDispatcher;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Zend\Diactoros\Response;
 
-> 路由中间件回调会自动回调 `Psr\Http\Message\ServerRequestInterface` 和 `FastD\Middleware\DelegateInterface` 两个对象作为参数。
+// 自定义中间件
+class ExampleMiddleware implements MiddlewareInterface
+{
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        // 在处理前执行的操作
+        $request = $request->withAttribute('timestamp', time());
+        
+        // 继续执行下一个中间件或路由处理器
+        $response = $handler->handle($request);
+        
+        // 在处理后执行的操作
+        return $response->withHeader('X-Middleware', 'processed');
+    }
+}
 
-中间件调用完成后，会返回 `\Psr\Http\Message\ResponseInterface` 对象，用于程序最终处理输出。
+$collection = new RouteCollection();
+
+$collection->addRoute('GET', '/middleware', function (ServerRequest $request, $handler) {
+    return new Response(200, [], 'middleware example');
+}, [
+    ExampleMiddleware::class
+]);
+
+$dispatcher = new RouteDispatcher($collection);
+
+$response = $dispatcher->dispatch(new ServerRequest('GET', '/middleware'));
+echo $response->getBody();
+```
+
+### 多层中间件示例
 
 ```php
 use FastD\Http\ServerRequest;
 use FastD\Routing\RouteCollection;
+use FastD\Routing\RouteDispatcher;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Zend\Diactoros\Response;
+
+// 定义多个中间件类
+abstract class BaseNumberMiddleware implements MiddlewareInterface
+{
+    abstract protected function getMiddlewareName(): string;
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $number = $request->getAttribute('number') ?? 0;
+        $number += 1; // 每个中间件将数字加1
+        
+        $processedHistory = $request->getAttribute('processed_history', []);
+        $processedHistory[] = [
+            'middleware' => $this->getMiddlewareName(),
+            'value' => $number
+        ];
+        
+        $request = $request->withAttribute('number', $number)
+                           ->withAttribute('processed_history', $processedHistory);
+        
+        return $handler->handle($request);
+    }
+}
+
+class NumberIncrementMiddleware1 extends BaseNumberMiddleware
+{
+    protected function getMiddlewareName(): string
+    {
+        return self::class;
+    }
+}
+
+class NumberIncrementMiddleware2 extends BaseNumberMiddleware
+{
+    protected function getMiddlewareName(): string
+    {
+        return self::class;
+    }
+}
+
+class NumberIncrementMiddleware3 extends BaseNumberMiddleware
+{
+    protected function getMiddlewareName(): string
+    {
+        return self::class;
+    }
+}
 
 $collection = new RouteCollection();
 
-$collection->addRoute('GET', '/api/*', function (ServerRequest $request) {
-    return 'hello';
-});
+$collection->addRoute('GET', '/process/{number:[0-9]+}', function (ServerRequest $request, $handler) {
+    $finalValue = $request->getAttribute('number');
+    $processedHistory = $request->getAttribute('processed_history', []);
+    
+    $data = [
+        'original_number' => $request->getAttribute('number') - count($processedHistory),
+        'final_number' => (int)$finalValue,
+        'processed_by' => $processedHistory,
+        'message' => 'Processing completed successfully'
+    ];
+    
+    $json = json_encode($data, JSON_PRETTY_PRINT);
+    return new Response(200, ['Content-Type' => 'application/json'], $json);
+}, [
+    NumberIncrementMiddleware1::class,
+    NumberIncrementMiddleware2::class,
+    NumberIncrementMiddleware3::class
+]);
 
-$dispatcher = new \FastD\Routing\RouteDispatcher($collection);
-
-$response = $dispatcher->dispatch(new ServerRequest('GET', '/api/abc'));
-
+$dispatcher = new RouteDispatcher($collection);
+$response = $dispatcher->dispatch(new ServerRequest('GET', '/process/5'));
 echo $response->getBody();
+// 输出: 原始数字5，经过3个中间件处理后变成8，同时显示每个中间件的处理过程
 ```
 
-## Testing
+## 文档
+
+更多详细文档请参阅:
+
+* [官方文档](https://github.com/JanHuang/fastD/wiki)
+* [API 参考](https://github.com/JanHuang/routing/tree/master/src)
+* [示例代码](https://github.com/JanHuang/routing/blob/master/example.php)
+
+## 测试
+
+运行单元测试:
 
 ```
 phpunit
 ```
 
-### 贡献
+## 贡献
 
-非常欢迎感兴趣，愿意参与其中，共同打造更好PHP生态，Swoole生态的开发者。
+欢迎提交 Issue 和 Pull Request 来帮助改进此项目！
 
-如果你乐于此，却又不知如何开始，可以试试下面这些事情：
+## License
 
-* 在你的系统中使用，将遇到的问题 [反馈](https://github.com/JanHuang/fastD/issues)。
-* 有更好的建议？欢迎联系 [bboyjanhuang@gmail.com](mailto:bboyjanhuang@gmail.com) 或 [新浪微博:编码侠](http://weibo.com/ecbboyjan)。
-
-### 联系
-
-如果你在使用中遇到问题，请联系: [bboyjanhuang@gmail.com](mailto:bboyjanhuang@gmail.com). 微博: [编码侠](http://weibo.com/ecbboyjan)
-
-## License MIT
+MIT License

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FastD\Routing\Dispatcher;
+namespace FastD\Routing\Middleware;
 
 use FastD\Routing\Collection\Route;
 use FastD\Routing\Exceptions\RouteCallbackException;
@@ -12,27 +12,10 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-class Matched implements MiddlewareInterface, MatchedInterface
+class RouteMiddleware implements MiddlewareInterface
 {
-    public function __construct(protected ServerRequestInterface $serverRequest, protected Route $route, protected array $matchedVars = [])
+    public function __construct(protected MatchedInterface $matched)
     {
-        // 设置匹配变量，保留预设默认和匹配变量
-        $route->setMatchedVariables($this->matchedVars);
-        $vars = array_merge($route->getParameters()['definition'] ?? [], $this->matchedVars);
-        foreach ($vars as $name => $value) {
-            // 以最终状态进行流转
-            $this->serverRequest = $this->serverRequest->withAttribute($name, $value);
-        }
-    }
-
-    public function getRoute(): Route
-    {
-        return $this->route;
-    }
-
-    public function getServerRequest(): ServerRequestInterface
-    {
-        return $this->serverRequest;
     }
 
     private function formattedRouteHandler($handler): array
@@ -81,9 +64,9 @@ class Matched implements MiddlewareInterface, MatchedInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $routeHandler = $this->formattedRouteHandler($this->route->getHandler());
+        $routeHandler = $this->formattedRouteHandler($this->matched->getRoute()->getHandler());
         // 除了 middleware 之外，其他类型参数可以动态注入
-        $parameters = 'middleware' === $routeHandler['type'] ? [$request, $handler] : array_merge([$request, $handler], $request->getAttributes());
-        return call_user_func_array($routeHandler['handler'], $parameters);
+//        $parameters = 'middleware' === $routeHandler['type'] ? [$request, $handler] : array_merge([$request, $handler], $request->getAttributes());
+        return call_user_func_array($routeHandler['handler'],  [$request, $handler]);
     }
 }

@@ -2,29 +2,39 @@
 
 declare(strict_types=1);
 
-namespace FastD\Routing;
+namespace FastD\Routing\Collection;
 
-use FastD\Routing\Exceptions\CallbackException;
-use Psr\Http\Server\MiddlewareInterface;
-
+// 路由个体，只做基础存储，不做过多解析
 class Route
 {
+    protected array $parameters = [];
+
     // 路由一旦确立之后，属性就不能通过外部进行变更，仅保留初始化赋值
     public function __construct(
         protected string $method,
-        protected string $handler,
+        protected mixed  $handler,
         protected string $regex,
         protected array  $variables,
-        protected array  $middlewares = [],
-        protected array  $parameters = []
+        protected array  $middlewares = [], // 可变
+        array $definition = [] // 默认变量参数
     )
-    {}
-
-    public function matches(string $str): bool
     {
-        $regex = '~^' . $this->regex . '$~';
+        $this->parameters['definition'] = $definition;
+    }
 
-        return (bool) preg_match($regex, $str);
+    public function getMethod(): string
+    {
+        return $this->method;
+    }
+
+    public function getRegex(): string
+    {
+        return $this->regex;
+    }
+
+    public function getVariables(): array
+    {
+        return $this->variables;
     }
 
     public function getParameters(): array
@@ -32,9 +42,10 @@ class Route
         return $this->parameters;
     }
 
-    public function setParameters(array $parameters): Route
+    // 设置匹配变量，同时保留原始变量
+    public function setMatchedVariables(array $variables): Route
     {
-        $this->parameters = $parameters;
+        $this->parameters['matched'] = $variables;
 
         return $this;
     }
@@ -58,20 +69,15 @@ class Route
         return $this->middlewares;
     }
 
-    public function getHandler(): array
+    public function getHandler(): mixed
     {
-        if (!str_contains($this->handler, '@')) {
-            if (function_exists($this->handler)) {
-                return [$this->handler];
-            }
-            $handler = new $this->handler;
-            if (!($handler instanceof MiddlewareInterface)) {
-                throw new CallbackException(sprintf('Route callback must be instance of %s', MiddlewareInterface::class));
-            }
-            return [$handler, 'process'];
-        }
+        return $this->handler;
+    }
 
-        [$handler, $callback] = explode('@', $this->handler);
-        return [new $handler, $callback];
+    public function match(string $str): bool
+    {
+        $regex = '~^' . $this->regex . '$~';
+
+        return (bool) preg_match($regex, $str);
     }
 }

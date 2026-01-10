@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FastD\Routing;
+namespace FastD\Routing\Collection;
 
 use FastD\Routing\Exceptions\RouteException;
 
