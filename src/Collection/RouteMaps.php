@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace FastD\Routing;
@@ -129,7 +130,7 @@ class RouteMaps
 
     private function regexHasCapturingGroups(string $regex): bool
     {
-        if (strpos($regex, '(') === false) {
+        if (!str_contains($regex, '(')) {
             // Needs to have at least a ( to contain a capturing group
             return false;
         }

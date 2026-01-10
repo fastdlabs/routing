@@ -20,10 +20,8 @@ class RouteCollection
         $path = $this->currentGroupPrefix . $path;
         $middleware = $this->currentGroupMiddleware + $middleware;
         $routeDatas = $this->routeParser->parse($path);
-        foreach ((array) $method as $value) {
-            foreach ($routeDatas as $routeData) {
-                $this->routeMaps->addRoute($value, $routeData, $handler, $middleware, $parameters);
-            }
+        foreach ($routeDatas as $routeData) {
+            $this->routeMaps->addRoute($method, $routeData, $handler, $middleware, $parameters);
         }
     }
 

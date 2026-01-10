@@ -9,11 +9,12 @@ use Psr\Http\Server\MiddlewareInterface;
 
 class Route
 {
+    // 路由一旦确立之后，属性就不能通过外部进行变更，仅保留初始化赋值
     public function __construct(
         protected string $method,
         protected string $handler,
-        public string    $regex,
-        public array     $variables,
+        protected string $regex,
+        protected array  $variables,
         protected array  $middlewares = [],
         protected array  $parameters = []
     )
