@@ -3,14 +3,14 @@
     "description": "FastD routing component",
     "type": "library",
     "license": "MIT",
-    "minimum-stability": "dev",
     "keywords": [
         "routing"
     ],
+    "minimum-stability": "dev",
     "authors": [
         {
-            "name": "janhuang",
-            "email": "bboyjanhuang@gmail.com"
+            "name": "JanHuang",
+            "email": "384099566@qq.com"
         }
     ],
     "require": {
