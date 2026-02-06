@@ -17,7 +17,7 @@ class RouteMatcher extends Dispatcher implements RouteMatchInterface
 {
     protected ?MatchedInterface $matched = null;
 
-    public function __construct(protected RouteCollection $routeCollection = new RouteCollection)
+    public function __construct(public readonly RouteCollection $routeCollection = new RouteCollection)
     {
         parent::__construct([]);
     }
