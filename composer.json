@@ -15,8 +15,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "fastd/middleware": "dev-develop",
-        "fastd/http": "dev-develop"
+        "fastd/middleware": "^8.0",
+        "fastd/http": "^8.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0",
