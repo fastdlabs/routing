@@ -40,6 +40,7 @@ final class ConcurrentDispatchTest extends TestCase
         $collection = new RouteCollection();
         $collection->get('/a', DemoFiberHandler::class, [DemoFiberMiddleware::class]);
         $collection->get('/b', DemoFiberHandler::class, [DemoFiberMiddleware::class]);
+        $collection->get('/plain', DemoFiberHandler::class);
 
         $matcher = new RouteMatcher($collection);
 
@@ -63,5 +64,15 @@ final class ConcurrentDispatchTest extends TestCase
         $this->assertSame('/b', $responseB->getHeaderLine('X-Fiber'));
         $this->assertTrue($fiberA->isTerminated());
         $this->assertTrue($fiberB->isTerminated());
+
+        // 共享栈不能因为请求级中间件而增长
+        $stack = new ReflectionProperty(RouteMatcher::class, 'splStack');
+        $stack->setAccessible(true);
+
+        for ($i = 0; $i < 100; $i++) {
+            $matcher->dispatch(new ServerRequest('GET', '/plain'));
+        }
+
+        $this->assertCount(0, $stack->getValue($matcher));
     }
 }
