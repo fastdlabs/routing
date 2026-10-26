@@ -29,31 +29,22 @@ class RouteMatcher extends Dispatcher implements RouteMatchInterface
 
     public function dispatch(ServerRequestInterface $serverRequest): ResponseInterface
     {
-        // 匹配路由后，会更新路由参数，请求参数，根据 psr7的约定，request 会以 clone 副本的方式返回，也就是与传入的可能存产生一定的差异，需要以 matched 的对象为准
+        // 匹配路由后，会更新路由参数、请求参数；PSR-7 请求以 clone 副本流转
         $matched = $this->match($serverRequest);
 
-        // 采用 clone 副本的方式，主要为了兼容 swoole 模式下，堆栈会被不断消费的问题
-        $prototypeStack = clone $this->splStack;
-        // wrapper route middleware
-        foreach ($matched->getRoute()->getMiddlewares() as $key => $middleware) {
+        // 请求作用域：本次 dispatch 使用独立 Dispatcher，避免并发请求
+        // 共享 RouteMatcher 的 SplStack（Swoole 协程交错时会污染中间件栈）。
+        $dispatcher = new Dispatcher([], clone $this->splStack);
+
+        foreach ($matched->getRoute()->getMiddlewares() as $middleware) {
             if (!class_exists($middleware)) {
                 throw new RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
             }
-            $this->push(new $middleware);
+            $dispatcher->push(new $middleware);
         }
-        $this->push(new RouteMiddleware($matched));
+        $dispatcher->push(new RouteMiddleware($matched));
 
-        // 调用完成后则重设中间间副本
-        try {
-            $response = parent::dispatch($matched->getServerRequest());
-            $this->splStack = $prototypeStack;
-            unset($prototypeStack);
-            return $response;
-        } catch (Throwable $throwable) {
-            $this->splStack = $prototypeStack;
-            unset($prototypeStack);
-            throw $throwable;
-        }
+        return $dispatcher->dispatch($matched->getServerRequest());
     }
 
     public function match(ServerRequestInterface $serverRequest): MatchedInterface
