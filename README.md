@@ -10,7 +10,7 @@ FastD Routing 是一个简单而强大的 PHP 路由器，支持路由嵌套、�
 
 ## 环境依赖
 
-* PHP 8.2+
+* PHP 8.4+
 * [fastd/http](https://github.com/JanHuang/http)
 * [psr/http-message](https://github.com/php-fig/http-message)
 * [psr/http-server-handler](https://github.com/php-fig/http-server-handler)
