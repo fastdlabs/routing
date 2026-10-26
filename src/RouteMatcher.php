@@ -10,6 +10,7 @@ use FastD\Routing\Middleware\RouteMiddleware;
 use FastD\Routing\Exceptions\RouteNotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Closure;
 use RuntimeException;
 use Throwable;
 
@@ -17,8 +18,10 @@ class RouteMatcher extends Dispatcher implements RouteMatchInterface
 {
     protected ?MatchedInterface $matched = null;
 
-    public function __construct(public readonly RouteCollection $routeCollection = new RouteCollection)
-    {
+    public function __construct(
+        public readonly RouteCollection $routeCollection = new RouteCollection(),
+        protected ?Closure $resolver = null,
+    ) {
         parent::__construct([]);
     }
 
@@ -40,11 +43,16 @@ class RouteMatcher extends Dispatcher implements RouteMatchInterface
             if (!class_exists($middleware)) {
                 throw new RuntimeException(sprintf('Middleware %s is not defined.', $middleware));
             }
-            $dispatcher->push(new $middleware);
+            $dispatcher->push($this->resolve($middleware));
         }
-        $dispatcher->push(new RouteMiddleware($matched));
+        $dispatcher->push(new RouteMiddleware($matched, $this->resolver));
 
         return $dispatcher->dispatch($matched->getServerRequest());
+    }
+
+    private function resolve(string $class): object
+    {
+        return $this->resolver ? ($this->resolver)($class) : new $class();
     }
 
     public function match(ServerRequestInterface $serverRequest): MatchedInterface

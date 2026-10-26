@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FastD\Routing\Middleware;
 
+use Closure;
 use FastD\Routing\Collection\Route;
 use FastD\Routing\Exceptions\RouteCallbackException;
 use FastD\Routing\MatchedInterface;
@@ -14,8 +15,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class RouteMiddleware implements MiddlewareInterface
 {
-    public function __construct(protected MatchedInterface $matched)
+    public function __construct(protected MatchedInterface $matched, protected ?Closure $resolver = null)
     {
+    }
+
+    protected function resolve(string $class): object
+    {
+        return $this->resolver ? ($this->resolver)($class) : new $class();
     }
 
     private function formattedRouteHandler($handler): array
@@ -27,7 +33,7 @@ class RouteMiddleware implements MiddlewareInterface
                 if (class_exists($className) && method_exists($className, $methodName)) {
                     return [
                         'type' => 'class',
-                        'handler' => [new $className, $methodName],
+                        'handler' => [$this->resolve($className), $methodName],
                     ];
                 }
                 throw new RouteCallbackException(sprintf('Handler %s or method %s does not exist', $className, $methodName));
@@ -37,7 +43,7 @@ class RouteMiddleware implements MiddlewareInterface
             if (class_exists($handler) && is_subclass_of($handler, MiddlewareInterface::class)) {
                 return [
                     'type' => 'middleware',
-                    'handler' => [new $handler, 'process']
+                    'handler' => [$this->resolve($handler), 'process']
                 ];
             }
 
