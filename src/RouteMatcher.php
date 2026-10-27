@@ -20,7 +20,7 @@ class RouteMatcher extends Dispatcher implements RouteMatchInterface
 
     public function __construct(
         public readonly RouteCollection $routeCollection = new RouteCollection(),
-        protected ?Closure $resolver = null,
+        public readonly ?Closure $resolver = null,
     ) {
         parent::__construct([]);
     }
