@@ -38,12 +38,6 @@ class RouteMatcherTest extends TestCase
         $matcher = new RouteMatcher();
         
         $this->assertInstanceOf(RouteMatcher::class, $matcher);
-        $this->assertNull($matcher->getMatched());
-    }
-
-    public function testGetMatchedReturnsNullInitially(): void
-    {
-        $this->assertNull($this->routeMatcher->getMatched());
     }
 
     public function testMatchReturnsMatchedInterface(): void
@@ -54,7 +48,6 @@ class RouteMatcherTest extends TestCase
         $matched = $this->routeMatcher->match($request);
         
         $this->assertInstanceOf(MatchedInterface::class, $matched);
-        $this->assertSame($matched, $this->routeMatcher->getMatched());
     }
 
     public function testMatchStaticRouteSuccessfully(): void
@@ -265,16 +258,17 @@ class RouteMatcherTest extends TestCase
         $this->assertLessThan(0.5, $executionTime, "Multiple matches took too long: {$executionTime}s");
     }
 
-    public function testMatchUpdatesMatchedProperty(): void
+    public function testMatchReturnsIndependentInstances(): void
     {
-        $this->routeCollection->get('/test', 'TestController@index');
-        $request = new ServerRequest('GET', '/test');
-        
-        $this->assertNull($this->routeMatcher->getMatched());
-        
-        $matched = $this->routeMatcher->match($request);
-        
-        $this->assertSame($matched, $this->routeMatcher->getMatched());
+        $this->routeCollection->get('/first', 'FirstController@index');
+        $this->routeCollection->get('/second', 'SecondController@index');
+
+        $first = $this->routeMatcher->match(new ServerRequest('GET', '/first'));
+        $second = $this->routeMatcher->match(new ServerRequest('GET', '/second'));
+
+        $this->assertNotSame($first, $second);
+        $this->assertSame('/first', $first->getServerRequest()->getUri()->getPath());
+        $this->assertSame('/second', $second->getServerRequest()->getUri()->getPath());
     }
 
     public function testMultipleSequentialMatches(): void
@@ -296,8 +290,6 @@ class RouteMatcherTest extends TestCase
         $thirdMatched = $this->routeMatcher->match($thirdRequest);
         $this->assertEquals('ThirdController@index', $thirdMatched->getRoute()->getHandler());
         
-        // 最后的匹配应该是当前的 matched
-        $this->assertSame($thirdMatched, $this->routeMatcher->getMatched());
     }
 }
 
