@@ -1,6 +1,6 @@
 # FastD Routing
 
-[![Build Status](https://travis-ci.org/fastdlabs/routing.svg?branch=master)](https://travis-ci.org/fastdlabs/routing)
+[![CI](https://github.com/fastdlabs/routing/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/fastdlabs/routing/actions/workflows/ci.yml)
 [![Latest Stable Version](https://poser.pugx.org/fastd/routing/v/stable)](https://packagist.org/packages/fastd/routing)
 [![Total Downloads](https://poser.pugx.org/fastd/routing/downloads)](https://packagist.org/packages/fastd/routing)
 [![Latest Unstable Version](https://poser.pugx.org/fastd/routing/v/unstable)](https://packagist.org/packages/fastd/routing)
