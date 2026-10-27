@@ -1,6 +1,6 @@
 {
     "name": "fastd/routing",
-    "description": "FastD routing component",
+    "description": "PSR-7/PSR-15 router with nested routes, middleware and resolver support.",
     "type": "library",
     "license": "MIT",
     "keywords": [
