@@ -16,18 +16,11 @@ use Throwable;
 
 class RouteMatcher extends Dispatcher implements RouteMatchInterface
 {
-    protected ?MatchedInterface $matched = null;
-
     public function __construct(
         public readonly RouteCollection $routeCollection = new RouteCollection(),
         public readonly ?Closure $resolver = null,
     ) {
         parent::__construct([]);
-    }
-
-    public function getMatched(): ?MatchedInterface
-    {
-        return $this->matched;
     }
 
     public function dispatch(ServerRequestInterface $serverRequest): ResponseInterface
@@ -91,9 +84,7 @@ class RouteMatcher extends Dispatcher implements RouteMatchInterface
             throw new RouteNotFoundException($serverRequest->getMethod(), $serverRequest->getUri()->getPath());
         }
 
-        $this->matched = new Matched($serverRequest, $route, $vars);
-
-        return $this->matched;
+        return new Matched($serverRequest, $route, $vars);
     }
 
     protected function matchVariableRoute(array $routeData, string $uri): array
