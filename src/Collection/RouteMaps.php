@@ -183,7 +183,7 @@ class RouteMaps
             //$routeMap[$markName] = [$route->handler, $route->variables];
             $routeMap[$markName] = $route;
 
-            ++$markName;
+            $markName = str_increment($markName);
         }
 
         $regex = '~^(?|' . implode('|', $regexes) . ')$~';
