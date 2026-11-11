@@ -279,4 +279,24 @@ class RouteMapsTest extends TestCase
 
         $this->assertArrayHasKey('/admin/dashboard/reports/daily', $staticRoutes['GET']);
     }
+
+    public function testVariableRouteMarkersUseStringIncrement(): void
+    {
+        for ($i = 1; $i <= 3; $i++) {
+            $this->routeMaps->addRoute(
+                'GET',
+                ['/api/items/', ['id' . $i, '[0-9]{' . $i . '}']],
+                'ItemController@show' . $i,
+                [],
+                []
+            );
+        }
+
+        [, $variableRoutes] = $this->routeMaps->getRoutes();
+        $chunk = $variableRoutes['GET'][0];
+
+        $this->assertSame(['a', 'b', 'c'], array_keys($chunk['routeMap']));
+        $this->assertStringContainsString('(*MARK:a)', $chunk['regex']);
+        $this->assertStringContainsString('(*MARK:c)', $chunk['regex']);
+    }
 }
